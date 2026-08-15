@@ -9,6 +9,10 @@ import { DepthField, type PlateMode } from './layouts/DepthField'
 import { SlideView } from './layouts/SlideView'
 import styles from './Shell.module.css'
 
+function holdsCopy(slide?: Slide) {
+  return Boolean(slide && !slide.enterHit && (slide.enterDelay || slide.enterBlack))
+}
+
 function plateState(slide: Slide, last: Slide['image']) {
   const hide =
     slide.motif === 'color-reveal' ||
@@ -72,10 +76,27 @@ export function Shell() {
   }
 
   const plate = plateState(slide, lastImage.current)
-  const [copyOn, setCopyOn] = useState(true)
-  const [blackout, setBlackout] = useState(false)
+  const [gateId, setGateId] = useState(slide.id)
+  const [copyOn, setCopyOn] = useState(() => !holdsCopy(slide))
+  const [blackout, setBlackout] = useState(() => Boolean(slide.enterBlack))
   const [blackoutCut, setBlackoutCut] = useState(false)
   const leavingRef = useRef(false)
+
+  if (slide.id !== gateId) {
+    setGateId(slide.id)
+    if (slide.enterHit) {
+      setCopyOn(true)
+      setBlackoutCut(true)
+      setBlackout(false)
+    } else if (holdsCopy(slide)) {
+      setCopyOn(false)
+      setBlackout(Boolean(slide.enterBlack))
+      setBlackoutCut(false)
+    } else {
+      setCopyOn(true)
+      setBlackoutCut(false)
+    }
+  }
 
   useEffect(() => {
     const href = slides.find((s) => s.id === 'cabinet-hit')?.image?.src
@@ -96,17 +117,15 @@ export function Shell() {
       return
     }
     if (slide?.enterHit) {
-      setCopyOn(true)
       setBlackoutCut(true)
       setBlackout(false)
       const clear = window.setTimeout(() => setBlackoutCut(false), 80)
       return () => window.clearTimeout(clear)
     }
-    if (!slide?.enterDelay && !slide?.enterBlack) {
+    if (!holdsCopy(slide)) {
       setCopyOn(true)
       return
     }
-    setCopyOn(false)
     if (slide.enterBlack) setBlackout(true)
     const timer = window.setTimeout(() => {
       setBlackout(false)

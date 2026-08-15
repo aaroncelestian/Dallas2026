@@ -20,11 +20,13 @@ function Rise({
   children,
   delay = 0,
   className,
+  snap = false,
 }: {
   active: boolean
   children: React.ReactNode
   delay?: number
   className?: string
+  snap?: boolean
 }) {
   const reduced = usePrefersReducedMotion()
   if (reduced) return <div className={className}>{children}</div>
@@ -34,7 +36,11 @@ function Rise({
       initial={false}
       animate={active ? 'show' : 'hidden'}
       variants={rise}
-      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay }}
+      transition={{
+        duration: snap ? 0 : 0.7,
+        ease: [0.16, 1, 0.3, 1],
+        delay: snap ? 0 : delay,
+      }}
     >
       {children}
     </motion.div>
@@ -137,13 +143,14 @@ export function SlideView({
   }
 
   if (slide.layout === 'monument') {
+    const snap = Boolean(slide.copySnap)
     return (
       <div className={styles.monument}>
-        <Rise active={copyActive}>
+        <Rise active={copyActive} snap={snap}>
           {slide.heroNum && <div className={styles.monumentYear}>{slide.heroNum}</div>}
         </Rise>
         {slide.subtitle && (
-          <Rise active={copyActive} delay={copyActive ? 0.18 : 0}>
+          <Rise active={copyActive} snap={snap} delay={copyActive && !snap ? 0.18 : 0}>
             <p className={styles.monumentLine}>{slide.subtitle}</p>
           </Rise>
         )}

@@ -63,6 +63,8 @@ export interface Slide {
   enterBlack?: boolean
   /** Arrive from black as a hard hit — do not lift the blackout first. */
   enterHit?: boolean
+  /** Type cuts on and off. No fade. */
+  copySnap?: boolean
   splitFlip?: boolean
   notes?: string
 }
@@ -144,6 +146,7 @@ export const slides: Slide[] = [
     subtitle: 'Four centuries. One cabinet.',
     enterDelay: 2,
     exitHold: 2,
+    copySnap: true,
     notes:
       'Papal cabinet specimen — acquired for curiosity, princely display, natural philosophy. Asked later to answer under instruments nobody in 1620 could imagine. A specimen’s use is not fixed at acquisition. This is the talk in miniature. Then the cabinet hits. Don’t caption it.',
   },
