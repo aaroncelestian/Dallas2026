@@ -19,6 +19,46 @@ export type DepthFieldProps = {
   children?: React.ReactNode
 }
 
+function useEdgeExtend(src: string, enabled: boolean) {
+  const [edges, setEdges] = useState<{ left: string; right: string } | null>(null)
+
+  useEffect(() => {
+    if (!enabled) {
+      setEdges(null)
+      return
+    }
+
+    let dead = false
+    const img = new Image()
+    img.src = src
+
+    const paint = () => {
+      if (dead || !img.naturalWidth) return
+      const w = img.naturalWidth
+      const h = img.naturalHeight
+      const sw = Math.max(16, Math.round(w * 0.03))
+      const ctxFor = (sx: number) => {
+        const canvas = document.createElement('canvas')
+        canvas.width = sw
+        canvas.height = h
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return ''
+        ctx.drawImage(img, sx, 0, sw, h, 0, 0, sw, h)
+        return canvas.toDataURL('image/jpeg', 0.75)
+      }
+      setEdges({ left: ctxFor(0), right: ctxFor(w - sw) })
+    }
+
+    if (img.complete) paint()
+    else img.onload = paint
+    return () => {
+      dead = true
+    }
+  }, [src, enabled])
+
+  return edges
+}
+
 export function DepthField({
   src,
   alt,
@@ -33,6 +73,7 @@ export function DepthField({
   const present = isPresentMode()
   const rootRef = useRef<HTMLDivElement>(null)
   const [ready, setReady] = useState(false)
+  const edges = useEdgeExtend(src, fit === 'contain')
 
   const px = useSpring(0, { stiffness: 28, damping: 24, mass: 0.8 })
   const py = useSpring(0, { stiffness: 28, damping: 24, mass: 0.8 })
@@ -95,6 +136,13 @@ export function DepthField({
             y: present || reduced ? 0 : py,
           }}
         >
+          {edges && (
+            <div className={styles.edgeField} aria-hidden>
+              <img src={edges.left} alt="" className={styles.edgeBleed} data-side="left" />
+              <img src={edges.right} alt="" className={styles.edgeBleed} data-side="right" />
+              <div className={styles.floorWash} />
+            </div>
+          )}
           <div className={styles.backPlate} aria-hidden>
             <img src={src} alt="" />
           </div>

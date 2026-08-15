@@ -49,7 +49,13 @@ export interface Slide {
   meta?: string
   ghostNum?: string
   heroNum?: string
-  image?: { src: string; alt: string; fit?: 'cover' | 'contain' }
+  image?: {
+    src: string
+    alt: string
+    fit?: 'cover' | 'contain'
+    /** Normalized crop the impact hold should fill. */
+    focus?: { x: number; y: number; w: number; h: number }
+  }
   motif?: MotifKind
   yaw?: 1 | -1
   camera?: CameraKind
@@ -107,6 +113,7 @@ export const slides: Slide[] = [
       fit: 'contain',
     },
     yaw: 1,
+    exitHold: 1,
     notes:
       'Title card only. The thesis stays in your mouth, not on the wall: acquisition is a bet on future analytical capacity — and on how the public learns to see.',
   },
@@ -117,9 +124,9 @@ export const slides: Slide[] = [
     layout: 'void',
     camera: 'drift',
     title: 'Why keep a mineral\nno one yet knows\nhow to use?',
-    enterDelay: 1,
     exitHold: 1,
     enterBlack: true,
+    copySnap: true,
     notes:
       'Open verbatim with the abstract line. Add, spoken: or put on public display? Don’t answer. Promise two answers that turn out to be the same answer.',
   },
@@ -130,9 +137,9 @@ export const slides: Slide[] = [
     layout: 'void',
     camera: 'drift',
     title: 'I’ll answer twice.',
-    enterDelay: 1,
-    exitHold: 1,
+    exitHold: 2,
     enterBlack: true,
+    copySnap: true,
     notes:
       'Once through research. Once through exhibition. Both answers converge. Then go to 1620.',
   },
@@ -144,26 +151,32 @@ export const slides: Slide[] = [
     camera: 'pull',
     heroNum: '1620',
     subtitle: 'Four centuries. One cabinet.',
-    enterDelay: 2,
-    exitHold: 2,
+    exitHold: 1,
     copySnap: true,
     notes:
-      'Papal cabinet specimen — acquired for curiosity, princely display, natural philosophy. Asked later to answer under instruments nobody in 1620 could imagine. A specimen’s use is not fixed at acquisition. This is the talk in miniature. Then the cabinet hits. Don’t caption it.',
+      'Papal cabinet specimen — acquired for curiosity, princely display, natural philosophy. Asked later to answer under instruments nobody in 1620 could imagine. A specimen’s use is not fixed at acquisition. This is the talk in miniature. Then the doorway hits. Don’t caption it.',
   },
   {
     id: 'cabinet-hit',
-    label: 'The cabinet',
+    label: 'The doorway',
     chapter: 'open',
     layout: 'impact',
     enterHit: true,
     clearPlate: true,
     image: {
-      src: asset('images/cabinet-borghese.jpg'),
-      alt: 'The Borghese-Windsor Cabinet',
+      src: asset('images/cabinet-windsor.webp'),
+      alt: 'Central doorway of the Borghese-Windsor Cabinet',
       fit: 'contain',
+      focus: { x: 0.348, y: 0.427, w: 0.342, h: 0.177 },
     },
+    bullets: [
+      'Made for Pope Paul V',
+      'Agate — Lapis — Ebony',
+      'Fact 3',
+      'Fact 4',
+    ],
     notes:
-      'Boom. Hardlines first, then the cabinet in your face, then it pulls back to the whole object. Do not name it yet. This is the tone for the rest of the night. Hold. Then Act I.',
+      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Five seconds. Then it pulls back and it is a cabinet. Speak the facts as they appear. Fact 3 and Fact 4 are still placeholders. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
   },
 
   // ── Act I ─────────────────────────────────────────────

@@ -4,13 +4,13 @@ import { slides, CHAPTERS, type CameraKind, type Slide } from '../data/slides'
 import { useActiveSlide, usePrefersReducedMotion } from '../hooks/useActiveSlide'
 import { useViewportHeight } from '../hooks/useViewportHeight'
 import { NavContext } from '../hooks/useSlideNav'
-import { exitPresent, fillAvailableScreen, isPresentMode, openPresentWindow } from '../lib/asset'
+import { exitPresent, fillAvailableScreen, isPresentMode, openPresentWindow, openPrintView } from '../lib/asset'
 import { DepthField, type PlateMode } from './layouts/DepthField'
 import { SlideView } from './layouts/SlideView'
 import styles from './Shell.module.css'
 
 function holdsCopy(slide?: Slide) {
-  return Boolean(slide && !slide.enterHit && (slide.enterDelay || slide.enterBlack))
+  return Boolean(slide && !slide.enterHit && (slide.enterDelay ?? 0) > 0)
 }
 
 function plateState(slide: Slide, last: Slide['image']) {
@@ -19,6 +19,8 @@ function plateState(slide: Slide, last: Slide['image']) {
     slide.motif === 'prep-modes' ||
     slide.clearPlate ||
     slide.layout === 'impact' ||
+    slide.layout === 'void' ||
+    slide.layout === 'monument' ||
     slide.enterHit
   if (hide) return { image: last, mode: 'hidden' as const }
   if (slide.image) return { image: slide.image, mode: 'live' as PlateMode }
@@ -124,6 +126,24 @@ export function Shell() {
     }
     if (!holdsCopy(slide)) {
       setCopyOn(true)
+      if (slide?.enterBlack) {
+        setBlackoutCut(true)
+        let cancelled = false
+        let cutTimer = 0
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (cancelled) return
+            setBlackout(false)
+            cutTimer = window.setTimeout(() => {
+              if (!cancelled) setBlackoutCut(false)
+            }, 80)
+          })
+        })
+        return () => {
+          cancelled = true
+          window.clearTimeout(cutTimer)
+        }
+      }
       return
     }
     if (slide.enterBlack) setBlackout(true)
@@ -142,12 +162,17 @@ export function Shell() {
       if (!current?.exitHold || reduced) return false
       leavingRef.current = true
       setCopyOn(false)
+      setBlackoutCut(true)
       setBlackout(true)
       window.setTimeout(() => {
         leavingRef.current = false
-        if (!slides[to]?.enterBlack && !slides[to]?.enterHit) setBlackout(false)
+        const next = slides[to]
+        if (!next?.enterBlack && !next?.enterHit) {
+          setBlackoutCut(true)
+          setBlackout(false)
+        }
         goTo(to, 'auto', true)
-      }, 800 + current.exitHold * 1000)
+      }, current.exitHold * 1000)
       return true
     }
   }, [goTo, reduced])
@@ -276,7 +301,7 @@ export function Shell() {
     }
   }, [])
 
-  const hard = reduced || Boolean(slide?.enterHit)
+  const hard = reduced || Boolean(slide?.enterHit || slide?.enterBlack || slide?.copySnap)
   const cut = {
     initial: hard ? { opacity: 1 } : { opacity: 0 },
     animate: { opacity: 1 },
@@ -304,7 +329,7 @@ export function Shell() {
           {__BUILD_ID__}
         </div>
 
-        <AnimatePresence mode="sync">
+        <AnimatePresence mode={hard ? 'wait' : 'sync'}>
           <motion.section
             key={slide.id}
             className={`${styles.slide} ${slide.layout}`}
@@ -376,6 +401,15 @@ export function Shell() {
           title="Stage window for Zoom (P)"
         >
           Stage
+        </button>
+        <button
+          type="button"
+          className={styles.fullscreenBtn}
+          onClick={() => openPrintView()}
+          aria-label="Open speaker script"
+          title="Print script — copy for AI or save as PDF"
+        >
+          Print
         </button>
         {fullscreen && (
           <button

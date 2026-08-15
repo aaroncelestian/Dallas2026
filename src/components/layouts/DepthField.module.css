@@ -5,6 +5,10 @@
   background: #000;
 }
 
+.root[data-fit='contain'] {
+  background: #0c0c0d;
+}
+
 .perspective {
   position: absolute;
   inset: 0;
@@ -145,7 +149,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6vh 6vw;
+  padding: 0 4vw;
 }
 
 .root[data-fit='contain'] .fore img {
@@ -154,12 +158,64 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 24px 60px rgba(0, 0, 0, 0.55));
 }
 
 .root[data-fit='contain'] .backPlate {
-  opacity: 0.34;
-  filter: blur(40px) saturate(1.25) brightness(0.4);
+  display: none;
+}
+
+.root[data-fit='contain'] .midGlow {
+  background:
+    radial-gradient(
+      ellipse 58% 50% at 50% 48%,
+      transparent 0%,
+      color-mix(in srgb, #000 12%, transparent) 72%,
+      color-mix(in srgb, #000 28%, transparent) 100%
+    );
+}
+
+.edgeField {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateZ(-80px);
+}
+
+.edgeBleed {
+  position: absolute;
+  top: -8%;
+  height: 116%;
+  width: 52%;
+  max-width: none;
+  object-fit: fill;
+  filter: blur(36px) saturate(1.08) brightness(1.04);
+}
+
+.edgeBleed[data-side='left'] {
+  left: 0;
+  transform-origin: left center;
+}
+
+.edgeBleed[data-side='right'] {
+  right: 0;
+  transform-origin: right center;
+}
+
+.floorWash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 88% 46% at 50% 100%,
+      rgba(36, 32, 28, 0.42) 0%,
+      transparent 68%
+    );
+}
+
+.root[data-mode='ghost'] .edgeField {
+  opacity: 0.4;
+  filter: saturate(0.45) brightness(0.55);
 }
 
 .sheen {
@@ -206,6 +262,15 @@
       ellipse 72% 68% at 50% 46%,
       transparent 36%,
       color-mix(in srgb, #000 48%, transparent) 100%
+    );
+}
+
+.root[data-fit='contain'] .vignette {
+  background:
+    radial-gradient(
+      ellipse 92% 82% at 50% 48%,
+      transparent 58%,
+      color-mix(in srgb, #000 22%, transparent) 100%
     );
 }
 

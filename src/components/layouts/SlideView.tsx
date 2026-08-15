@@ -39,7 +39,7 @@ function Rise({
       transition={{
         duration: snap ? 0 : 0.7,
         ease: [0.16, 1, 0.3, 1],
-        delay: snap ? 0 : delay,
+        delay: snap || !active ? 0 : delay,
       }}
     >
       {children}
@@ -106,6 +106,8 @@ export function SlideView({
         src={slide.image?.src ?? ''}
         alt={slide.image?.alt ?? 'Cabinet'}
         active={active}
+        facts={slide.bullets}
+        focus={slide.image?.focus}
       />
     )
   }
@@ -130,7 +132,7 @@ export function SlideView({
   if (slide.layout === 'void') {
     return (
       <div className={styles.voidSlide}>
-        <Rise active={copyActive} className={styles.voidInner}>
+        <Rise active={copyActive} snap={Boolean(slide.copySnap)} className={styles.voidInner}>
           <Kicker text={slide.kicker} />
           {slide.title && (
             <h2 className={styles.voidTitle}>
@@ -189,7 +191,7 @@ export function SlideView({
           />
         )}
         <div className={styles.coverScrim} aria-hidden />
-        <Rise active={active} delay={0.15} className={styles.coverContent}>
+        <Rise active={copyActive} delay={0.15} className={styles.coverContent}>
           {slide.brand && <div className={styles.brand}>{slide.brand}</div>}
           {slide.displayTitle && (
             <h1 className={styles.display}>
@@ -197,7 +199,11 @@ export function SlideView({
             </h1>
           )}
         </Rise>
-        {slide.meta && <div className={styles.meta}>{slide.meta}</div>}
+        {slide.meta && (
+          <Rise active={copyActive} delay={0.28} className={styles.meta}>
+            {slide.meta}
+          </Rise>
+        )}
       </div>
     )
   }

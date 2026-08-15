@@ -36,6 +36,7 @@ That launches Chrome/Edge as an app window (`--app`), which is the cleanest shar
 | `Home` / `End` | First / last |
 | `P` | Open stage window (share this in Zoom) |
 | `Esc` or `P` again | Leave stage / close the stage window |
+| Print button | Speaker script — copy for an AI, or print / save as PDF |
 | `Shift+F` | Native fullscreen (breaks Zoom window-share) |
 | `Enter` or `R` | Blue Wave color reveal (on that beat) |
 | `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
