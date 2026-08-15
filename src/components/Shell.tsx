@@ -3,7 +3,7 @@ import { slides, CHAPTERS } from '../data/slides'
 import { useActiveSlide } from '../hooks/useActiveSlide'
 import { useViewportHeight } from '../hooks/useViewportHeight'
 import { NavContext } from '../hooks/useSlideNav'
-import { isPresentMode } from '../lib/asset'
+import { exitPresent, fillAvailableScreen, isPresentMode, openPresentWindow } from '../lib/asset'
 import { SlideView } from './layouts/SlideView'
 import styles from './Shell.module.css'
 
@@ -37,12 +37,14 @@ export function Shell() {
 
   useViewportHeight()
 
+  const presenting = isPresentMode()
+
   useEffect(() => {
-    if (isPresentMode()) {
-      document.documentElement.setAttribute('data-present', '')
-    }
+    if (!presenting) return
+    document.documentElement.setAttribute('data-present', '')
+    fillAvailableScreen()
     return () => document.documentElement.removeAttribute('data-present')
-  }, [])
+  }, [presenting])
 
   useEffect(() => {
     let timer = 0
@@ -50,7 +52,7 @@ export function Shell() {
       document.documentElement.style.cursor = ''
       window.clearTimeout(timer)
       timer = window.setTimeout(() => {
-        if (getFullscreenElement() || isPresentMode()) {
+        if (getFullscreenElement() || presenting) {
           document.documentElement.style.cursor = 'none'
         }
       }, 2200)
@@ -61,7 +63,7 @@ export function Shell() {
       window.clearTimeout(timer)
       document.documentElement.style.cursor = ''
     }
-  }, [])
+  }, [presenting])
 
   const activeIndexRef = useRef(activeIndex)
   activeIndexRef.current = activeIndex
@@ -107,7 +109,6 @@ export function Shell() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'f' && e.key !== 'F') return
       if (e.metaKey || e.ctrlKey || e.altKey) return
       const tag = (e.target as HTMLElement)?.tagName
       const editable =
@@ -116,12 +117,30 @@ export function Shell() {
         tag === 'SELECT' ||
         (e.target as HTMLElement)?.isContentEditable
       if (editable) return
+
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        if (presenting) exitPresent()
+        return
+      }
+
+      if (e.key === 'p' || e.key === 'P') {
+        e.preventDefault()
+        if (presenting) exitPresent()
+        else openPresentWindow()
+        return
+      }
+
+      if (e.key !== 'f' && e.key !== 'F') return
       e.preventDefault()
-      void toggleFullscreen()
+      // Native fullscreen breaks Zoom window-share. Shift+F only, if you
+      // are projecting the laptop itself and not sharing a window.
+      if (e.shiftKey) void toggleFullscreen()
+      else if (!presenting) openPresentWindow()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [toggleFullscreen])
+  }, [presenting, toggleFullscreen])
 
   useEffect(() => {
     let timer = 0
@@ -158,6 +177,8 @@ export function Shell() {
         ))}
       </div>
 
+      {!presenting && (
+      <>
       <nav className={styles.nav} aria-label="Slide progress">
         {slides.map((s, i) => (
           <button
@@ -193,14 +214,27 @@ export function Shell() {
         <button
           type="button"
           className={styles.fullscreenBtn}
-          onClick={() => void toggleFullscreen()}
-          aria-pressed={fullscreen}
-          aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-          title={fullscreen ? 'Exit fullscreen (F)' : 'Fullscreen (F)'}
+          onClick={() => openPresentWindow()}
+          aria-label="Open stage window"
+          title="Stage window for Zoom (P)"
         >
-          {fullscreen ? 'Exit full screen' : 'Full screen'}
+          Stage
         </button>
+        {fullscreen && (
+          <button
+            type="button"
+            className={styles.fullscreenBtn}
+            onClick={() => void toggleFullscreen()}
+            aria-pressed
+            aria-label="Exit fullscreen"
+            title="Exit fullscreen (Shift+F)"
+          >
+            Exit full screen
+          </button>
+        )}
       </div>
+      </>
+      )}
     </NavContext.Provider>
   )
 }

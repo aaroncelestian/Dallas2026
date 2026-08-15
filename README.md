@@ -13,13 +13,19 @@ npm run dev
 
 Open the URL Vite prints (usually `http://localhost:5173`).
 
-### Present mode
+### Stage window (Zoom)
 
-Append `?present=1` to disable mouse parallax and hide chrome until hover:
+Do **not** use browser fullscreen — Zoom keeps sharing the old window and the slides freeze.
 
-`http://localhost:5173/?present=1`
+From the rehearsal tab, press **P** (or click **Stage**). That opens a chrome-less window: slides only, no tabs, no URL, no buttons. In Zoom, share **that window**.
 
-Then press **F** for fullscreen.
+Or, with the server already running:
+
+```bash
+npm run stage
+```
+
+That launches Chrome/Edge as an app window (`--app`), which is the cleanest share.
 
 ## Present keys
 
@@ -28,7 +34,9 @@ Then press **F** for fullscreen.
 | `→` `↓` `Space` `PageDown` | Next beat |
 | `←` `↑` `PageUp` | Previous |
 | `Home` / `End` | First / last |
-| `F` | Fullscreen toggle |
+| `P` | Open stage window (share this in Zoom) |
+| `Esc` or `P` again | Leave stage / close the stage window |
+| `Shift+F` | Native fullscreen (breaks Zoom window-share) |
 | `Enter` or `R` | Blue Wave color reveal (on that beat) |
 | `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
 

@@ -182,28 +182,20 @@
   border-color: color-mix(in srgb, var(--color-text) 35%, var(--color-divider));
 }
 
-:global(html[data-present]) .nav,
-:global(html[data-present]) .toc,
-:global(html[data-present]) .chrome,
-:global(html[data-fullscreen]) .nav,
-:global(html[data-fullscreen]) .toc,
-:global(html[data-fullscreen]) .chrome {
-  opacity: 0;
+:global(html[data-present]) {
+  overflow: hidden;
 }
 
-:global(html[data-present]) .nav:hover,
-:global(html[data-present]) .toc:hover,
-:global(html[data-present]) .chrome:hover,
-:global(html[data-present]) .nav:focus-within,
-:global(html[data-present]) .toc:focus-within,
-:global(html[data-present]) .chrome:focus-within,
-:global(html[data-fullscreen]) .nav:hover,
-:global(html[data-fullscreen]) .toc:hover,
-:global(html[data-fullscreen]) .chrome:hover,
-:global(html[data-fullscreen]) .nav:focus-within,
-:global(html[data-fullscreen]) .toc:focus-within,
-:global(html[data-fullscreen]) .chrome:focus-within {
-  opacity: 1;
+:global(html[data-present]) .shell {
+  scrollbar-width: none;
+}
+
+:global(html[data-present]) .shell::-webkit-scrollbar {
+  display: none;
+}
+
+:global(html[data-present]) .slideInner {
+  max-width: none;
 }
 
 @media (max-width: 700px) {
