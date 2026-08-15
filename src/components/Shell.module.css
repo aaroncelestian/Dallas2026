@@ -51,6 +51,22 @@
   padding: 0;
 }
 
+.buildId {
+  position: fixed;
+  top: 14px;
+  left: 16px;
+  z-index: 80;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 42%, transparent);
+  pointer-events: none;
+  user-select: none;
+}
+
 .nav {
   position: fixed;
   right: 16px;

@@ -14,7 +14,7 @@
 
 .stage {
   position: absolute;
-  inset: -6%;
+  inset: 0;
   transform-style: preserve-3d;
   will-change: transform;
 }
@@ -51,9 +51,13 @@
   position: absolute;
   inset: 0;
   transform: translateZ(32px);
-  transform-origin: 50% 45%;
+  transform-origin: 50% 50%;
   filter: blur(18px) brightness(0.62);
   transition: filter 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.root[data-camera='pull'] .fore {
+  transform: translateZ(32px) scale(1.1);
 }
 
 .root[data-ready][data-mode='live'] .fore {
@@ -94,41 +98,40 @@
 }
 
 @keyframes cam-push {
-  from { transform: translateZ(32px) scale(1.05) translate3d(0, 1.5%, 0); }
-  to { transform: translateZ(32px) scale(1.22) translate3d(0, -3.5%, 0); }
+  from { transform: translateZ(32px); }
+  to { transform: translateZ(32px) scale(1.12); }
 }
 @keyframes cam-pull {
-  from { transform: translateZ(32px) scale(1.24) translate3d(0, -2%, 0); }
-  to { transform: translateZ(32px) scale(1.06) translate3d(0, 1.5%, 0); }
+  from { transform: translateZ(32px) scale(1.1); }
+  to { transform: translateZ(32px); }
 }
 @keyframes cam-pan-left {
-  from { transform: translateZ(32px) scale(1.18) translate3d(6%, 0, 0); }
-  to { transform: translateZ(32px) scale(1.18) translate3d(-6%, 1%, 0); }
+  from { transform: translateZ(32px); }
+  to { transform: translateZ(32px) scale(1.08) translate3d(-5%, 0, 0); }
 }
 @keyframes cam-pan-right {
-  from { transform: translateZ(32px) scale(1.18) translate3d(-6%, 0, 0); }
-  to { transform: translateZ(32px) scale(1.18) translate3d(6%, -1%, 0); }
+  from { transform: translateZ(32px); }
+  to { transform: translateZ(32px) scale(1.08) translate3d(5%, 0, 0); }
 }
 @keyframes cam-rise {
-  from { transform: translateZ(32px) scale(1.16) translate3d(0, 7%, 0); }
-  to { transform: translateZ(32px) scale(1.2) translate3d(0, -5%, 0); }
+  from { transform: translateZ(32px); }
+  to { transform: translateZ(32px) scale(1.08) translate3d(0, -4%, 0); }
 }
 @keyframes cam-fall {
-  from { transform: translateZ(32px) scale(1.14) translate3d(0, -5%, 0); }
-  to { transform: translateZ(32px) scale(1.18) translate3d(0, 6%, 0); }
+  from { transform: translateZ(32px); }
+  to { transform: translateZ(32px) scale(1.08) translate3d(0, 4%, 0); }
 }
 @keyframes cam-drift {
-  from { transform: translateZ(32px) scale(1.08) translate3d(-2.2%, 1.4%, 0) rotate(0.35deg); }
-  to { transform: translateZ(32px) scale(1.16) translate3d(2.4%, -2%, 0) rotate(-0.4deg); }
+  from { transform: translateZ(32px); }
+  to { transform: translateZ(32px) scale(1.06) translate3d(1.2%, -0.8%, 0); }
 }
 @keyframes cam-rack {
-  0% { transform: translateZ(32px) scale(1.12); }
-  14% { transform: translateZ(32px) scale(1.05); }
-  100% { transform: translateZ(32px) scale(1.2) translate3d(1%, -2%, 0); }
+  from { transform: translateZ(32px); }
+  to { transform: translateZ(32px) scale(1.1); }
 }
 @keyframes cam-ghost {
-  from { transform: translateZ(32px) scale(1.12) translate3d(-1.5%, 0, 0); }
-  to { transform: translateZ(32px) scale(1.2) translate3d(1.5%, -1%, 0); }
+  from { transform: translateZ(32px); }
+  to { transform: translateZ(32px) scale(1.05) translate3d(1%, 0, 0); }
 }
 
 .fore img {

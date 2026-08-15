@@ -24,7 +24,7 @@ export function DepthField({
   alt,
   active,
   fit = 'cover',
-  yaw = 1,
+  yaw: _yaw = 1,
   camera = 'push',
   mode = 'live',
   className,
@@ -78,10 +78,6 @@ export function DepthField({
     }
   }, [active, reduced, present, mode, px, py])
 
-  const enterRotateY = reduced ? 0 : yaw * 7
-  const enterRotateX = reduced ? 0 : -2.4
-  const enterScale = reduced ? 1 : 1.1
-
   return (
     <div
       ref={rootRef}
@@ -99,18 +95,6 @@ export function DepthField({
             x: present || reduced ? 0 : px,
             y: present || reduced ? 0 : py,
           }}
-          initial={false}
-          animate={
-            ready
-              ? { rotateY: 0, rotateX: 0, scale: 1, opacity: 1 }
-              : {
-                  rotateY: enterRotateY,
-                  rotateX: enterRotateX,
-                  scale: enterScale,
-                  opacity: reduced ? 1 : 0.88,
-                }
-          }
-          transition={{ duration: reduced ? 0 : 1.35, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className={styles.backPlate} aria-hidden>
             <img src={src} alt="" />

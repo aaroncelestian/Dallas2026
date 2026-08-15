@@ -202,6 +202,10 @@ export function Shell() {
           />
         )}
 
+        <div className={styles.buildId} aria-hidden>
+          {__BUILD_ID__}
+        </div>
+
         <AnimatePresence mode="sync">
           <motion.section
             key={slide.id}
