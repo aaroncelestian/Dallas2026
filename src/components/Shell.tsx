@@ -202,7 +202,7 @@ export function Shell() {
           />
         )}
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="sync">
           <motion.section
             key={slide.id}
             className={`${styles.slide} ${slide.layout}`}

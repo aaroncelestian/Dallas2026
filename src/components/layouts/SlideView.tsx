@@ -10,8 +10,8 @@ import { PREP_MODES } from '../../data/prepModes'
 import styles from './Layouts.module.css'
 
 const rise = {
-  hidden: { opacity: 0, y: 22, filter: 'blur(10px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)' },
+  hidden: { opacity: 0 },
+  show: { opacity: 1 },
 }
 
 function Rise({
@@ -33,7 +33,7 @@ function Rise({
       initial={false}
       animate={active ? 'show' : 'hidden'}
       variants={rise}
-      transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay }}
     >
       {children}
     </motion.div>
@@ -169,7 +169,7 @@ export function SlideView({
           />
         )}
         <div className={styles.coverScrim} aria-hidden />
-        <Rise active={active} delay={0.7} className={styles.coverContent}>
+        <Rise active={active} delay={0.15} className={styles.coverContent}>
           {slide.brand && <div className={styles.brand}>{slide.brand}</div>}
           {slide.displayTitle && (
             <h1 className={styles.display}>
@@ -213,7 +213,7 @@ export function SlideView({
         <div className={styles.bleedScrim} aria-hidden />
         {slide.kicker && <div className={`${styles.bleedKicker} kicker`}>{slide.kicker}</div>}
         {slide.title && (
-          <Rise active={active} delay={0.85} className={styles.bleedCopy}>
+          <Rise active={active} delay={0.2} className={styles.bleedCopy}>
             <h2>
               <TitleLines text={slide.title} />
             </h2>
@@ -256,7 +256,7 @@ export function SlideView({
             </Rise>
           </div>
         ) : (
-          <Rise active={active} delay={0.7} className={styles.stageCopy}>
+          <Rise active={active} delay={0.15} className={styles.stageCopy}>
             <Kicker text={slide.kicker} />
             {slide.title && (
               <h2>
