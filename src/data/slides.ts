@@ -54,6 +54,12 @@ export interface Slide {
   camera?: CameraKind
   /** Drop the living plate to black instead of ghosting the last specimen. */
   clearPlate?: boolean
+  /** Seconds before type appears. */
+  enterDelay?: number
+  /** Seconds to hold on black after type fades, before the next beat. */
+  exitHold?: number
+  /** Hold a black frame before the type comes up. */
+  enterBlack?: boolean
   splitFlip?: boolean
   notes?: string
 }
@@ -86,7 +92,7 @@ export const slides: Slide[] = [
     label: 'Title',
     chapter: 'open',
     layout: 'cover',
-    camera: 'push',
+    camera: 'rack',
     brand: 'NHMLAC',
     displayTitle: 'Exhibitions\nand the Mission\nof a Natural\nHistory Museum',
     meta: 'Aaron Celestian  ·  Mineral Sciences  ·  Dallas  ·  40 minutes',
@@ -106,6 +112,9 @@ export const slides: Slide[] = [
     layout: 'void',
     camera: 'drift',
     title: 'Why keep a mineral\nno one yet knows\nhow to use?',
+    enterDelay: 1,
+    exitHold: 1,
+    enterBlack: true,
     notes:
       'Open verbatim with the abstract line. Add, spoken: or put on public display? Don’t answer. Promise two answers that turn out to be the same answer.',
   },
@@ -116,6 +125,9 @@ export const slides: Slide[] = [
     layout: 'void',
     camera: 'drift',
     title: 'I’ll answer twice.',
+    enterDelay: 1,
+    exitHold: 1,
+    enterBlack: true,
     notes:
       'Once through research. Once through exhibition. Both answers converge. Then go to 1620.',
   },
@@ -127,6 +139,8 @@ export const slides: Slide[] = [
     camera: 'pull',
     heroNum: '1620',
     subtitle: 'Four centuries. One cabinet.',
+    enterDelay: 2,
+    exitHold: 2,
     notes:
       'Papal cabinet specimen — acquired for curiosity, princely display, natural philosophy. Asked later to answer under instruments nobody in 1620 could imagine. A specimen’s use is not fixed at acquisition. This is the talk in miniature. Then breathe into Act I.',
   },

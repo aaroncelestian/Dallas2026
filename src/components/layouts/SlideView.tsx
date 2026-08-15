@@ -83,10 +83,12 @@ export function SlideView({
   slide,
   active,
   plated = false,
+  copyActive = true,
 }: {
   slide: Slide
   active: boolean
   plated?: boolean
+  copyActive?: boolean
 }) {
   const yaw = (slide.yaw ?? 1) as 1 | -1
   const ownImage = !plated
@@ -111,7 +113,7 @@ export function SlideView({
   if (slide.layout === 'void') {
     return (
       <div className={styles.voidSlide}>
-        <Rise active={active} className={styles.voidInner}>
+        <Rise active={copyActive} className={styles.voidInner}>
           <Kicker text={slide.kicker} />
           {slide.title && (
             <h2 className={styles.voidTitle}>
@@ -126,11 +128,11 @@ export function SlideView({
   if (slide.layout === 'monument') {
     return (
       <div className={styles.monument}>
-        <Rise active={active}>
+        <Rise active={copyActive}>
           {slide.heroNum && <div className={styles.monumentYear}>{slide.heroNum}</div>}
         </Rise>
         {slide.subtitle && (
-          <Rise active={active} delay={0.18}>
+          <Rise active={copyActive} delay={copyActive ? 0.18 : 0}>
             <p className={styles.monumentLine}>{slide.subtitle}</p>
           </Rise>
         )}

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { slides, CHAPTERS, type Slide } from '../data/slides'
+import { slides, CHAPTERS, type CameraKind, type Slide } from '../data/slides'
 import { useActiveSlide, usePrefersReducedMotion } from '../hooks/useActiveSlide'
 import { useViewportHeight } from '../hooks/useViewportHeight'
 import { NavContext } from '../hooks/useSlideNav'
@@ -41,19 +41,67 @@ async function exitFullscreen() {
 }
 
 export function Shell() {
-  const { containerRef, activeIndex, goTo } = useActiveSlide(slides.length)
+  const interceptRef = useRef<((from: number, to: number) => boolean) | null>(null)
+  const { containerRef, activeIndex, goTo } = useActiveSlide(slides.length, interceptRef)
   const slide = slides[activeIndex]
   const activeChapter = slide?.chapter
   const [fullscreen, setFullscreen] = useState(false)
   const lastImage = useRef<Slide['image']>(slide?.image)
+  const heldCamera = useRef<CameraKind | undefined>(slide?.camera)
   const reduced = usePrefersReducedMotion()
 
   if (slide?.image && slide.motif !== 'color-reveal' && slide.motif !== 'prep-modes') {
+    if (lastImage.current?.src !== slide.image.src) {
+      heldCamera.current = slide.camera
+    }
     lastImage.current = slide.image
   }
-  if (slide?.clearPlate) lastImage.current = undefined
+  if (slide?.clearPlate) {
+    lastImage.current = undefined
+    heldCamera.current = undefined
+  }
 
   const plate = plateState(slide, lastImage.current)
+  const [copyOn, setCopyOn] = useState(true)
+  const [blackout, setBlackout] = useState(false)
+  const leavingRef = useRef(false)
+
+  useEffect(() => {
+    if (reduced) {
+      setCopyOn(true)
+      setBlackout(false)
+      return
+    }
+    if (!slide?.enterDelay && !slide?.enterBlack) {
+      setCopyOn(true)
+      return
+    }
+    setCopyOn(false)
+    if (slide.enterBlack) setBlackout(true)
+    const timer = window.setTimeout(() => {
+      setBlackout(false)
+      setCopyOn(true)
+    }, (slide.enterDelay ?? 0) * 1000)
+    return () => window.clearTimeout(timer)
+  }, [slide?.id, slide?.enterDelay, slide?.enterBlack, reduced])
+
+  useEffect(() => {
+    interceptRef.current = (from, to) => {
+      if (leavingRef.current) return true
+      if (to <= from) return false
+      const current = slides[from]
+      if (!current?.exitHold || reduced) return false
+      leavingRef.current = true
+      setCopyOn(false)
+      setBlackout(true)
+      window.setTimeout(() => {
+        leavingRef.current = false
+        if (!slides[to]?.enterBlack) setBlackout(false)
+        goTo(to, 'auto', true)
+      }, 800 + current.exitHold * 1000)
+      return true
+    }
+  }, [goTo, reduced])
 
   useViewportHeight()
 
@@ -197,7 +245,7 @@ export function Shell() {
             active
             fit={plate.image.fit ?? 'contain'}
             yaw={slide.yaw ?? 1}
-            camera={slide.camera ?? 'drift'}
+            camera={heldCamera.current ?? slide.camera ?? 'drift'}
             mode={plate.mode}
           />
         )}
@@ -219,10 +267,16 @@ export function Shell() {
             transition={cut.transition}
           >
             <div className={styles.slideInner}>
-              <SlideView slide={slide} active plated={plate.mode !== 'hidden'} />
+              <SlideView
+                slide={slide}
+                active
+                plated={plate.mode !== 'hidden'}
+                copyActive={copyOn}
+              />
             </div>
           </motion.section>
         </AnimatePresence>
+        <div className={styles.blackout} data-on={blackout || undefined} aria-hidden />
       </div>
 
       {!presenting && (

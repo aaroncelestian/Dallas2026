@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 
-export function useActiveSlide(count: number) {
+export function useActiveSlide(
+  count: number,
+  interceptRef?: { current: ((from: number, to: number) => boolean) | null },
+) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const activeIndexRef = useRef(0)
@@ -11,11 +14,12 @@ export function useActiveSlide(count: number) {
   }, [])
 
   const goTo = useCallback(
-    (index: number, _behavior?: ScrollBehavior) => {
+    (index: number, _behavior?: ScrollBehavior, force = false) => {
       const clamped = Math.max(0, Math.min(count - 1, index))
+      if (!force && interceptRef?.current?.(activeIndexRef.current, clamped)) return
       setIndex(clamped)
     },
-    [count, setIndex],
+    [count, setIndex, interceptRef],
   )
 
   useEffect(() => {
