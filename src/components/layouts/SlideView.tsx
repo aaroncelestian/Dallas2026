@@ -4,6 +4,7 @@ import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { DepthField } from './DepthField'
 import { ImpactHit } from './ImpactHit'
 import { IonChart } from '../motifs/IonChart'
+import { CrystalViewer } from '../motifs/CrystalViewer'
 import { CriteriaOverlap } from '../motifs/CriteriaOverlap'
 import { PrepModes } from '../motifs/PrepModes'
 import { ColorReveal } from '../motifs/ColorReveal'
@@ -69,6 +70,8 @@ function Motif({ kind, active, slide }: { kind: MotifKind; active: boolean; slid
   switch (kind) {
     case 'ion-chart':
       return <IonChart active={active} />
+    case 'crystal-viewer':
+      return <CrystalViewer active={active} />
     case 'criteria-overlap':
       return <CriteriaOverlap active={active} />
     case 'prep-modes':
@@ -251,7 +254,9 @@ export function SlideView({
 
   if (slide.layout === 'stage') {
     const motifFull =
-      slide.motif === 'color-reveal' || slide.motif === 'prep-modes'
+      slide.motif === 'color-reveal' ||
+      slide.motif === 'prep-modes' ||
+      slide.motif === 'crystal-viewer'
     return (
       <div className={styles.stage} data-motif={slide.motif || undefined}>
         {ownImage && slide.image && !motifFull && (
@@ -264,9 +269,24 @@ export function SlideView({
             camera={slide.camera}
           />
         )}
-        {!motifFull && <div className={styles.stageScrim} aria-hidden />}
+        {slide.motif === 'crystal-viewer' && (
+          <div className={styles.stageCrystal}>
+            <Motif kind="crystal-viewer" active={active} slide={slide} />
+          </div>
+        )}
+        {slide.motif !== 'color-reveal' && <div className={styles.stageScrim} aria-hidden />}
         {slide.motif === 'color-reveal' ? (
           <Motif kind="color-reveal" active={active} slide={slide} />
+        ) : slide.motif === 'crystal-viewer' ? (
+          <Rise active={active} delay={0.15} className={styles.stageCopy}>
+            <Kicker text={slide.kicker} />
+            {slide.title && (
+              <h2>
+                <TitleLines text={slide.title} />
+              </h2>
+            )}
+            {slide.subtitle && <p className={`${styles.body} text-muted`}>{slide.subtitle}</p>}
+          </Rise>
         ) : slide.motif === 'prep-modes' ? (
           <div className={styles.stagePad}>
             <Rise active={active} className={styles.stageCopy}>

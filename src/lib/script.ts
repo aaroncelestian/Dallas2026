@@ -41,6 +41,8 @@ export function onScreenLines(slide: Slide): string[] {
     for (const mode of PREP_MODES) lines.push(`• ${mode.title} — ${mode.body}`)
   } else if (slide.motif === 'ion-chart') {
     lines.push('Motif: ion-exchange chart (Na⁺ admitted, K⁺ excluded)')
+  } else if (slide.motif === 'crystal-viewer') {
+    lines.push('Motif: ZS-9 crystal structure — K⁺ in the channels (drag to orbit)')
   } else if (slide.motif === 'criteria-overlap') {
     lines.push('Motif: aesthetic judgment overlapping scientific standing')
   } else if (slide.motif === 'color-reveal') {

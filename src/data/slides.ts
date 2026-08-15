@@ -16,6 +16,7 @@ export type LayoutKind =
 
 export type MotifKind =
   | 'ion-chart'
+  | 'crystal-viewer'
   | 'criteria-overlap'
   | 'prep-modes'
   | 'color-reveal'
@@ -211,13 +212,14 @@ export const slides: Slide[] = [
     id: 'lokelma',
     label: 'Lokelma',
     chapter: 'research',
-    layout: 'hero',
+    layout: 'stage',
+    clearPlate: true,
     kicker: 'Zeolite → Lokelma',
-    heroNum: 'K⁺',
     title: 'Size-selective exchange\nbecomes a drug.',
-    motif: 'ion-chart',
+    subtitle: '3 million patients.',
+    motif: 'crystal-viewer',
     notes:
-      'Microporous zirconosilicate. Channels permissive to Na⁺, exclusive of K⁺ (1.38 Å). The selectivity coefficient that cleared FDA approval for hyperkalemia. ~3 million patients. Prefer the chart over a table. Then leave it.',
+      'The structure is the argument. Cubic zirconosilicate, ~3 Å pores, K⁺ sitting in the 7-rings — extremely selective over Na⁺, Ca²⁺, Mg²⁺. Drag if you want the room to look into a channel. Speak the scale: one in nine people with chronic kidney disease are hyperkalemic. The three million is already on the wall. Then leave it.',
   },
   {
     id: 'rowleyite-setup',

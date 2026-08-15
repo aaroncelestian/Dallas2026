@@ -40,6 +40,7 @@ function plateState(slide: Slide, last: Slide['image']) {
   const hide =
     slide.motif === 'color-reveal' ||
     slide.motif === 'prep-modes' ||
+    slide.motif === 'crystal-viewer' ||
     slide.clearPlate ||
     slide.layout === 'impact' ||
     slide.layout === 'void' ||
@@ -95,7 +96,8 @@ export function Shell() {
     slide?.image &&
     slide.layout !== 'impact' &&
     slide.motif !== 'color-reveal' &&
-    slide.motif !== 'prep-modes'
+    slide.motif !== 'prep-modes' &&
+    slide.motif !== 'crystal-viewer'
   ) {
     if (lastImage.current?.src !== slide.image.src) {
       heldCamera.current = slide.camera

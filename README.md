@@ -40,6 +40,7 @@ That launches Chrome/Edge as an app window (`--app`), which is the cleanest shar
 | `Shift+F` | Native fullscreen (breaks Zoom window-share) |
 | `Enter` or `R` | Blue Wave color reveal (on that beat) |
 | `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
+| Drag | Orbit the Lokelma structure (on that beat) |
 
 Chrome (counter, TOC, Resources) stays invisible until you hover. Cursor hides after a beat of stillness. The counter opens a slide list. Resources open over the talk — **Back to talk** or Esc returns.
 
@@ -86,4 +87,10 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 - Act II Unearthed + loans: ~16 min
 - Return + close: ~6 min
 
-Breathe on the cold open, zeolite/Lokelma, Blue Wave reveal, prep spectrum, and the closing return to gold.
+Breathe on the cold open, zeolite/Lokelma structure, Blue Wave reveal, prep spectrum, and the closing return to gold.
+
+Regenerate the Lokelma structure JSON after CIF changes:
+
+```bash
+npm run parse-cif
+```

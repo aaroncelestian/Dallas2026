@@ -206,8 +206,15 @@
   align-items: center;
 }
 
-.stage[data-motif='color-reveal'] {
+.stage[data-motif='color-reveal'],
+.stage[data-motif='crystal-viewer'] {
   padding: 0;
+}
+
+.stageCrystal {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 
 .voidSlide {
