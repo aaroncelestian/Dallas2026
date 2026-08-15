@@ -244,9 +244,56 @@
   opacity: 1;
 }
 
+.resourceMenu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  z-index: 60;
+  width: min(300px, calc(100vw - 40px));
+  padding: 6px 0;
+  background: color-mix(in srgb, var(--color-bg) 94%, transparent);
+  border: 1px solid var(--color-divider);
+  backdrop-filter: blur(12px);
+}
+
+.resourceLink {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--color-text) 82%, transparent);
+}
+
+.resourceLink:hover,
+.resourceLink:focus-visible {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+
+.resourceTitle {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.resourceDetail {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 48%, transparent);
+}
+
 .counter:hover,
 .counter:focus-visible,
-.counter[aria-expanded='true'] {
+.counter[aria-expanded='true'],
+.fullscreenBtn[aria-expanded='true'] {
   color: var(--color-text);
   border-color: color-mix(in srgb, var(--color-text) 35%, var(--color-divider));
 }
@@ -261,6 +308,72 @@
 .fullscreenBtn:focus-visible {
   color: var(--color-text);
   border-color: color-mix(in srgb, var(--color-text) 35%, var(--color-divider));
+}
+
+.resourceStage {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  background: #0c0b09;
+}
+
+.resourceBar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  background: #11100d;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.resourceBack {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-text) 28%, transparent);
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.resourceBack:hover,
+.resourceBack:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.resourceNow {
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--color-text) 78%, transparent);
+}
+
+.resourceExt {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+  text-decoration: none;
+}
+
+.resourceExt:hover,
+.resourceExt:focus-visible {
+  color: var(--color-text);
+}
+
+.resourceFrame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: #fff;
 }
 
 :global(html[data-present]) {

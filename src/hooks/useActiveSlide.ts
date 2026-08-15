@@ -32,6 +32,7 @@ export function useActiveSlide(
         tag === 'BUTTON' ||
         (e.target as HTMLElement)?.isContentEditable
       if (editable) return
+      if (document.documentElement.hasAttribute('data-resource')) return
 
       const current = activeIndexRef.current
 

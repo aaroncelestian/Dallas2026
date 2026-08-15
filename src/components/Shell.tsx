@@ -13,6 +13,23 @@ function holdsCopy(slide?: Slide) {
   return Boolean(slide && !slide.enterHit && (slide.enterDelay ?? 0) > 0)
 }
 
+const RESOURCES = [
+  {
+    href: 'https://lacnhm.maps.arcgis.com/apps/mapviewer/index.html?webmap=6f3eb85811d645059fe7afe5441a1480',
+    embed:
+      'https://lacnhm.maps.arcgis.com/apps/Embed/index.html?webmap=6f3eb85811d645059fe7afe5441a1480',
+    title: 'Agate trade routes',
+    detail: 'ArcGIS map',
+  },
+  {
+    href: 'https://aaroncelestian.substack.com/p/everything-has-an-address',
+    title: 'Everything Has an Address',
+    detail: 'pocketful of χtals',
+  },
+] as const
+
+type Resource = (typeof RESOURCES)[number]
+
 function chapterLabel(id: ChapterId) {
   if (id === 'open') return 'Open'
   const ch = CHAPTERS.find((c) => c.id === id)
@@ -64,8 +81,12 @@ export function Shell() {
   const activeChapter = slide?.chapter
   const [fullscreen, setFullscreen] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [resourcesOpen, setResourcesOpen] = useState(false)
+  const [resource, setResource] = useState<Resource | null>(null)
   const pickerRef = useRef<HTMLDivElement>(null)
+  const resourcesRef = useRef<HTMLDivElement>(null)
   const activePickRef = useRef<HTMLButtonElement>(null)
+  const chromeOpen = pickerOpen || resourcesOpen
   const lastImage = useRef<Slide['image']>(slide?.image)
   const heldCamera = useRef<CameraKind | undefined>(slide?.camera)
   const reduced = usePrefersReducedMotion()
@@ -271,8 +292,13 @@ export function Shell() {
 
       if (e.key === 'Escape') {
         e.preventDefault()
-        if (pickerOpen) {
+        if (resource) {
+          setResource(null)
+          return
+        }
+        if (pickerOpen || resourcesOpen) {
           setPickerOpen(false)
+          setResourcesOpen(false)
           return
         }
         if (presenting) exitPresent()
@@ -295,21 +321,30 @@ export function Shell() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [presenting, pickerOpen, toggleFullscreen])
+  }, [presenting, pickerOpen, resourcesOpen, resource, toggleFullscreen])
+
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-resource', Boolean(resource))
+    return () => document.documentElement.removeAttribute('data-resource')
+  }, [resource])
 
   useEffect(() => {
     setPickerOpen(false)
+    setResourcesOpen(false)
   }, [activeIndex])
 
   useEffect(() => {
-    if (!pickerOpen) return
-    activePickRef.current?.scrollIntoView({ block: 'nearest' })
+    if (pickerOpen) activePickRef.current?.scrollIntoView({ block: 'nearest' })
+    if (!pickerOpen && !resourcesOpen) return
     const onPointer = (e: PointerEvent) => {
-      if (!pickerRef.current?.contains(e.target as Node)) setPickerOpen(false)
+      const t = e.target as Node
+      if (pickerRef.current?.contains(t) || resourcesRef.current?.contains(t)) return
+      setPickerOpen(false)
+      setResourcesOpen(false)
     }
     document.addEventListener('pointerdown', onPointer)
     return () => document.removeEventListener('pointerdown', onPointer)
-  }, [pickerOpen])
+  }, [pickerOpen, resourcesOpen])
 
   useEffect(() => {
     let timer = 0
@@ -386,7 +421,7 @@ export function Shell() {
         />
       </div>
 
-      {!presenting && (
+      {!resource && (
       <>
       <nav className={styles.toc} aria-label="Chapters">
         {chapterStarts.map((ch) => (
@@ -402,7 +437,7 @@ export function Shell() {
         ))}
       </nav>
 
-      <div className={styles.chrome} data-open={pickerOpen || undefined}>
+      <div className={styles.chrome} data-open={chromeOpen || undefined}>
         <div className={styles.pickerWrap} ref={pickerRef}>
           {pickerOpen && (
             <div className={styles.picker} role="listbox" aria-label="Slides">
@@ -440,30 +475,72 @@ export function Shell() {
             aria-expanded={pickerOpen}
             aria-label={`Slide ${activeIndex + 1} of ${slides.length}. Open slide list`}
             title="Jump to a slide"
-            onClick={() => setPickerOpen((open) => !open)}
+            onClick={() => {
+              setResourcesOpen(false)
+              setPickerOpen((open) => !open)
+            }}
           >
             {activeIndex + 1} / {slides.length}
           </button>
         </div>
-        <button
-          type="button"
-          className={styles.fullscreenBtn}
-          onClick={() => openPresentWindow()}
-          aria-label="Open stage window"
-          title="Stage window for Zoom (P)"
-        >
-          Stage
-        </button>
-        <button
-          type="button"
-          className={styles.fullscreenBtn}
-          onClick={() => openPrintView()}
-          aria-label="Open speaker script"
-          title="Print script — copy for AI or save as PDF"
-        >
-          Print
-        </button>
-        {fullscreen && (
+        {!presenting && (
+          <button
+            type="button"
+            className={styles.fullscreenBtn}
+            onClick={() => openPresentWindow()}
+            aria-label="Open stage window"
+            title="Stage window for Zoom (P)"
+          >
+            Stage
+          </button>
+        )}
+        <div className={styles.pickerWrap} ref={resourcesRef}>
+          {resourcesOpen && (
+            <div className={styles.resourceMenu} role="menu" aria-label="Resources">
+              {RESOURCES.map((item) => (
+                <button
+                  key={item.href}
+                  type="button"
+                  className={styles.resourceLink}
+                  role="menuitem"
+                  onClick={() => {
+                    setResourcesOpen(false)
+                    setResource(item)
+                  }}
+                >
+                  <span className={styles.resourceTitle}>{item.title}</span>
+                  <span className={styles.resourceDetail}>{item.detail}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            className={styles.fullscreenBtn}
+            aria-haspopup="menu"
+            aria-expanded={resourcesOpen}
+            aria-label="Open resources"
+            title="Trade routes map and cabinet essay"
+            onClick={() => {
+              setPickerOpen(false)
+              setResourcesOpen((open) => !open)
+            }}
+          >
+            Resources
+          </button>
+        </div>
+        {!presenting && (
+          <button
+            type="button"
+            className={styles.fullscreenBtn}
+            onClick={() => openPrintView()}
+            aria-label="Open speaker script"
+            title="Print script — copy for AI or save as PDF"
+          >
+            Print
+          </button>
+        )}
+        {!presenting && fullscreen && (
           <button
             type="button"
             className={styles.fullscreenBtn}
@@ -477,6 +554,34 @@ export function Shell() {
         )}
       </div>
       </>
+      )}
+
+      {resource && (
+        <div className={styles.resourceStage}>
+          <header className={styles.resourceBar}>
+            <button
+              type="button"
+              className={styles.resourceBack}
+              onClick={() => setResource(null)}
+            >
+              Back to talk
+            </button>
+            <p className={styles.resourceNow}>{resource.title}</p>
+            <a
+              className={styles.resourceExt}
+              href={resource.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open separately
+            </a>
+          </header>
+          <iframe
+            className={styles.resourceFrame}
+            src={'embed' in resource ? resource.embed : resource.href}
+            title={resource.title}
+          />
+        </div>
       )}
     </NavContext.Provider>
   )

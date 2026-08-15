@@ -17,7 +17,7 @@ Open the URL Vite prints (usually `http://localhost:5173`).
 
 Do **not** use browser fullscreen — Zoom keeps sharing the old window and the slides freeze.
 
-From the rehearsal tab, press **P** (or click **Stage**). That opens a chrome-less window: slides only, no tabs, no URL, no buttons. In Zoom, share **that window**.
+From the rehearsal tab, press **P** (or click **Stage**). That opens a chrome-less window for Zoom. Share **that window**. The chapter outline, slide index, and Resources stay available on hover.
 
 Or, with the server already running:
 
@@ -41,7 +41,7 @@ That launches Chrome/Edge as an app window (`--app`), which is the cleanest shar
 | `Enter` or `R` | Blue Wave color reveal (on that beat) |
 | `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
 
-Chrome (counter, TOC) stays invisible in present/fullscreen until you hover. Cursor hides after a beat of stillness. The counter opens a slide list.
+Chrome (counter, TOC, Resources) stays invisible until you hover. Cursor hides after a beat of stillness. The counter opens a slide list. Resources open over the talk — **Back to talk** or Esc returns.
 
 ## Build for projector / USB
 

@@ -172,11 +172,11 @@ export const slides: Slide[] = [
     bullets: [
       'Made for Pope Paul V',
       'Agate — Lapis — Ebony',
-      'Fact 3',
-      'Fact 4',
+      'Moganite-to-quartz ratio dates the agate',
+      'Two populations. Two source rocks.',
     ],
     notes:
-      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Five seconds. Then it pulls back and it is a cabinet. Speak the facts as they appear. Fact 3 and Fact 4 are still placeholders. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
+      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Five seconds. Then it pulls back and it is a cabinet. Speak the facts as they appear: papal commission, the materials, then the science the object did not know it would be asked — moganite dating the agate, two populations from two source rocks. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
   },
 
   // ── Act I ─────────────────────────────────────────────
