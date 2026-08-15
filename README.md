@@ -41,7 +41,7 @@ That launches Chrome/Edge as an app window (`--app`), which is the cleanest shar
 | `Enter` or `R` | Blue Wave color reveal (on that beat) |
 | `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
 
-Chrome (counter, TOC, dots) stays invisible in present/fullscreen until you hover. Cursor hides after a beat of stillness.
+Chrome (counter, TOC) stays invisible in present/fullscreen until you hover. Cursor hides after a beat of stillness. The counter opens a slide list.
 
 ## Build for projector / USB
 

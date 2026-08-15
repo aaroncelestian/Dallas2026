@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { slides, CHAPTERS, type CameraKind, type Slide } from '../data/slides'
+import { slides, CHAPTERS, type CameraKind, type ChapterId, type Slide } from '../data/slides'
 import { useActiveSlide, usePrefersReducedMotion } from '../hooks/useActiveSlide'
 import { useViewportHeight } from '../hooks/useViewportHeight'
 import { NavContext } from '../hooks/useSlideNav'
@@ -11,6 +11,12 @@ import styles from './Shell.module.css'
 
 function holdsCopy(slide?: Slide) {
   return Boolean(slide && !slide.enterHit && (slide.enterDelay ?? 0) > 0)
+}
+
+function chapterLabel(id: ChapterId) {
+  if (id === 'open') return 'Open'
+  const ch = CHAPTERS.find((c) => c.id === id)
+  return ch ? `${ch.num} ${ch.title}` : id
 }
 
 function plateState(slide: Slide, last: Slide['image']) {
@@ -57,6 +63,9 @@ export function Shell() {
   const slide = slides[activeIndex]
   const activeChapter = slide?.chapter
   const [fullscreen, setFullscreen] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const pickerRef = useRef<HTMLDivElement>(null)
+  const activePickRef = useRef<HTMLButtonElement>(null)
   const lastImage = useRef<Slide['image']>(slide?.image)
   const heldCamera = useRef<CameraKind | undefined>(slide?.camera)
   const reduced = usePrefersReducedMotion()
@@ -262,6 +271,10 @@ export function Shell() {
 
       if (e.key === 'Escape') {
         e.preventDefault()
+        if (pickerOpen) {
+          setPickerOpen(false)
+          return
+        }
         if (presenting) exitPresent()
         return
       }
@@ -282,7 +295,21 @@ export function Shell() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [presenting, toggleFullscreen])
+  }, [presenting, pickerOpen, toggleFullscreen])
+
+  useEffect(() => {
+    setPickerOpen(false)
+  }, [activeIndex])
+
+  useEffect(() => {
+    if (!pickerOpen) return
+    activePickRef.current?.scrollIntoView({ block: 'nearest' })
+    const onPointer = (e: PointerEvent) => {
+      if (!pickerRef.current?.contains(e.target as Node)) setPickerOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointer)
+    return () => document.removeEventListener('pointerdown', onPointer)
+  }, [pickerOpen])
 
   useEffect(() => {
     let timer = 0
@@ -361,20 +388,6 @@ export function Shell() {
 
       {!presenting && (
       <>
-      <nav className={styles.nav} aria-label="Slide progress">
-        {slides.map((s, i) => (
-          <button
-            key={s.id}
-            type="button"
-            className={styles.dot}
-            data-active={i === activeIndex}
-            aria-label={`Go to ${s.label}`}
-            aria-current={i === activeIndex ? 'true' : undefined}
-            onClick={() => goTo(i)}
-          />
-        ))}
-      </nav>
-
       <nav className={styles.toc} aria-label="Chapters">
         {chapterStarts.map((ch) => (
           <button
@@ -389,9 +402,48 @@ export function Shell() {
         ))}
       </nav>
 
-      <div className={styles.chrome}>
-        <div className={styles.counter} aria-live="polite">
-          {activeIndex + 1} / {slides.length}
+      <div className={styles.chrome} data-open={pickerOpen || undefined}>
+        <div className={styles.pickerWrap} ref={pickerRef}>
+          {pickerOpen && (
+            <div className={styles.picker} role="listbox" aria-label="Slides">
+              {slides.map((s, i) => {
+                const showChapter = i === 0 || s.chapter !== slides[i - 1].chapter
+                return (
+                  <div key={s.id}>
+                    {showChapter && (
+                      <div className={styles.pickerChapter}>{chapterLabel(s.chapter)}</div>
+                    )}
+                    <button
+                      type="button"
+                      role="option"
+                      ref={i === activeIndex ? activePickRef : undefined}
+                      className={styles.pickerItem}
+                      data-active={i === activeIndex}
+                      aria-selected={i === activeIndex}
+                      onClick={() => {
+                        goTo(i)
+                        setPickerOpen(false)
+                      }}
+                    >
+                      <span className={styles.pickerNum}>{i + 1}</span>
+                      {s.label}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          <button
+            type="button"
+            className={styles.counter}
+            aria-haspopup="listbox"
+            aria-expanded={pickerOpen}
+            aria-label={`Slide ${activeIndex + 1} of ${slides.length}. Open slide list`}
+            title="Jump to a slide"
+            onClick={() => setPickerOpen((open) => !open)}
+          >
+            {activeIndex + 1} / {slides.length}
+          </button>
         </div>
         <button
           type="button"

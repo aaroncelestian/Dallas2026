@@ -86,39 +86,6 @@
   user-select: none;
 }
 
-.nav {
-  position: fixed;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  opacity: 0.18;
-  transition: opacity 150ms ease;
-}
-
-.nav:hover,
-.nav:focus-within {
-  opacity: 1;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border: 1px solid color-mix(in srgb, var(--color-text) 45%, transparent);
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  border-radius: 0;
-}
-
-.dot[data-active='true'] {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-}
-
 .toc {
   position: fixed;
   right: 16px;
@@ -167,14 +134,86 @@
   gap: 8px;
 }
 
-.counter {
-  font-size: 12px;
+.pickerWrap {
+  position: relative;
+}
+
+.picker {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  z-index: 60;
+  width: min(320px, calc(100vw - 40px));
+  max-height: min(60vh, 440px);
+  overflow: auto;
+  padding: 8px 0;
+  background: color-mix(in srgb, var(--color-bg) 94%, transparent);
+  border: 1px solid var(--color-divider);
+  backdrop-filter: blur(12px);
+}
+
+.pickerChapter {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  padding: 10px 12px 4px;
+}
+
+.pickerItem {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-align: left;
+  color: color-mix(in srgb, var(--color-text) 78%, transparent);
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.pickerItem:hover,
+.pickerItem:focus-visible {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+
+.pickerItem[data-active='true'] {
+  color: var(--color-accent);
+}
+
+.pickerNum {
+  flex: 0 0 1.6em;
+  font-size: 11px;
+  font-weight: 600;
   font-feature-settings: 'tnum' 1;
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  color: color-mix(in srgb, var(--color-text) 42%, transparent);
+}
+
+.pickerItem[data-active='true'] .pickerNum {
+  color: var(--color-accent);
+}
+
+.counter {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
   background: color-mix(in srgb, var(--color-bg) 88%, transparent);
   padding: 6px 10px;
   border: 1px solid var(--color-divider);
+  cursor: pointer;
   opacity: 0.22;
+  transition: opacity 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
 .fullscreenBtn {
@@ -196,9 +235,20 @@
 .chrome:hover .fullscreenBtn,
 .chrome:focus-within .counter,
 .chrome:focus-within .fullscreenBtn,
+.chrome[data-open] .counter,
+.chrome[data-open] .fullscreenBtn,
+.counter:hover,
+.counter:focus-visible,
 .fullscreenBtn:hover,
 .fullscreenBtn:focus-visible {
   opacity: 1;
+}
+
+.counter:hover,
+.counter:focus-visible,
+.counter[aria-expanded='true'] {
+  color: var(--color-text);
+  border-color: color-mix(in srgb, var(--color-text) 35%, var(--color-divider));
 }
 
 .fullscreenBtn[aria-pressed='true'] {
@@ -230,9 +280,6 @@
 }
 
 @media (max-width: 700px) {
-  .nav {
-    display: none;
-  }
   .toc {
     flex-direction: row;
     flex-wrap: wrap;
