@@ -226,17 +226,27 @@
 }
 
 .voidInner {
-  max-width: 18ch;
+  max-width: min(22em, 92vw);
   text-align: center;
 }
 
 .voidTitle {
-  font-size: clamp(2.8rem, 6.8vw, 5.2rem);
+  font-size: clamp(2.2rem, 4.8vw, 3.8rem);
   font-weight: 700;
   font-style: italic;
-  line-height: 1.02;
-  letter-spacing: -0.03em;
+  line-height: 1.14;
+  letter-spacing: -0.025em;
   margin: 0;
+}
+
+.voidTitle span {
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .voidTitle span {
+    white-space: normal;
+  }
 }
 
 .monument {
