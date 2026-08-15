@@ -10,7 +10,7 @@ import { PREP_MODES } from '../../data/prepModes'
 import styles from './Layouts.module.css'
 
 const rise = {
-  hidden: { opacity: 0, y: 14 },
+  hidden: { opacity: 0, y: 28 },
   show: { opacity: 1, y: 0 },
 }
 
@@ -33,7 +33,7 @@ function Rise({
       initial={false}
       animate={active ? 'show' : 'hidden'}
       variants={rise}
-      transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1], delay }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay }}
     >
       {children}
     </motion.div>
@@ -82,6 +82,69 @@ function Motif({ kind, active, slide }: { kind: MotifKind; active: boolean; slid
 export function SlideView({ slide, active }: { slide: Slide; active: boolean }) {
   const yaw = (slide.yaw ?? 1) as 1 | -1
 
+  if (slide.layout === 'image') {
+    return (
+      <div className={styles.bleedWrap}>
+        {slide.image && (
+          <DepthField
+            src={slide.image.src}
+            alt={slide.image.alt}
+            active={active}
+            fit={slide.image.fit ?? 'contain'}
+            yaw={yaw}
+          />
+        )}
+      </div>
+    )
+  }
+
+  if (slide.layout === 'void') {
+    return (
+      <div className={styles.voidSlide}>
+        <Rise active={active} className={styles.voidInner}>
+          <Kicker text={slide.kicker} />
+          {slide.title && (
+            <h2 className={styles.voidTitle}>
+              <TitleLines text={slide.title} />
+            </h2>
+          )}
+        </Rise>
+      </div>
+    )
+  }
+
+  if (slide.layout === 'monument') {
+    return (
+      <div className={styles.monument}>
+        <Rise active={active}>
+          {slide.heroNum && <div className={styles.monumentYear}>{slide.heroNum}</div>}
+        </Rise>
+        {slide.subtitle && (
+          <Rise active={active} delay={0.18}>
+            <p className={styles.monumentLine}>{slide.subtitle}</p>
+          </Rise>
+        )}
+      </div>
+    )
+  }
+
+  if (slide.layout === 'litany') {
+    return (
+      <div className={styles.litany}>
+        <Rise active={active}>
+          <Kicker text={slide.kicker} />
+        </Rise>
+        <div className={styles.litanyList}>
+          {(slide.bullets ?? []).map((line, i) => (
+            <Rise key={line} active={active} delay={0.12 + i * 0.1}>
+              <p>{line}</p>
+            </Rise>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   if (slide.layout === 'cover') {
     return (
       <div className={styles.cover} data-active={active || undefined}>
@@ -102,7 +165,6 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
               <TitleLines text={slide.displayTitle} />
             </h1>
           )}
-          {slide.subtitle && <p className={styles.sub}>{slide.subtitle}</p>}
         </Rise>
         {slide.meta && <div className={styles.meta}>{slide.meta}</div>}
       </div>
@@ -115,14 +177,11 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
         <Rise active={active}>
           <div className={styles.ghost}>{slide.ghostNum}</div>
         </Rise>
-        <Rise active={active} delay={0.12}>
-          <h2 className={styles.dividerTitle}>{slide.title}</h2>
+        <Rise active={active} delay={0.16}>
+          <h2 className={styles.dividerTitle}>
+            {slide.title && <TitleLines text={slide.title} />}
+          </h2>
         </Rise>
-        {slide.body && (
-          <Rise active={active} delay={0.2}>
-            <p className={`${styles.body} text-muted`}>{slide.body}</p>
-          </Rise>
-        )}
       </div>
     )
   }
@@ -139,15 +198,13 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
             yaw={yaw}
           />
         )}
+        <div className={styles.bleedScrim} aria-hidden />
         {slide.kicker && <div className={`${styles.bleedKicker} kicker`}>{slide.kicker}</div>}
-        {(slide.title || slide.body) && (
+        {slide.title && (
           <Rise active={active} className={styles.bleedCopy}>
-            {slide.title && (
-              <h2>
-                <TitleLines text={slide.title} />
-              </h2>
-            )}
-            {slide.body && <p className={`${styles.body} text-muted`}>{slide.body}</p>}
+            <h2>
+              <TitleLines text={slide.title} />
+            </h2>
           </Rise>
         )}
       </div>
@@ -175,10 +232,13 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
           <div className={styles.stagePad}>
             <Rise active={active} className={styles.stageCopy}>
               <Kicker text={slide.kicker} />
-              {slide.title && <h2>{slide.title}</h2>}
-              {slide.body && <p className={`${styles.body} text-muted`}>{slide.body}</p>}
+              {slide.title && (
+                <h2>
+                  <TitleLines text={slide.title} />
+                </h2>
+              )}
             </Rise>
-            <Rise active={active} delay={0.1} className={styles.stageMotifWide}>
+            <Rise active={active} delay={0.14} className={styles.stageMotifWide}>
               <Motif kind="prep-modes" active={active} slide={slide} />
             </Rise>
           </div>
@@ -190,13 +250,11 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
                 <TitleLines text={slide.title} />
               </h2>
             )}
-            {slide.body && <p className={`${styles.body} text-muted`}>{slide.body}</p>}
             {slide.motif && (
               <div className={styles.stageMotif}>
                 <Motif kind={slide.motif} active={active} slide={slide} />
               </div>
             )}
-            {slide.quote && <blockquote className={styles.quote}>{slide.quote}</blockquote>}
           </Rise>
         )}
       </div>
@@ -214,10 +272,9 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
               <TitleLines text={slide.title} />
             </h2>
           )}
-          {slide.body && <p className={`${styles.body} text-muted`}>{slide.body}</p>}
         </Rise>
         {slide.motif && (
-          <Rise active={active} delay={0.12} className={styles.heroMotif}>
+          <Rise active={active} delay={0.16} className={styles.heroMotif}>
             <Motif kind={slide.motif} active={active} slide={slide} />
           </Rise>
         )}
@@ -235,16 +292,9 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
               <TitleLines text={slide.title} />
             </h2>
           )}
-          {slide.body && <p className={`${styles.body} text-muted`}>{slide.body}</p>}
-          {slide.bullets && (
-            <ul className={styles.bullets}>
-              {slide.bullets.map((b) => (
-                <li key={b}>{b}</li>
-              ))}
-            </ul>
-          )}
+          {slide.subtitle && <p className={`${styles.body} text-muted`}>{slide.subtitle}</p>}
         </Rise>
-        <Rise active={active} delay={0.08} className={styles.splitMedia}>
+        <Rise active={active} delay={0.1} className={styles.splitMedia}>
           {slide.motif ? (
             <Motif kind={slide.motif} active={active} slide={slide} />
           ) : slide.image ? (
@@ -263,7 +313,6 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
     )
   }
 
-  // content
   return (
     <div className={styles.contentSlide}>
       <Rise active={active} className={styles.contentFill}>
@@ -273,20 +322,7 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
             <TitleLines text={slide.title} />
           </h2>
         )}
-        {slide.body && <p className={`${styles.body} text-muted`}>{slide.body}</p>}
-        {slide.quote && <blockquote className={styles.quote}>{slide.quote}</blockquote>}
-        {slide.bullets && (
-          <ul className={styles.bullets}>
-            {slide.bullets.map((b) => (
-              <li key={b}>{b}</li>
-            ))}
-          </ul>
-        )}
-        {slide.motif && (
-          <div className={styles.contentMotif}>
-            <Motif kind={slide.motif} active={active} slide={slide} />
-          </div>
-        )}
+        {slide.subtitle && <p className={`${styles.body} text-muted`}>{slide.subtitle}</p>}
       </Rise>
     </div>
   )

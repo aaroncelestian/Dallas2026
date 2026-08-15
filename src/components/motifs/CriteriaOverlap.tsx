@@ -19,12 +19,10 @@ export function CriteriaOverlap({ active }: { active: boolean }) {
     <div className={styles.criteria} aria-label="Aesthetic and scientific criteria overlap">
       <div className={styles.criteriaCols}>
         <div className={styles.criteriaCol}>
-          <h3>Aesthetic object</h3>
-          <p>What collectors and visitors respond to.</p>
+          <h3>Beautiful</h3>
         </div>
         <div className={styles.criteriaCol} data-science>
-          <h3>Scientific dataset</h3>
-          <p>What future instruments can still read.</p>
+          <h3>Usable</h3>
         </div>
       </div>
       <ul className={styles.criteriaList}>
@@ -48,15 +46,6 @@ export function CriteriaOverlap({ active }: { active: boolean }) {
           </motion.li>
         ))}
       </ul>
-      <motion.p
-        className={styles.criteriaThesis}
-        initial={false}
-        animate={active ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-        transition={{ delay: reduced ? 0 : 0.55, duration: reduced ? 0 : 0.45 }}
-      >
-        Same act of looking. A complete crystal face is a better object and a better
-        growth history.
-      </motion.p>
     </div>
   )
 }

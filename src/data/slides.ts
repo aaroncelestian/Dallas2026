@@ -40,6 +40,7 @@ export interface Slide {
   image?: { src: string; alt: string; fit?: 'cover' | 'contain' }
   motif?: MotifKind
   yaw?: 1 | -1
+  splitFlip?: boolean
   notes?: string
 }
 

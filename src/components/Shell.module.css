@@ -45,7 +45,12 @@
 
 .slide:global(.bleed) .slideInner,
 .slide:global(.cover) .slideInner,
-.slide:global(.stage) .slideInner {
+.slide:global(.stage) .slideInner,
+.slide:global(.void) .slideInner,
+.slide:global(.monument) .slideInner,
+.slide:global(.image) .slideInner,
+.slide:global(.litany) .slideInner,
+.slide:global(.divider) .slideInner {
   max-width: none;
   padding: 0;
 }
@@ -59,7 +64,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  opacity: 0.4;
+  opacity: 0.18;
   transition: opacity 150ms ease;
 }
 
@@ -71,7 +76,7 @@
 .dot {
   width: 8px;
   height: 8px;
-  border: 1px solid var(--color-text);
+  border: 1px solid color-mix(in srgb, var(--color-text) 45%, transparent);
   background: transparent;
   padding: 0;
   cursor: pointer;
@@ -92,7 +97,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
-  opacity: 0.45;
+  opacity: 0.2;
   transition: opacity 150ms ease;
 }
 
@@ -108,8 +113,8 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   border: none;
-  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
-  color: var(--color-text);
+  background: transparent;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
   padding: 7px 10px;
   cursor: pointer;
   text-align: right;
@@ -138,7 +143,7 @@
   background: color-mix(in srgb, var(--color-bg) 88%, transparent);
   padding: 6px 10px;
   border: 1px solid var(--color-divider);
-  opacity: 0.5;
+  opacity: 0.22;
 }
 
 .fullscreenBtn {
@@ -152,7 +157,7 @@
   border: 1px solid var(--color-divider);
   padding: 6px 10px;
   cursor: pointer;
-  opacity: 0.5;
+  opacity: 0.22;
   transition: opacity 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
@@ -175,6 +180,30 @@
 .fullscreenBtn:focus-visible {
   color: var(--color-text);
   border-color: color-mix(in srgb, var(--color-text) 35%, var(--color-divider));
+}
+
+:global(html[data-present]) .nav,
+:global(html[data-present]) .toc,
+:global(html[data-present]) .chrome,
+:global(html[data-fullscreen]) .nav,
+:global(html[data-fullscreen]) .toc,
+:global(html[data-fullscreen]) .chrome {
+  opacity: 0;
+}
+
+:global(html[data-present]) .nav:hover,
+:global(html[data-present]) .toc:hover,
+:global(html[data-present]) .chrome:hover,
+:global(html[data-present]) .nav:focus-within,
+:global(html[data-present]) .toc:focus-within,
+:global(html[data-present]) .chrome:focus-within,
+:global(html[data-fullscreen]) .nav:hover,
+:global(html[data-fullscreen]) .toc:hover,
+:global(html[data-fullscreen]) .chrome:hover,
+:global(html[data-fullscreen]) .nav:focus-within,
+:global(html[data-fullscreen]) .toc:focus-within,
+:global(html[data-fullscreen]) .chrome:focus-within {
+  opacity: 1;
 }
 
 @media (max-width: 700px) {

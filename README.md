@@ -2,7 +2,7 @@
 
 Invited symposium talk (40 min): *Exhibitions and the Mission of a Natural History Museum*.
 
-Hybrid Aquarius-style shell (scroll-snap + keyboard + fullscreen) with stage/bleed cinema, daylight editorial look, and depth-of-field / perspective settle on image beats.
+Dark-room cinema: specimens on a black stage, one line of type, the argument in your voice. Scroll-snap + keyboard + fullscreen.
 
 ## Run
 
@@ -15,7 +15,7 @@ Open the URL Vite prints (usually `http://localhost:5173`).
 
 ### Present mode
 
-Append `?present=1` to disable mouse parallax for rock-solid live advances:
+Append `?present=1` to disable mouse parallax and hide chrome until hover:
 
 `http://localhost:5173/?present=1`
 
@@ -32,7 +32,7 @@ Then press **F** for fullscreen.
 | `Enter` or `R` | Blue Wave color reveal (on that beat) |
 | `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
 
-Bottom-left: counter + fullscreen. Bottom-right: chapter TOC. Right edge: progress dots.
+Chrome (counter, TOC, dots) stays invisible in present/fullscreen until you hover. Cursor hides after a beat of stillness.
 
 ## Build for projector / USB
 
@@ -42,33 +42,39 @@ npm run build
 
 Output is in `dist/` with relative `base: './'` — open `dist/index.html` locally or copy the folder to a USB stick.
 
-## Asset checklist
+## How to play it
 
-Replace SVGs in `public/images/` with final photographs (keep filenames, or update paths in `src/data/slides.ts` and `src/data/prepModes.ts`):
+The screen holds the specimen and a sentence. Everything else is in `notes` on each beat in `src/data/slides.ts`. Hold the cold open. Hold Blue Wave after the reveal. Hold the return to gold.
+
+Argument source: `docs/Dallas_Symposium_Talk_Outline.md`.
+
+## Photographs
+
+Studio and gallery frames from `original_images/` are compressed into `public/images/`:
 
 | File | Beat |
 |------|------|
-| `cabinet-1620.svg` | Title, question, cabinet, close |
-| `zeolite.svg` | Zeolite case |
-| `rowleyite.svg` | Rowleyite case |
-| `spinel.svg` | Spinel / lithium |
-| `mars-analog.svg` | Mars analogs |
-| `pattern-hinge.svg` | Act I hinge |
-| `unearthed-hero.svg` | Unearthed open + loans |
-| `blue-wave.svg` | Color reveal |
-| `preservation.svg` | Preservation |
-| `provenance.svg` | Provenance hinge |
-| `prep-teapot.svg` | Prep mode 1 |
-| `prep-chrysanthemum.svg` | Prep mode 2 |
-| `prep-turquoise.svg` | Prep mode 3 |
-| `prep-ammolite.svg` | Prep mode 4 |
+| `gold.jpg` | Cold open, title, close |
+| `zeolite.jpg` | Zeolite |
+| `rowleyite.jpg` | Rowleyite |
+| `mars-analog.jpg` | Mars analogs |
+| `emerald.jpg` | Unearthed |
+| `blue-wave.jpg` | Color reveal |
+| `stibnite.jpg` | Preservation |
+| `fluorite.jpg` | Provenance |
+| `tourmaline.jpg` | Peninsular Ranges |
+| `unearthed-gallery.jpg` | Loans |
+| `prep-teapot.jpg` | Prep mode 1 |
+| `prep-chrysanthemum.jpg` | Prep mode 2 |
+| `prep-turquoise.jpg` | Prep mode 3 |
+| `prep-ammolite.jpg` | Prep mode 4 |
 
-Speaker notes live on each slide in `src/data/slides.ts` (`notes` field). Argument source: `docs/Dallas_Symposium_Talk_Outline.md`.
+1620 and the lithium beat are typographic on purpose — no stand-in specimen.
 
 ## Timing guide (~40 min)
 
 - Open + Act I research anchors: ~18 min
 - Act II Unearthed + loans: ~16 min
-- Synthesis + close: ~6 min
+- Return + close: ~6 min
 
-Breathe on zeolite/Lokelma, Blue Wave reveal, prep spectrum, and the closing return to 1620.
+Breathe on the cold open, zeolite/Lokelma, Blue Wave reveal, prep spectrum, and the closing return to gold.

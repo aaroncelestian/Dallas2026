@@ -60,23 +60,20 @@ export function ColorReveal({
         >
           {!revealed ? (
             <>
-              <p className={styles.revealQuestion}>Visitors assume it&apos;s dyed.</p>
+              <p className={styles.revealQuestion}>Dyed?</p>
               <button
                 type="button"
                 className={styles.revealBtn}
                 onClick={() => setRevealed(true)}
               >
-                Reveal the blue · Enter
+                Reveal · Enter
               </button>
             </>
           ) : (
             <>
-              <p className={styles.revealAnswer}>
-                Trace copper substitution in the aragonite lattice — the same
-                transition-metal mechanism as malachite and azurite.
-              </p>
+              <p className={styles.revealAnswer}>Copper.</p>
               <p className={styles.revealSub}>
-                Aesthetic surprise delivering a mineralogy lesson.
+                The same mechanism as malachite.
               </p>
             </>
           )}

@@ -1,41 +1,20 @@
 .ion {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 32px;
   max-width: 720px;
   width: 100%;
-}
-
-.ionHead {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ionKicker {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-}
-
-.ionLead {
-  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-  max-width: 48ch;
-  color: color-mix(in srgb, var(--color-text) 72%, transparent);
-  margin: 0;
 }
 
 .ionBars {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 .ionRow {
   display: grid;
-  grid-template-columns: 88px 1fr minmax(120px, 180px);
+  grid-template-columns: 88px 1fr minmax(120px, 200px);
   gap: 16px;
   align-items: center;
 }
@@ -49,19 +28,18 @@
 
 .ionLabel strong {
   font-family: var(--font-heading);
-  font-size: 1.35rem;
+  font-size: 1.45rem;
 }
 
 .ionLabel span {
   font-size: 13px;
-  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+  color: color-mix(in srgb, var(--color-text) 45%, transparent);
 }
 
 .ionTrack {
   position: relative;
-  height: 28px;
-  background: color-mix(in srgb, var(--color-text) 6%, transparent);
-  border-bottom: 1px solid var(--color-divider);
+  height: 22px;
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
 }
 
 .ionFill {
@@ -71,7 +49,7 @@
   bottom: 0;
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, var(--color-mineral-blue) 75%, var(--color-accent)),
+    color-mix(in srgb, var(--color-mineral-blue) 70%, var(--color-accent)),
     var(--color-accent)
   );
 }
@@ -80,23 +58,24 @@
   background: linear-gradient(
     90deg,
     var(--color-accent),
-    color-mix(in srgb, var(--color-accent) 70%, #1c1a17)
+    color-mix(in srgb, var(--color-accent) 55%, #fff)
   );
 }
 
 .ionGate {
   position: absolute;
-  top: -6px;
-  bottom: -6px;
+  top: -8px;
+  bottom: -8px;
   left: 68%;
-  width: 2px;
+  width: 1px;
   background: var(--color-text);
   opacity: 0.35;
 }
 
 .ionNote {
   font-size: 14px;
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
 }
 
 .ionRow:not([data-pass]) .ionNote {
@@ -106,15 +85,18 @@
 
 .ionFoot {
   margin: 0;
-  font-size: 15px;
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
-  max-width: 52ch;
+  font-family: var(--font-heading);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-style: italic;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--color-text) 72%, transparent);
+  max-width: 36ch;
 }
 
 .criteria {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 32px;
   max-width: 780px;
   width: 100%;
 }
@@ -126,14 +108,13 @@
 }
 
 .criteriaCol h3 {
-  font-size: 1.15rem;
-  margin-bottom: 6px;
-}
-
-.criteriaCol p {
+  font-size: 1.05rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   margin: 0;
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
-  font-size: 15px;
+  color: var(--color-accent);
 }
 
 .criteriaCol[data-science] h3 {
@@ -146,21 +127,21 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .criteriaList li {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   font-family: var(--font-heading);
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
   font-weight: 600;
 }
 
 .criteriaBar {
-  width: 48px;
-  height: 3px;
+  width: 40px;
+  height: 2px;
   background: linear-gradient(
     90deg,
     var(--color-accent),
@@ -169,17 +150,10 @@
   flex: none;
 }
 
-.criteriaThesis {
-  margin: 0;
-  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
-  max-width: 42ch;
-  line-height: 1.4;
-}
-
 .prep {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
-  gap: 32px;
+  gap: 36px;
   align-items: center;
   width: 100%;
   max-width: 1100px;
@@ -189,13 +163,13 @@
 .prepGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 .prepCell {
   position: relative;
-  border: 1px solid var(--color-divider);
-  background: var(--color-surface);
+  border: none;
+  background: #000;
   padding: 0;
   cursor: pointer;
   overflow: hidden;
@@ -211,37 +185,38 @@
 
 .prepCell span {
   position: absolute;
-  left: 10px;
-  bottom: 8px;
-  font-size: 12px;
+  left: 12px;
+  bottom: 10px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #fff;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
 }
 
 .prepCell[data-focus] {
-  outline: 2px solid var(--color-accent);
+  outline: 1px solid var(--color-accent);
   outline-offset: 2px;
 }
 
 .prepCaption h3 {
   margin-bottom: 10px;
+  font-size: clamp(1.4rem, 2.4vw, 1.85rem);
 }
 
 .prepCaption p {
-  color: color-mix(in srgb, var(--color-text) 65%, transparent);
-  max-width: 34ch;
+  color: color-mix(in srgb, var(--color-text) 62%, transparent);
+  max-width: 28ch;
 }
 
 .prepHint {
   display: inline-block;
-  margin-top: 16px;
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  margin-top: 18px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-text) 40%, transparent);
+  color: color-mix(in srgb, var(--color-text) 32%, transparent);
 }
 
 .reveal {
@@ -249,18 +224,22 @@
   width: 100%;
   height: 100%;
   min-height: 100%;
+  background: #000;
 }
 
 .revealStage {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .revealImg {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .revealScrim {
@@ -268,9 +247,9 @@
   inset: 0;
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, var(--color-bg) 88%, transparent) 0%,
-    color-mix(in srgb, var(--color-bg) 55%, transparent) 28%,
-    transparent 55%
+    color-mix(in srgb, var(--color-bg) 72%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg) 28%, transparent) 28%,
+    transparent 58%
   );
   pointer-events: none;
 }
@@ -291,36 +270,39 @@
 
 .revealQuestion {
   font-family: var(--font-heading);
-  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
   font-weight: 700;
-  line-height: 1.15;
-  margin-bottom: 20px;
+  font-style: italic;
+  line-height: 1.05;
+  margin-bottom: 24px;
 }
 
 .revealAnswer {
   font-family: var(--font-heading);
-  font-size: clamp(1.4rem, 2.8vw, 2rem);
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
   font-weight: 700;
-  line-height: 1.2;
+  font-style: italic;
+  line-height: 1.05;
   margin-bottom: 12px;
 }
 
 .revealSub {
   color: color-mix(in srgb, var(--color-text) 55%, transparent);
-  max-width: 36ch;
+  max-width: 28ch;
+  font-size: 1.05rem;
 }
 
 .revealBtn {
   align-self: flex-start;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-bg);
   background: var(--color-accent);
   border: none;
-  padding: 12px 18px;
+  padding: 14px 20px;
   cursor: pointer;
 }
 

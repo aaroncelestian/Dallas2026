@@ -1,26 +1,26 @@
 :root {
-  --color-bg: #f2efe9;
-  --color-surface: #e8e4dc;
-  --color-text: #1c1a17;
-  --color-accent: #c94c2a;
-  --color-accent-2: #a63d22;
-  --color-divider: color-mix(in srgb, #1c1a17 28%, transparent);
-  --color-copper: #b87333;
-  --color-mineral-blue: #2a6f8f;
+  --color-bg: #070605;
+  --color-surface: #12100d;
+  --color-text: #f3eee4;
+  --color-accent: #d4a04a;
+  --color-accent-2: #c4893a;
+  --color-divider: color-mix(in srgb, #f3eee4 16%, transparent);
+  --color-copper: #c4894a;
+  --color-mineral-blue: #7ec4d4;
 
-  --color-neutral-100: #f7f5f0;
-  --color-neutral-200: #ebe7df;
-  --color-neutral-300: #d6d0c6;
-  --color-neutral-400: #b8b1a5;
+  --color-neutral-100: #1a1815;
+  --color-neutral-200: #24211c;
+  --color-neutral-300: #3a352f;
+  --color-neutral-400: #564f48;
   --color-neutral-500: #958e83;
-  --color-neutral-600: #736d64;
-  --color-neutral-700: #564f48;
-  --color-neutral-800: #3a352f;
-  --color-neutral-900: #24211c;
+  --color-neutral-600: #b8b1a5;
+  --color-neutral-700: #d6d0c6;
+  --color-neutral-800: #ebe7df;
+  --color-neutral-900: #f7f5f0;
 
-  --color-accent-100: #fceee9;
-  --color-accent-600: #b84325;
-  --color-accent-700: #8f3219;
+  --color-accent-100: #2a2114;
+  --color-accent-600: #e0b15c;
+  --color-accent-700: #f0c878;
 
   --font-heading: "Fraunces", "Times New Roman", serif;
   --font-body: "Instrument Sans", system-ui, sans-serif;
@@ -40,9 +40,9 @@
   --pad-y: clamp(24px, 4.5vh, 52px);
 
   --radius: 0px;
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --slide-duration: 0.5s;
-  --perspective: 1400px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --slide-duration: 0.7s;
+  --perspective: 1600px;
 }
 
 *,
@@ -75,16 +75,16 @@ h5,
 h6 {
   font-family: var(--font-heading);
   font-weight: var(--font-heading-weight);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   margin: 0 0 var(--space-2);
 }
 
 h1 {
-  font-size: clamp(2.4rem, 5.2vw, 3.8rem);
+  font-size: clamp(2.6rem, 6vw, 4.4rem);
 }
 h2 {
-  font-size: clamp(1.85rem, 3.8vw, 2.75rem);
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
 }
 h3 {
   font-size: clamp(1.25rem, 2.2vw, 1.55rem);
@@ -115,21 +115,21 @@ a {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-accent) 28%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 36%, transparent);
 }
 
 .text-muted {
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  color: color-mix(in srgb, var(--color-text) 58%, transparent);
 }
 
 .kicker {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-accent);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 @media (prefers-reduced-motion: reduce) {

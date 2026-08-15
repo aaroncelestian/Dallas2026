@@ -3,9 +3,9 @@ import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import styles from './Motifs.module.css'
 
 const ions = [
-  { id: 'Na', label: 'Na⁺', radius: 1.02, pass: true, note: 'Fits channels' },
-  { id: 'Ca', label: 'Ca²⁺', radius: 1.0, pass: true, note: 'Fits channels' },
-  { id: 'K', label: 'K⁺', radius: 1.38, pass: false, note: 'Excluded — selectivity' },
+  { id: 'Na', label: 'Na⁺', radius: 1.02, pass: true, note: 'Fits' },
+  { id: 'Ca', label: 'Ca²⁺', radius: 1.0, pass: true, note: 'Fits' },
+  { id: 'K', label: 'K⁺', radius: 1.38, pass: false, note: 'Excluded' },
 ]
 
 const maxR = 1.5
@@ -15,13 +15,6 @@ export function IonChart({ active }: { active: boolean }) {
 
   return (
     <div className={styles.ion} aria-label="Ion radius versus channel selectivity">
-      <div className={styles.ionHead}>
-        <span className={styles.ionKicker}>Channel selectivity</span>
-        <p className={styles.ionLead}>
-          Microporous zirconosilicate — size-selective ion exchange. K⁺ at 1.38 Å is
-          excluded from Na⁺-permissive channels.
-        </p>
-      </div>
       <div className={styles.ionBars}>
         {ions.map((ion, i) => (
           <div key={ion.id} className={styles.ionRow} data-pass={ion.pass || undefined}>
@@ -55,7 +48,7 @@ export function IonChart({ active }: { active: boolean }) {
         ))}
       </div>
       <p className={styles.ionFoot}>
-        Selectivity coefficient → FDA-approved hyperkalemia therapy (Lokelma) · ~3M patients
+        Three million patients.
       </p>
     </div>
   )

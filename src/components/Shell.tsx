@@ -3,6 +3,7 @@ import { slides, CHAPTERS } from '../data/slides'
 import { useActiveSlide } from '../hooks/useActiveSlide'
 import { useViewportHeight } from '../hooks/useViewportHeight'
 import { NavContext } from '../hooks/useSlideNav'
+import { isPresentMode } from '../lib/asset'
 import { SlideView } from './layouts/SlideView'
 import styles from './Shell.module.css'
 
@@ -35,6 +36,32 @@ export function Shell() {
   const [fullscreen, setFullscreen] = useState(false)
 
   useViewportHeight()
+
+  useEffect(() => {
+    if (isPresentMode()) {
+      document.documentElement.setAttribute('data-present', '')
+    }
+    return () => document.documentElement.removeAttribute('data-present')
+  }, [])
+
+  useEffect(() => {
+    let timer = 0
+    const show = () => {
+      document.documentElement.style.cursor = ''
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => {
+        if (getFullscreenElement() || isPresentMode()) {
+          document.documentElement.style.cursor = 'none'
+        }
+      }, 2200)
+    }
+    window.addEventListener('pointermove', show)
+    return () => {
+      window.removeEventListener('pointermove', show)
+      window.clearTimeout(timer)
+      document.documentElement.style.cursor = ''
+    }
+  }, [])
 
   const activeIndexRef = useRef(activeIndex)
   activeIndexRef.current = activeIndex
