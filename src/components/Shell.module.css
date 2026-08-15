@@ -46,6 +46,7 @@
 .slide:global(.monument) .slideInner,
 .slide:global(.image) .slideInner,
 .slide:global(.litany) .slideInner,
+.slide:global(.impact) .slideInner,
 .slide:global(.divider) .slideInner {
   max-width: none;
   padding: 0;
@@ -63,6 +64,10 @@
 
 .blackout[data-on] {
   opacity: 1;
+}
+
+.blackout[data-cut] {
+  transition: none;
 }
 
 .buildId {

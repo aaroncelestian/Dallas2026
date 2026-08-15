@@ -12,6 +12,7 @@ export type LayoutKind =
   | 'monument'
   | 'image'
   | 'litany'
+  | 'impact'
 
 export type MotifKind =
   | 'ion-chart'
@@ -60,6 +61,8 @@ export interface Slide {
   exitHold?: number
   /** Hold a black frame before the type comes up. */
   enterBlack?: boolean
+  /** Arrive from black as a hard hit — do not lift the blackout first. */
+  enterHit?: boolean
   splitFlip?: boolean
   notes?: string
 }
@@ -142,7 +145,22 @@ export const slides: Slide[] = [
     enterDelay: 2,
     exitHold: 2,
     notes:
-      'Papal cabinet specimen — acquired for curiosity, princely display, natural philosophy. Asked later to answer under instruments nobody in 1620 could imagine. A specimen’s use is not fixed at acquisition. This is the talk in miniature. Then breathe into Act I.',
+      'Papal cabinet specimen — acquired for curiosity, princely display, natural philosophy. Asked later to answer under instruments nobody in 1620 could imagine. A specimen’s use is not fixed at acquisition. This is the talk in miniature. Then the cabinet hits. Don’t caption it.',
+  },
+  {
+    id: 'cabinet-hit',
+    label: 'The cabinet',
+    chapter: 'open',
+    layout: 'impact',
+    enterHit: true,
+    clearPlate: true,
+    image: {
+      src: asset('images/cabinet-borghese.jpg'),
+      alt: 'The Borghese-Windsor Cabinet',
+      fit: 'contain',
+    },
+    notes:
+      'Boom. Hardlines first, then the cabinet in your face, then it pulls back to the whole object. Do not name it yet. This is the tone for the rest of the night. Hold. Then Act I.',
   },
 
   // ── Act I ─────────────────────────────────────────────

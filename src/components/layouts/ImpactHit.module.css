@@ -1,0 +1,76 @@
+.root {
+  position: relative;
+  flex: 1;
+  min-height: 100%;
+  background: #000;
+  overflow: hidden;
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.photo,
+.lines {
+  position: absolute;
+  max-width: 96vw;
+  max-height: 94vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transform-origin: 50% 38%;
+  will-change: transform, opacity;
+}
+
+.lines {
+  filter: grayscale(1) contrast(28) brightness(2.8) invert(1) sepia(0.45)
+    hue-rotate(6deg) saturate(8);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.photo {
+  z-index: 1;
+  filter: drop-shadow(0 28px 70px rgba(0, 0, 0, 0.65));
+}
+
+.flash {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(180deg, #fff6e4 0%, #e8c57a 55%, #0a0602 100%);
+  opacity: 0;
+}
+
+.flash[data-on] {
+  animation: sting 0.22s steps(2, end) 1;
+}
+
+@keyframes sting {
+  0% {
+    opacity: 0.72;
+  }
+  40% {
+    opacity: 0.18;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo,
+  .lines {
+    transform: none !important;
+  }
+  .flash {
+    display: none;
+  }
+}

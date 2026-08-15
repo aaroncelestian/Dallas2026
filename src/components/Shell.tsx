@@ -10,7 +10,12 @@ import { SlideView } from './layouts/SlideView'
 import styles from './Shell.module.css'
 
 function plateState(slide: Slide, last: Slide['image']) {
-  const hide = slide.motif === 'color-reveal' || slide.motif === 'prep-modes' || slide.clearPlate
+  const hide =
+    slide.motif === 'color-reveal' ||
+    slide.motif === 'prep-modes' ||
+    slide.clearPlate ||
+    slide.layout === 'impact' ||
+    slide.enterHit
   if (hide) return { image: last, mode: 'hidden' as const }
   if (slide.image) return { image: slide.image, mode: 'live' as PlateMode }
   if (last) return { image: last, mode: 'ghost' as PlateMode }
@@ -50,7 +55,12 @@ export function Shell() {
   const heldCamera = useRef<CameraKind | undefined>(slide?.camera)
   const reduced = usePrefersReducedMotion()
 
-  if (slide?.image && slide.motif !== 'color-reveal' && slide.motif !== 'prep-modes') {
+  if (
+    slide?.image &&
+    slide.layout !== 'impact' &&
+    slide.motif !== 'color-reveal' &&
+    slide.motif !== 'prep-modes'
+  ) {
     if (lastImage.current?.src !== slide.image.src) {
       heldCamera.current = slide.camera
     }
@@ -64,13 +74,33 @@ export function Shell() {
   const plate = plateState(slide, lastImage.current)
   const [copyOn, setCopyOn] = useState(true)
   const [blackout, setBlackout] = useState(false)
+  const [blackoutCut, setBlackoutCut] = useState(false)
   const leavingRef = useRef(false)
+
+  useEffect(() => {
+    const href = slides.find((s) => s.id === 'cabinet-hit')?.image?.src
+    if (!href) return
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'image'
+    link.href = href
+    document.head.appendChild(link)
+    return () => link.remove()
+  }, [])
 
   useEffect(() => {
     if (reduced) {
       setCopyOn(true)
       setBlackout(false)
+      setBlackoutCut(false)
       return
+    }
+    if (slide?.enterHit) {
+      setCopyOn(true)
+      setBlackoutCut(true)
+      setBlackout(false)
+      const clear = window.setTimeout(() => setBlackoutCut(false), 80)
+      return () => window.clearTimeout(clear)
     }
     if (!slide?.enterDelay && !slide?.enterBlack) {
       setCopyOn(true)
@@ -83,7 +113,7 @@ export function Shell() {
       setCopyOn(true)
     }, (slide.enterDelay ?? 0) * 1000)
     return () => window.clearTimeout(timer)
-  }, [slide?.id, slide?.enterDelay, slide?.enterBlack, reduced])
+  }, [slide?.id, slide?.enterDelay, slide?.enterBlack, slide?.enterHit, reduced])
 
   useEffect(() => {
     interceptRef.current = (from, to) => {
@@ -96,7 +126,7 @@ export function Shell() {
       setBlackout(true)
       window.setTimeout(() => {
         leavingRef.current = false
-        if (!slides[to]?.enterBlack) setBlackout(false)
+        if (!slides[to]?.enterBlack && !slides[to]?.enterHit) setBlackout(false)
         goTo(to, 'auto', true)
       }, 800 + current.exitHold * 1000)
       return true
@@ -227,11 +257,12 @@ export function Shell() {
     }
   }, [])
 
+  const hard = reduced || Boolean(slide?.enterHit)
   const cut = {
-    initial: reduced ? { opacity: 1 } : { opacity: 0 },
+    initial: hard ? { opacity: 1 } : { opacity: 0 },
     animate: { opacity: 1 },
     exit: reduced ? { opacity: 1 } : { opacity: 0 },
-    transition: { duration: reduced ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: hard ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] as const },
   }
 
   return (
@@ -276,7 +307,12 @@ export function Shell() {
             </div>
           </motion.section>
         </AnimatePresence>
-        <div className={styles.blackout} data-on={blackout || undefined} aria-hidden />
+        <div
+          className={styles.blackout}
+          data-on={blackout || undefined}
+          data-cut={blackoutCut || undefined}
+          aria-hidden
+        />
       </div>
 
       {!presenting && (

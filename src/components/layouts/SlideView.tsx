@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import type { Slide, MotifKind } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { DepthField } from './DepthField'
+import { ImpactHit } from './ImpactHit'
 import { IonChart } from '../motifs/IonChart'
 import { CriteriaOverlap } from '../motifs/CriteriaOverlap'
 import { PrepModes } from '../motifs/PrepModes'
@@ -92,6 +93,16 @@ export function SlideView({
 }) {
   const yaw = (slide.yaw ?? 1) as 1 | -1
   const ownImage = !plated
+
+  if (slide.layout === 'impact') {
+    return (
+      <ImpactHit
+        src={slide.image?.src ?? ''}
+        alt={slide.image?.alt ?? 'Cabinet'}
+        active={active}
+      />
+    )
+  }
 
   if (slide.layout === 'image') {
     return (
