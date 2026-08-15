@@ -1,11 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { slides, CHAPTERS } from '../data/slides'
-import { useActiveSlide } from '../hooks/useActiveSlide'
+import { AnimatePresence, motion } from 'framer-motion'
+import { slides, CHAPTERS, type Slide } from '../data/slides'
+import { useActiveSlide, usePrefersReducedMotion } from '../hooks/useActiveSlide'
 import { useViewportHeight } from '../hooks/useViewportHeight'
 import { NavContext } from '../hooks/useSlideNav'
 import { exitPresent, fillAvailableScreen, isPresentMode, openPresentWindow } from '../lib/asset'
+import { DepthField, type PlateMode } from './layouts/DepthField'
 import { SlideView } from './layouts/SlideView'
 import styles from './Shell.module.css'
+
+function plateState(slide: Slide, last: Slide['image']) {
+  const hide = slide.motif === 'color-reveal' || slide.motif === 'prep-modes' || slide.clearPlate
+  if (hide) return { image: last, mode: 'hidden' as const }
+  if (slide.image) return { image: slide.image, mode: 'live' as PlateMode }
+  if (last) return { image: last, mode: 'ghost' as PlateMode }
+  return { image: undefined, mode: 'hidden' as const }
+}
 
 function getFullscreenElement() {
   const doc = document as Document & {
@@ -32,8 +42,18 @@ async function exitFullscreen() {
 
 export function Shell() {
   const { containerRef, activeIndex, goTo } = useActiveSlide(slides.length)
-  const activeChapter = slides[activeIndex]?.chapter
+  const slide = slides[activeIndex]
+  const activeChapter = slide?.chapter
   const [fullscreen, setFullscreen] = useState(false)
+  const lastImage = useRef<Slide['image']>(slide?.image)
+  const reduced = usePrefersReducedMotion()
+
+  if (slide?.image && slide.motif !== 'color-reveal' && slide.motif !== 'prep-modes') {
+    lastImage.current = slide.image
+  }
+  if (slide?.clearPlate) lastImage.current = undefined
+
+  const plate = plateState(slide, lastImage.current)
 
   useViewportHeight()
 
@@ -159,22 +179,46 @@ export function Shell() {
     }
   }, [])
 
+  const cut = {
+    initial: reduced ? { opacity: 1 } : { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: reduced ? { opacity: 1 } : { opacity: 0 },
+    transition: { duration: reduced ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] },
+  }
+
   return (
     <NavContext.Provider value={goTo}>
       <div ref={containerRef} className={styles.shell} id="deck">
-        {slides.map((slide, i) => (
-          <section
+        {plate.image && plate.mode !== 'hidden' && (
+          <DepthField
+            key={plate.image.src}
+            src={plate.image.src}
+            alt={plate.image.alt}
+            active
+            fit={plate.image.fit ?? 'contain'}
+            yaw={slide.yaw ?? 1}
+            camera={slide.camera ?? 'drift'}
+            mode={plate.mode}
+          />
+        )}
+
+        <AnimatePresence mode="wait">
+          <motion.section
             key={slide.id}
             className={`${styles.slide} ${slide.layout}`}
-            data-slide-index={i}
+            data-slide-index={activeIndex}
             data-slide-id={slide.id}
             aria-label={slide.label}
+            initial={cut.initial}
+            animate={cut.animate}
+            exit={cut.exit}
+            transition={cut.transition}
           >
             <div className={styles.slideInner}>
-              <SlideView slide={slide} active={i === activeIndex} />
+              <SlideView slide={slide} active plated={plate.mode !== 'hidden'} />
             </div>
-          </section>
-        ))}
+          </motion.section>
+        </AnimatePresence>
       </div>
 
       {!presenting && (

@@ -9,22 +9,22 @@
   position: absolute;
   inset: 0;
   perspective: var(--perspective);
-  perspective-origin: 50% 45%;
+  perspective-origin: 50% 42%;
 }
 
 .stage {
   position: absolute;
-  inset: -2%;
+  inset: -6%;
   transform-style: preserve-3d;
   will-change: transform;
 }
 
 .backPlate {
   position: absolute;
-  inset: -8%;
-  transform: translateZ(-56px) scale(1.14);
-  filter: blur(22px) saturate(1.15) brightness(0.55);
-  opacity: 0.55;
+  inset: -10%;
+  transform: translateZ(-72px) scale(1.18);
+  filter: blur(28px) saturate(1.2) brightness(0.45);
+  opacity: 0.6;
 }
 
 .backPlate img {
@@ -50,7 +50,85 @@
 .fore {
   position: absolute;
   inset: 0;
-  transform: translateZ(28px);
+  transform: translateZ(32px);
+  transform-origin: 50% 45%;
+  filter: blur(18px) brightness(0.62);
+  transition: filter 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.root[data-ready][data-mode='live'] .fore {
+  filter: blur(0) brightness(1);
+}
+
+.root[data-mode='ghost'] .fore {
+  filter: blur(24px) brightness(0.2) saturate(0.45);
+}
+
+.root[data-ready][data-mode='live'][data-camera='push'] .fore {
+  animation: cam-push 32s cubic-bezier(0.22, 0.6, 0.35, 1) forwards;
+}
+.root[data-ready][data-mode='live'][data-camera='pull'] .fore {
+  animation: cam-pull 28s cubic-bezier(0.22, 0.6, 0.35, 1) forwards;
+}
+.root[data-ready][data-mode='live'][data-camera='pan-left'] .fore {
+  animation: cam-pan-left 30s cubic-bezier(0.22, 0.6, 0.35, 1) forwards;
+}
+.root[data-ready][data-mode='live'][data-camera='pan-right'] .fore {
+  animation: cam-pan-right 30s cubic-bezier(0.22, 0.6, 0.35, 1) forwards;
+}
+.root[data-ready][data-mode='live'][data-camera='rise'] .fore {
+  animation: cam-rise 30s cubic-bezier(0.22, 0.6, 0.35, 1) forwards;
+}
+.root[data-ready][data-mode='live'][data-camera='fall'] .fore {
+  animation: cam-fall 28s cubic-bezier(0.22, 0.6, 0.35, 1) forwards;
+}
+.root[data-ready][data-mode='live'][data-camera='drift'] .fore {
+  animation: cam-drift 36s ease-in-out infinite alternate;
+}
+.root[data-ready][data-mode='live'][data-camera='rack'] .fore {
+  animation: cam-rack 26s cubic-bezier(0.22, 0.6, 0.35, 1) forwards;
+}
+
+.root[data-mode='ghost'] .fore {
+  animation: cam-ghost 40s ease-in-out infinite alternate;
+}
+
+@keyframes cam-push {
+  from { transform: translateZ(32px) scale(1.05) translate3d(0, 1.5%, 0); }
+  to { transform: translateZ(32px) scale(1.22) translate3d(0, -3.5%, 0); }
+}
+@keyframes cam-pull {
+  from { transform: translateZ(32px) scale(1.24) translate3d(0, -2%, 0); }
+  to { transform: translateZ(32px) scale(1.06) translate3d(0, 1.5%, 0); }
+}
+@keyframes cam-pan-left {
+  from { transform: translateZ(32px) scale(1.18) translate3d(6%, 0, 0); }
+  to { transform: translateZ(32px) scale(1.18) translate3d(-6%, 1%, 0); }
+}
+@keyframes cam-pan-right {
+  from { transform: translateZ(32px) scale(1.18) translate3d(-6%, 0, 0); }
+  to { transform: translateZ(32px) scale(1.18) translate3d(6%, -1%, 0); }
+}
+@keyframes cam-rise {
+  from { transform: translateZ(32px) scale(1.16) translate3d(0, 7%, 0); }
+  to { transform: translateZ(32px) scale(1.2) translate3d(0, -5%, 0); }
+}
+@keyframes cam-fall {
+  from { transform: translateZ(32px) scale(1.14) translate3d(0, -5%, 0); }
+  to { transform: translateZ(32px) scale(1.18) translate3d(0, 6%, 0); }
+}
+@keyframes cam-drift {
+  from { transform: translateZ(32px) scale(1.08) translate3d(-2.2%, 1.4%, 0) rotate(0.35deg); }
+  to { transform: translateZ(32px) scale(1.16) translate3d(2.4%, -2%, 0) rotate(-0.4deg); }
+}
+@keyframes cam-rack {
+  0% { transform: translateZ(32px) scale(1.12); }
+  14% { transform: translateZ(32px) scale(1.05); }
+  100% { transform: translateZ(32px) scale(1.2) translate3d(1%, -2%, 0); }
+}
+@keyframes cam-ghost {
+  from { transform: translateZ(32px) scale(1.12) translate3d(-1.5%, 0, 0); }
+  to { transform: translateZ(32px) scale(1.2) translate3d(1.5%, -1%, 0); }
 }
 
 .fore img {
@@ -77,8 +155,42 @@
 }
 
 .root[data-fit='contain'] .backPlate {
-  opacity: 0.32;
-  filter: blur(36px) saturate(1.2) brightness(0.45);
+  opacity: 0.34;
+  filter: blur(40px) saturate(1.25) brightness(0.4);
+}
+
+.sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateZ(36px);
+  background: linear-gradient(
+    115deg,
+    transparent 36%,
+    rgba(255, 245, 220, 0.07) 48%,
+    transparent 58%
+  );
+  background-size: 220% 100%;
+  opacity: 0;
+}
+
+.root[data-ready][data-mode='live'] .sheen {
+  animation: sheen 16s ease-in-out 1.4s infinite;
+}
+
+@keyframes sheen {
+  0%,
+  100% {
+    opacity: 0;
+    background-position: 120% 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  42% {
+    opacity: 0;
+    background-position: -20% 0;
+  }
 }
 
 .vignette {
@@ -89,8 +201,17 @@
   background:
     radial-gradient(
       ellipse 72% 68% at 50% 46%,
-      transparent 40%,
-      color-mix(in srgb, #000 42%, transparent) 100%
+      transparent 36%,
+      color-mix(in srgb, #000 48%, transparent) 100%
+    );
+}
+
+.root[data-mode='ghost'] .vignette {
+  background:
+    radial-gradient(
+      ellipse 70% 64% at 50% 46%,
+      color-mix(in srgb, #000 35%, transparent) 0%,
+      color-mix(in srgb, #000 78%, transparent) 100%
     );
 }
 
@@ -98,7 +219,13 @@
   .backPlate {
     filter: blur(12px) saturate(1);
   }
-  .stage {
+  .stage,
+  .fore,
+  .sheen {
+    animation: none !important;
     will-change: auto;
+  }
+  .fore {
+    filter: none;
   }
 }

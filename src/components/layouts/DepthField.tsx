@@ -2,15 +2,19 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useSpring } from 'framer-motion'
 import { isPresentMode } from '../../lib/asset'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
+import type { CameraKind } from '../../data/slides'
 import styles from './DepthField.module.css'
+
+export type PlateMode = 'live' | 'ghost'
 
 export type DepthFieldProps = {
   src: string
   alt: string
   active: boolean
   fit?: 'cover' | 'contain'
-  /** Sign of enter yaw; alternates per beat for variety. */
   yaw?: 1 | -1
+  camera?: CameraKind
+  mode?: PlateMode
   className?: string
   children?: React.ReactNode
 }
@@ -21,6 +25,8 @@ export function DepthField({
   active,
   fit = 'cover',
   yaw = 1,
+  camera = 'push',
+  mode = 'live',
   className,
   children,
 }: DepthFieldProps) {
@@ -29,8 +35,8 @@ export function DepthField({
   const rootRef = useRef<HTMLDivElement>(null)
   const [ready, setReady] = useState(false)
 
-  const px = useSpring(0, { stiffness: 40, damping: 22, mass: 0.6 })
-  const py = useSpring(0, { stiffness: 40, damping: 22, mass: 0.6 })
+  const px = useSpring(0, { stiffness: 28, damping: 24, mass: 0.8 })
+  const py = useSpring(0, { stiffness: 28, damping: 24, mass: 0.8 })
 
   useEffect(() => {
     if (!active) {
@@ -39,10 +45,10 @@ export function DepthField({
     }
     const id = requestAnimationFrame(() => setReady(true))
     return () => cancelAnimationFrame(id)
-  }, [active])
+  }, [active, src])
 
   useEffect(() => {
-    if (!active || reduced || present) {
+    if (!active || reduced || present || mode === 'ghost') {
       px.set(0)
       py.set(0)
       return
@@ -55,8 +61,8 @@ export function DepthField({
       const rect = el.getBoundingClientRect()
       const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2
       const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2
-      px.set(nx * 8)
-      py.set(ny * 5)
+      px.set(nx * 10)
+      py.set(ny * 6)
     }
 
     const onLeave = () => {
@@ -70,11 +76,11 @@ export function DepthField({
       el.removeEventListener('pointermove', onMove)
       el.removeEventListener('pointerleave', onLeave)
     }
-  }, [active, reduced, present, px, py])
+  }, [active, reduced, present, mode, px, py])
 
-  const enterRotateY = reduced ? 0 : yaw * 3.2
-  const enterRotateX = reduced ? 0 : -1.8
-  const enterScale = reduced ? 1 : 1.08
+  const enterRotateY = reduced ? 0 : yaw * 7
+  const enterRotateX = reduced ? 0 : -2.4
+  const enterScale = reduced ? 1 : 1.1
 
   return (
     <div
@@ -82,6 +88,9 @@ export function DepthField({
       className={`${styles.root}${className ? ` ${className}` : ''}`}
       data-fit={fit}
       data-active={active || undefined}
+      data-ready={ready || undefined}
+      data-camera={reduced ? 'hold' : camera}
+      data-mode={mode}
     >
       <div className={styles.perspective}>
         <motion.div
@@ -98,10 +107,10 @@ export function DepthField({
                   rotateY: enterRotateY,
                   rotateX: enterRotateX,
                   scale: enterScale,
-                  opacity: reduced ? 1 : 0.92,
+                  opacity: reduced ? 1 : 0.88,
                 }
           }
-          transition={{ duration: reduced ? 0 : 1.15, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: reduced ? 0 : 1.35, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className={styles.backPlate} aria-hidden>
             <img src={src} alt="" />
@@ -110,6 +119,7 @@ export function DepthField({
           <div className={styles.fore}>
             <img src={src} alt={alt} />
           </div>
+          <div className={styles.sheen} aria-hidden />
           <div className={styles.vignette} aria-hidden />
         </motion.div>
       </div>

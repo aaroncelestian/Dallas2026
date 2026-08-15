@@ -21,6 +21,17 @@ export type MotifKind =
 
 export type ChapterId = 'open' | 'research' | 'exhibition' | 'close'
 
+export type CameraKind =
+  | 'push'
+  | 'pull'
+  | 'pan-left'
+  | 'pan-right'
+  | 'rise'
+  | 'fall'
+  | 'rack'
+  | 'drift'
+  | 'hold'
+
 export interface Slide {
   id: string
   label: string
@@ -40,6 +51,9 @@ export interface Slide {
   image?: { src: string; alt: string; fit?: 'cover' | 'contain' }
   motif?: MotifKind
   yaw?: 1 | -1
+  camera?: CameraKind
+  /** Drop the living plate to black instead of ghosting the last specimen. */
+  clearPlate?: boolean
   splitFlip?: boolean
   notes?: string
 }
@@ -57,6 +71,7 @@ export const slides: Slide[] = [
     label: 'Cold open',
     chapter: 'open',
     layout: 'image',
+    camera: 'rack',
     image: {
       src: asset('images/gold.jpg'),
       alt: 'Crystallized gold on quartz, uncaptioned',
@@ -71,6 +86,7 @@ export const slides: Slide[] = [
     label: 'Title',
     chapter: 'open',
     layout: 'cover',
+    camera: 'push',
     brand: 'NHMLAC',
     displayTitle: 'Exhibitions\nand the Mission\nof a Natural\nHistory Museum',
     meta: 'Aaron Celestian  ·  Mineral Sciences  ·  Dallas  ·  40 minutes',
@@ -88,6 +104,7 @@ export const slides: Slide[] = [
     label: 'The question',
     chapter: 'open',
     layout: 'void',
+    camera: 'drift',
     title: 'Why keep a mineral\nno one yet knows\nhow to use?',
     notes:
       'Open verbatim with the abstract line. Add, spoken: or put on public display? Don’t answer. Promise two answers that turn out to be the same answer.',
@@ -97,6 +114,7 @@ export const slides: Slide[] = [
     label: 'Twice',
     chapter: 'open',
     layout: 'void',
+    camera: 'drift',
     title: 'I’ll answer twice.',
     notes:
       'Once through research. Once through exhibition. Both answers converge. Then go to 1620.',
@@ -106,6 +124,7 @@ export const slides: Slide[] = [
     label: 'Four centuries',
     chapter: 'open',
     layout: 'monument',
+    camera: 'pull',
     heroNum: '1620',
     subtitle: 'Four centuries. One cabinet.',
     notes:
@@ -128,6 +147,7 @@ export const slides: Slide[] = [
     label: 'Zeolite',
     chapter: 'research',
     layout: 'bleed',
+    camera: 'rack',
     kicker: 'Channel structure',
     title: 'Nobody bought this\nas medicine.',
     image: {
@@ -156,6 +176,7 @@ export const slides: Slide[] = [
     label: 'Rowleyite',
     chapter: 'research',
     layout: 'bleed',
+    camera: 'pan-right',
     kicker: 'A new species',
     title: 'Prized for novelty.',
     image: {
@@ -172,6 +193,7 @@ export const slides: Slide[] = [
     label: 'Oncology',
     chapter: 'research',
     layout: 'void',
+    camera: 'drift',
     title: 'Then a\ntherapeutic lead.',
     notes:
       'Vanadium-bearing framework, cytotoxic selectivity, controlled-release potential. Channel architecture informing targeted oncology. The delay between “new species” and “drug-design lead” is the point.',
@@ -181,8 +203,9 @@ export const slides: Slide[] = [
     label: 'Lithium',
     chapter: 'research',
     layout: 'void',
-    kicker: 'Resource security',
+    clearPlate: true,
     title: 'Low-water lithium.',
+    kicker: 'Resource security',
     notes:
       'Spinel-structured analogs guiding extraction against Chile/Argentina evaporative brine — water cost, ecosystem impact. Museum mineralogy in a live supply-chain conversation. No specimen on screen: let the sentence carry it.',
   },
@@ -191,6 +214,7 @@ export const slides: Slide[] = [
     label: 'Mars analogs',
     chapter: 'research',
     layout: 'bleed',
+    camera: 'rise',
     kicker: 'Astrobiology',
     title: 'It looked like\nnothing else.',
     image: {
@@ -228,6 +252,7 @@ export const slides: Slide[] = [
     label: 'Unearthed',
     chapter: 'exhibition',
     layout: 'bleed',
+    camera: 'rack',
     kicker: 'Unearthed: Raw Beauty',
     title: 'The mineral\nstands alone.',
     image: {
@@ -270,6 +295,7 @@ export const slides: Slide[] = [
     label: 'Preservation',
     chapter: 'exhibition',
     layout: 'bleed',
+    camera: 'pull',
     kicker: 'Wuning',
     title: 'Specimens that\nalmost weren’t.',
     image: {
@@ -297,6 +323,7 @@ export const slides: Slide[] = [
     label: 'Provenance',
     chapter: 'exhibition',
     layout: 'bleed',
+    camera: 'pan-left',
     kicker: 'De’an · Wushan',
     title: 'Named locality.',
     image: {
@@ -313,6 +340,7 @@ export const slides: Slide[] = [
     label: 'Peninsular Ranges',
     chapter: 'exhibition',
     layout: 'bleed',
+    camera: 'push',
     kicker: 'Southern California',
     title: 'Himalaya. Pala.\nStewart Lithia.',
     image: {
@@ -329,6 +357,7 @@ export const slides: Slide[] = [
     label: 'Loans',
     chapter: 'exhibition',
     layout: 'bleed',
+    camera: 'pan-right',
     kicker: 'April 2027',
     title: 'Nearly everything\nis on loan.',
     image: {
@@ -382,6 +411,7 @@ export const slides: Slide[] = [
     label: 'Close',
     chapter: 'close',
     layout: 'stage',
+    camera: 'push',
     kicker: 'The longer bet',
     title: 'It’s you.',
     image: {

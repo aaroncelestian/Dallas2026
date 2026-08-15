@@ -10,8 +10,8 @@ import { PREP_MODES } from '../../data/prepModes'
 import styles from './Layouts.module.css'
 
 const rise = {
-  hidden: { opacity: 0, y: 28 },
-  show: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 22, filter: 'blur(10px)' },
+  show: { opacity: 1, y: 0, filter: 'blur(0px)' },
 }
 
 function Rise({
@@ -33,7 +33,7 @@ function Rise({
       initial={false}
       animate={active ? 'show' : 'hidden'}
       variants={rise}
-      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay }}
+      transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay }}
     >
       {children}
     </motion.div>
@@ -79,19 +79,29 @@ function Motif({ kind, active, slide }: { kind: MotifKind; active: boolean; slid
   }
 }
 
-export function SlideView({ slide, active }: { slide: Slide; active: boolean }) {
+export function SlideView({
+  slide,
+  active,
+  plated = false,
+}: {
+  slide: Slide
+  active: boolean
+  plated?: boolean
+}) {
   const yaw = (slide.yaw ?? 1) as 1 | -1
+  const ownImage = !plated
 
   if (slide.layout === 'image') {
     return (
       <div className={styles.bleedWrap}>
-        {slide.image && (
+        {ownImage && slide.image && (
           <DepthField
             src={slide.image.src}
             alt={slide.image.alt}
             active={active}
             fit={slide.image.fit ?? 'contain'}
             yaw={yaw}
+            camera={slide.camera}
           />
         )}
       </div>
@@ -148,17 +158,18 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
   if (slide.layout === 'cover') {
     return (
       <div className={styles.cover} data-active={active || undefined}>
-        {slide.image && (
+        {ownImage && slide.image && (
           <DepthField
             src={slide.image.src}
             alt={slide.image.alt}
             active={active}
             fit={slide.image.fit ?? 'cover'}
             yaw={yaw}
+            camera={slide.camera}
           />
         )}
         <div className={styles.coverScrim} aria-hidden />
-        <Rise active={active} className={styles.coverContent}>
+        <Rise active={active} delay={0.7} className={styles.coverContent}>
           {slide.brand && <div className={styles.brand}>{slide.brand}</div>}
           {slide.displayTitle && (
             <h1 className={styles.display}>
@@ -189,19 +200,20 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
   if (slide.layout === 'bleed') {
     return (
       <div className={styles.bleedWrap}>
-        {slide.image && (
+        {ownImage && slide.image && (
           <DepthField
             src={slide.image.src}
             alt={slide.image.alt}
             active={active}
             fit={slide.image.fit ?? 'cover'}
             yaw={yaw}
+            camera={slide.camera}
           />
         )}
         <div className={styles.bleedScrim} aria-hidden />
         {slide.kicker && <div className={`${styles.bleedKicker} kicker`}>{slide.kicker}</div>}
         {slide.title && (
-          <Rise active={active} className={styles.bleedCopy}>
+          <Rise active={active} delay={0.85} className={styles.bleedCopy}>
             <h2>
               <TitleLines text={slide.title} />
             </h2>
@@ -216,13 +228,14 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
       slide.motif === 'color-reveal' || slide.motif === 'prep-modes'
     return (
       <div className={styles.stage} data-motif={slide.motif || undefined}>
-        {slide.image && !motifFull && (
+        {ownImage && slide.image && !motifFull && (
           <DepthField
             src={slide.image.src}
             alt={slide.image.alt}
             active={active}
             fit={slide.image.fit ?? 'cover'}
             yaw={yaw}
+            camera={slide.camera}
           />
         )}
         {!motifFull && <div className={styles.stageScrim} aria-hidden />}
@@ -243,7 +256,7 @@ export function SlideView({ slide, active }: { slide: Slide; active: boolean }) 
             </Rise>
           </div>
         ) : (
-          <Rise active={active} className={styles.stageCopy}>
+          <Rise active={active} delay={0.7} className={styles.stageCopy}>
             <Kicker text={slide.kicker} />
             {slide.title && (
               <h2>

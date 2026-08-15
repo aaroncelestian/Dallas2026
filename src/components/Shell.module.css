@@ -1,27 +1,21 @@
 .shell {
   height: var(--app-height, 100dvh);
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-snap-type: y mandatory;
-  scroll-behavior: auto;
-  background: var(--color-bg);
+  overflow: hidden;
+  position: relative;
+  background: #000;
 }
 
 .shell:fullscreen,
 .shell:-webkit-full-screen {
   width: 100%;
   height: 100%;
-  background: var(--color-bg);
+  background: #000;
 }
 
 .slide {
   box-sizing: border-box;
-  flex: none;
-  min-height: var(--app-height, 100dvh);
-  height: var(--app-height, 100dvh);
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  position: relative;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
