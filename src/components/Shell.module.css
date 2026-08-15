@@ -1,0 +1,201 @@
+.shell {
+  height: var(--app-height, 100dvh);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: auto;
+  background: var(--color-bg);
+}
+
+.shell:fullscreen,
+.shell:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+}
+
+.slide {
+  box-sizing: border-box;
+  flex: none;
+  min-height: var(--app-height, 100dvh);
+  height: var(--app-height, 100dvh);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.slideInner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--pad-y) var(--pad-x);
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+:global(html[data-fullscreen]) .slideInner {
+  max-width: min(1760px, 94vw);
+}
+
+.slide:global(.bleed) .slideInner,
+.slide:global(.cover) .slideInner,
+.slide:global(.stage) .slideInner {
+  max-width: none;
+  padding: 0;
+}
+
+.nav {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0.4;
+  transition: opacity 150ms ease;
+}
+
+.nav:hover,
+.nav:focus-within {
+  opacity: 1;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--color-text);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.dot[data-active='true'] {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.toc {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  opacity: 0.45;
+  transition: opacity 150ms ease;
+}
+
+.toc:hover,
+.toc:focus-within {
+  opacity: 1;
+}
+
+.tocBtn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: none;
+  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  color: var(--color-text);
+  padding: 7px 10px;
+  cursor: pointer;
+  text-align: right;
+  border-right: 2px solid transparent;
+}
+
+.tocBtn[data-active='true'] {
+  border-right-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.chrome {
+  position: fixed;
+  bottom: 16px;
+  left: 20px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter {
+  font-size: 12px;
+  font-feature-settings: 'tnum' 1;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  padding: 6px 10px;
+  border: 1px solid var(--color-divider);
+  opacity: 0.5;
+}
+
+.fullscreenBtn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  border: 1px solid var(--color-divider);
+  padding: 6px 10px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.chrome:hover .counter,
+.chrome:hover .fullscreenBtn,
+.chrome:focus-within .counter,
+.chrome:focus-within .fullscreenBtn,
+.fullscreenBtn:hover,
+.fullscreenBtn:focus-visible {
+  opacity: 1;
+}
+
+.fullscreenBtn[aria-pressed='true'] {
+  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-divider));
+  opacity: 0.85;
+}
+
+.fullscreenBtn:hover,
+.fullscreenBtn:focus-visible {
+  color: var(--color-text);
+  border-color: color-mix(in srgb, var(--color-text) 35%, var(--color-divider));
+}
+
+@media (max-width: 700px) {
+  .nav {
+    display: none;
+  }
+  .toc {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: calc(100vw - 100px);
+    right: 12px;
+    left: auto;
+    bottom: 12px;
+  }
+  .tocBtn {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+  .chrome {
+    left: 12px;
+    bottom: 12px;
+  }
+}
