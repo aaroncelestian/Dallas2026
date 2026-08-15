@@ -183,7 +183,7 @@ export function Shell() {
     initial: reduced ? { opacity: 1 } : { opacity: 0 },
     animate: { opacity: 1 },
     exit: reduced ? { opacity: 1 } : { opacity: 0 },
-    transition: { duration: reduced ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: reduced ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] as const },
   }
 
   return (

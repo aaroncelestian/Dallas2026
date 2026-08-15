@@ -24,7 +24,6 @@ export function DepthField({
   alt,
   active,
   fit = 'cover',
-  yaw: _yaw = 1,
   camera = 'push',
   mode = 'live',
   className,
