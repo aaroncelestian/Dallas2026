@@ -95,8 +95,9 @@
 
 .prep {
   display: flex;
-  flex-direction: column;
-  gap: 14px;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 20px;
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -104,9 +105,11 @@
 
 .prepStrip {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   gap: 6px;
   flex: none;
-  width: min(420px, 48vw);
+  width: min(128px, 14vw);
 }
 
 .prepCell {
@@ -116,7 +119,8 @@
   padding: 0;
   cursor: pointer;
   overflow: hidden;
-  flex: 1;
+  flex: none;
+  width: 100%;
   aspect-ratio: 16 / 10;
   text-align: left;
 }
@@ -156,6 +160,7 @@
 .prepStage {
   position: relative;
   flex: 1;
+  min-width: 0;
   min-height: 0;
 }
 
