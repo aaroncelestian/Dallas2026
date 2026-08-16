@@ -116,6 +116,7 @@ export function SlideView({
         active={active}
         facts={slide.bullets}
         focus={slide.image?.focus}
+        detailSrc={slide.image?.detail}
       />
     )
   }

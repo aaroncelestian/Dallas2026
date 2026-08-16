@@ -77,6 +77,8 @@ export interface Slide {
     fit?: 'cover' | 'contain'
     /** Normalized crop the impact hold should fill. */
     focus?: { x: number; y: number; w: number; h: number }
+    /** High-res plate of `focus` — used for the zoomed-in hold, then faded as the full image pulls back. */
+    detail?: string
   }
   motif?: MotifKind
   yaw?: 1 | -1
@@ -191,7 +193,8 @@ export const slides: Slide[] = [
       src: asset('images/cabinet-windsor.webp'),
       alt: 'Central doorway of the Borghese-Windsor Cabinet',
       fit: 'contain',
-      focus: { x: 0.348, y: 0.427, w: 0.342, h: 0.177 },
+      focus: { x: 0.347876, y: 0.427042, w: 0.342135, h: 0.176953 },
+      detail: asset('images/cabinet-doorway.webp'),
     },
     bullets: [
       'Made for Pope Paul V',
