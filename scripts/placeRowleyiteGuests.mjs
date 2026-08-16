@@ -17,9 +17,9 @@ const PROBE = 1.35
 const RADII = { O: 1.32, V: 1.58, P: 1.48, As: 1.52 }
 const GUEST_CLEAR = 0.55
 const DISPLAY = {
-  C: { color: '#e8d4c0', radius: 0.48 },
-  N: { color: '#5b7ec7', radius: 0.44 },
-  O: { color: '#e24b4b', radius: 0.42 },
+  C: { color: '#e8d4c0', radius: 0.2 },
+  N: { color: '#5b7ec7', radius: 0.19 },
+  O: { color: '#e24b4b', radius: 0.18 },
 }
 
 const GUESTS = [

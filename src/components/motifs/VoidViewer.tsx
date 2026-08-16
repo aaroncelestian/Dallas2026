@@ -79,7 +79,7 @@ function Bond({ a, b }: { a: [number, number, number]; b: [number, number, numbe
   }, [a, b])
   return (
     <mesh position={mid.pos.toArray()} quaternion={mid.quat} renderOrder={3}>
-      <cylinderGeometry args={[0.16, 0.16, mid.len, 6]} />
+      <cylinderGeometry args={[0.055, 0.055, mid.len, 6]} />
       <meshStandardMaterial color="#6a5a4a" roughness={0.65} metalness={0.08} depthTest={false} />
     </mesh>
   )
@@ -98,7 +98,7 @@ function GuestMolecules() {
           })}
           {mol.atoms.map((atom) => (
             <mesh key={`${mol.name}-${atom.id}`} position={[atom.x, atom.y, atom.z]} renderOrder={3}>
-              <sphereGeometry args={[atom.radius * 1.45, 16, 16]} />
+              <sphereGeometry args={[atom.radius, 16, 16]} />
               <meshStandardMaterial
                 color={atom.color}
                 roughness={0.3}
@@ -148,7 +148,7 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
             emissive={VOID_OUT}
             emissiveIntensity={0.12}
             transparent
-            opacity={0.38}
+            opacity={0.82}
             side={THREE.FrontSide}
             depthWrite={false}
           />
@@ -161,7 +161,7 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
             emissive={VOID_IN}
             emissiveIntensity={0.2}
             transparent
-            opacity={0.46}
+            opacity={0.88}
             side={THREE.BackSide}
             depthWrite={false}
           />
