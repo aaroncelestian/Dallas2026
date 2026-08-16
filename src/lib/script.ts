@@ -36,7 +36,6 @@ function motifLine(slide: Slide): string | undefined {
   if (slide.motif === 'lithium-cycle') {
     return 'Motif: lithium ride — first-person on the loop, then pullback'
   }
-  if (slide.motif === 'color-reveal') return 'Motif: color reveal (Enter / R)'
   return undefined
 }
 

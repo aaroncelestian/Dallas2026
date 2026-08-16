@@ -77,8 +77,9 @@
   background:
     linear-gradient(
       90deg,
-      color-mix(in srgb, var(--color-bg) 78%, transparent) 0%,
-      color-mix(in srgb, var(--color-bg) 42%, transparent) 100%
+      color-mix(in srgb, var(--color-bg) 72%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 28%, transparent) 42%,
+      color-mix(in srgb, var(--color-bg) 8%, transparent) 100%
     );
 }
 
@@ -237,7 +238,6 @@
   width: 100%;
 }
 
-.stage[data-motif='color-reveal'],
 .stage[data-motif='crystal-viewer'] {
   padding: 0;
 }
@@ -384,8 +384,9 @@
   background:
     linear-gradient(
       90deg,
-      color-mix(in srgb, var(--color-bg) 80%, transparent) 0%,
-      color-mix(in srgb, var(--color-bg) 48%, transparent) 100%
+      color-mix(in srgb, var(--color-bg) 74%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 32%, transparent) 46%,
+      color-mix(in srgb, var(--color-bg) 6%, transparent) 100%
     );
 }
 

@@ -20,7 +20,6 @@ export type MotifKind =
   | 'void-viewer'
   | 'lithium-cycle'
   | 'prep-modes'
-  | 'color-reveal'
 
 export type ChapterId = 'open' | 'research' | 'exhibition' | 'close'
 
@@ -821,7 +820,7 @@ export const slides: Slide[] = [
         layers: ['bluecap'],
         callouts: ['termination', 'cap', 'body', 'pocket'],
         notes:
-          'Carnegie kept it for the first reason. Aesthetic standing and scientific standing are one act. Then Blue Wave for the color case.',
+          'Carnegie kept it for the first reason. Aesthetic standing and scientific standing are one act. Then the wave — water, crystallization, the real color.',
       },
     ],
   },
@@ -830,14 +829,42 @@ export const slides: Slide[] = [
     label: 'Blue Wave',
     chapter: 'exhibition',
     layout: 'stage',
-    motif: 'color-reveal',
-    image: {
-      src: asset('images/blue-wave.jpg'),
-      alt: 'Blue Wave aragonite, Wenshan Mine, Yunnan',
-      fit: 'contain',
-    },
-    notes:
-      'Press Enter or R to reveal. Visitors assume dyed. Trace copper substitution in the aragonite lattice — same transition-metal mechanism as malachite and azurite. Aesthetic surprise delivering a mineralogy lesson. Hold after the reveal.',
+    clearPlate: true,
+    layers: [
+      {
+        id: 'wave',
+        kind: 'image',
+        src: asset('images/blue-wave.jpg'),
+        alt: 'Blue Wave aragonite, Wenshan Mine, Yunnan — the real copper-blue',
+        fit: 'contain',
+        camera: 'hold',
+      },
+    ],
+    scene: [
+      {
+        id: 'hold',
+        label: 'The wave',
+        layers: ['wave'],
+        notes:
+          'Hold. This is the real color. Do not say dyed. Let the room read a wave that never moved — water, frozen by crystallization, still carrying the chemistry of the fluid that made it.',
+      },
+      {
+        id: 'water',
+        label: 'Water',
+        title: 'Water is the sculptor.',
+        layers: ['wave'],
+        notes:
+          'Aragonite precipitating from solution. Every ridge is a growth front, not a carving. The same power that built every specimen tonight, made visible as one gesture: water writing mineral, over and over, until a wave stood up and stayed.',
+      },
+      {
+        id: 'color',
+        label: 'The color',
+        title: 'The color came\nwith the water.',
+        layers: ['wave'],
+        notes:
+          'Trace copper in the aragonite lattice — the fluid’s chemistry, not a dye. Same transition-metal mechanism as malachite and azurite. Visitors will assume dyed. Don’t lead with that. They have already seen the form as water. Now the blue is what that water was carrying.',
+      },
+    ],
   },
   {
     id: 'preservation',
@@ -927,7 +954,6 @@ export const slides: Slide[] = [
     bullets: [
       'Research scientists',
       'A permanent collection',
-      'Traveling exhibitions',
       'Research loans out',
       'Exhibit loans in',
     ],
@@ -953,14 +979,15 @@ export const slides: Slide[] = [
     layout: 'void',
     title: 'Today’s specimen is\ntomorrow’s unanswered\nquestion.',
     notes:
-      'Run on an instrument not yet built — or seen by a visitor who hasn’t yet learned how to look. Strategic collecting is scientific and cultural infrastructure. Restate the abstract closing claim, then return to the aquamarine — full frame, no type.',
+      'Run on an instrument not yet built — or seen by a visitor who hasn’t yet learned how to look. Strategic collecting is scientific and cultural infrastructure. Restate the abstract closing claim, then return to the aquamarine.',
   },
   {
     id: 'close',
     label: 'Close',
     chapter: 'close',
-    layout: 'image',
+    layout: 'bleed',
     camera: 'push',
+    title: 'A museum is a reflection\nof who cared enough\nto keep it.',
     image: {
       src: asset('images/aquamarine.jpg'),
       alt: 'Aquamarine crystals in albite with schorl, Unearthed',
@@ -968,6 +995,6 @@ export const slides: Slide[] = [
     },
     yaw: 1,
     notes:
-      'Full blast. No type. Land this spoken, not on the wall: Unearthed closes April 2027. Nearly everything is on loan. That’s not a weakness; it’s the argument. What NHMLAC is betting on isn’t these objects — it’s you. A private collection can show you something extraordinary once. A public museum is making a longer bet: that showing you something extraordinary, even temporarily, changes what you notice in what’s already, permanently, yours. Then thank-yous. Not before.',
+      'Full blast. The line is on the wall. Then, spoken: Unearthed closes April 2027. Nearly everything is on loan. That’s not a weakness; it’s the argument. What NHMLAC is betting on isn’t these objects — it’s you. A private collection can show you something extraordinary once. A public museum is making a longer bet: that showing you something extraordinary, even temporarily, changes what you notice in what’s already, permanently, yours. Then thank-yous. Not before.',
   },
 ]

@@ -38,7 +38,6 @@ That launches Chrome/Edge as an app window (`--app`), which is the cleanest shar
 | `Esc` or `P` again | Leave stage / close the stage window |
 | Print button | Speaker script — copy for an AI, or print / save as PDF |
 | `Shift+F` | Native fullscreen (breaks Zoom window-share) |
-| `Enter` or `R` | Blue Wave color reveal (on that beat) |
 | `H` | Lokelma H/K exchange: K in → H pointing → bend/leave → locked |
 | `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
 | Space / → | Next scene beat, then next slide |
@@ -59,7 +58,7 @@ Output is in `dist/` with relative `base: './'` — open `dist/index.html` local
 
 ## How to play it
 
-The screen holds the specimen and a sentence. Everything else is in `notes` on each beat in `src/data/slides.ts`. Hold the cold open. Hold Blue Wave after the reveal. Hold the closing aquamarine.
+The screen holds the specimen and a sentence. Everything else is in `notes` on each beat in `src/data/slides.ts`. Hold the cold open. Hold Blue Wave. Hold the closing aquamarine.
 
 Argument source: `docs/Dallas_Symposium_Talk_Outline.md`.
 
@@ -84,7 +83,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `mars-analog.jpg` | Salt and Mars |
 | `emerald.jpg` | Unearthed |
 | `bluecap.jpg` | Blue Cap · criteria |
-| `blue-wave.jpg` | Color reveal |
+| `blue-wave.jpg` | Blue Wave · water and crystallization |
 | `stibnite.jpg` | Preservation |
 | `fluorite.jpg` | Provenance |
 | `tourmaline.jpg` | Peninsular Ranges |
@@ -103,7 +102,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 - Act II Unearthed + loans: ~16 min
 - Return + close: ~6 min
 
-Breathe on the cold open, porous mineral/Lokelma structure, Blue Wave reveal, prep spectrum, and the closing aquamarine.
+Breathe on the cold open, porous mineral/Lokelma structure, Blue Wave, prep spectrum, and the closing aquamarine.
 
 Regenerate the Lokelma atoms or the rowleyite void mesh after CIF changes:
 

@@ -39,7 +39,6 @@ function chapterLabel(id: ChapterId) {
 
 function plateState(slide: Slide, last: Slide['image']) {
   const hide =
-    slide.motif === 'color-reveal' ||
     slide.motif === 'prep-modes' ||
     slide.motif === 'crystal-viewer' ||
     slide.motif === 'void-viewer' ||
@@ -100,7 +99,6 @@ export function Shell() {
   if (
     slide?.image &&
     slide.layout !== 'impact' &&
-    slide.motif !== 'color-reveal' &&
     slide.motif !== 'prep-modes' &&
     slide.motif !== 'crystal-viewer' &&
     slide.motif !== 'void-viewer' &&

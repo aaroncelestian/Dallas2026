@@ -8,7 +8,6 @@ import { CrystalViewer } from '../motifs/CrystalViewer'
 import { LithiumCycle } from '../motifs/LithiumCycle'
 import { VoidViewer } from '../motifs/VoidViewer'
 import { PrepModes } from '../motifs/PrepModes'
-import { ColorReveal } from '../motifs/ColorReveal'
 import { PREP_MODES } from '../../data/prepModes'
 import { SceneView } from './SceneView'
 import styles from './Layouts.module.css'
@@ -80,14 +79,6 @@ function Motif({ kind, active, slide }: { kind: MotifKind; active: boolean; slid
       return <LithiumCycle active={active} />
     case 'prep-modes':
       return <PrepModes active={active} modes={PREP_MODES} />
-    case 'color-reveal':
-      return (
-        <ColorReveal
-          active={active}
-          src={slide.image?.src ?? ''}
-          alt={slide.image?.alt ?? 'Blue Wave aragonite'}
-        />
-      )
     default:
       return null
   }
@@ -263,10 +254,7 @@ export function SlideView({
   }
 
   if (slide.layout === 'stage') {
-    const motifFull =
-      slide.motif === 'color-reveal' ||
-      slide.motif === 'prep-modes' ||
-      slide.motif === 'crystal-viewer'
+    const motifFull = slide.motif === 'prep-modes' || slide.motif === 'crystal-viewer'
     return (
       <div className={styles.stage} data-motif={slide.motif || undefined}>
         {ownImage && slide.image && !motifFull && (
@@ -284,10 +272,8 @@ export function SlideView({
             <Motif kind="crystal-viewer" active={active} slide={slide} />
           </div>
         )}
-        {slide.motif !== 'color-reveal' && <div className={styles.stageScrim} aria-hidden />}
-        {slide.motif === 'color-reveal' ? (
-          <Motif kind="color-reveal" active={active} slide={slide} />
-        ) : slide.motif === 'crystal-viewer' ? (
+        <div className={styles.stageScrim} aria-hidden />
+        {slide.motif === 'crystal-viewer' ? (
           <Rise active={active} delay={0.15} className={styles.stageCopy}>
             <Kicker text={slide.kicker} />
             {slide.title && (

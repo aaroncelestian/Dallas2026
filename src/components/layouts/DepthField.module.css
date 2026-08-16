@@ -69,7 +69,7 @@
 }
 
 .root[data-mode='ghost'] .fore {
-  filter: blur(24px) brightness(0.2) saturate(0.45);
+  filter: blur(8px) brightness(0.48) saturate(0.8);
 }
 
 .root[data-ready][data-mode='live'][data-camera='push'] .fore {
@@ -319,12 +319,17 @@
     );
 }
 
+.root[data-mode='ghost'] .midGlow {
+  opacity: 0.35;
+}
+
 .root[data-mode='ghost'] .vignette {
   background:
     radial-gradient(
-      ellipse 70% 64% at 50% 46%,
-      color-mix(in srgb, #000 35%, transparent) 0%,
-      color-mix(in srgb, #000 78%, transparent) 100%
+      ellipse 78% 70% at 50% 46%,
+      transparent 0%,
+      color-mix(in srgb, #000 22%, transparent) 58%,
+      color-mix(in srgb, #000 52%, transparent) 100%
     );
 }
 
