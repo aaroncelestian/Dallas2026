@@ -95,7 +95,9 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
                 ? 'Motif: lithium loop — CO₂ falls in from the air'
                 : beat?.id === 'product'
                   ? 'Motif: lithium loop — Li₂CO₃, ready for a battery'
-                  : 'Motif: lithium loop — brine → H₂MnO₄ → CO₂ → Li₂CO₃'
+                  : beat?.id === 'recycle'
+                    ? 'Motif: lithium loop — dashed CO₂ → brine return; after 3s the cycle replays'
+                    : 'Motif: lithium loop — brine → H₂MnO₄ → CO₂ → Li₂CO₃'
         lines.push(cycle)
       }
     }

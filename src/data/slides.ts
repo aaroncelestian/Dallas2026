@@ -343,7 +343,7 @@ export const slides: Slide[] = [
         id: 'product',
         label: 'Li₂CO₃',
         kicker: 'Resource security',
-        title: 'Li₂CO₃.\nReady for a battery.',
+        title: 'Li₂CO₃\nReady for a battery.',
         layers: ['cycle'],
         notes:
           'The wash is also the product. Lithium carbonate, the feedstock battery plants already know how to use. Loop closed.',
@@ -355,7 +355,16 @@ export const slides: Slide[] = [
         title: 'An R&D 100.',
         layers: ['cycle'],
         notes:
-          'R&D World. Global competition. The stamp that a mineral-inspired process left the cabinet and entered a live supply-chain conversation. The prize is not the point for this room. The point is that a museum was on the team because someone had spent years watching how natural structures already solve the problem. Then rowleyite — that same structural selectivity doesn’t stop at extraction.',
+          'R&D World. Global competition. The stamp that a mineral-inspired process left the cabinet and entered a live supply-chain conversation. The prize is not the point for this room. The point is that a museum was on the team because someone had spent years watching how natural structures already solve the problem.',
+      },
+      {
+        id: 'recycle',
+        label: 'Recycle',
+        kicker: 'Resource security',
+        title: 'The spinel comes back.',
+        layers: ['cycle'],
+        notes:
+          'One hundred percent recyclable. The dashed line is the return — after the CO₂ wash, the empty spinel goes back to the brine. Hold. The loop will run itself. Then rowleyite — that same structural selectivity doesn’t stop at extraction.',
       },
     ],
   },
