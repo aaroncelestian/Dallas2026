@@ -109,7 +109,7 @@ function LayerView({
         active={active}
         fit={layer.fit ?? 'contain'}
         yaw={1}
-        camera="hold"
+        camera={layer.camera ?? 'hold'}
       />
     )
   }
@@ -125,9 +125,14 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
   const layers = (slide.layers ?? []).filter((layer) => visible.has(layer.id))
   const hasPlate = layers.length > 0
   const duration = reduced ? 0 : 0.7
+  const camera = layers[0]?.camera
 
   return (
-    <div className={styles.scene} data-empty={!hasPlate || undefined}>
+    <div
+      className={styles.scene}
+      data-empty={!hasPlate || undefined}
+      data-camera={camera}
+    >
       <div className={styles.sceneStage}>
         <AnimatePresence>
           {layers.map((layer) => (

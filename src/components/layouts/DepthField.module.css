@@ -96,6 +96,15 @@
 .root[data-ready][data-mode='live'][data-camera='rack'] .fore {
   animation: cam-rack 26s cubic-bezier(0.22, 0.6, 0.35, 1) forwards;
 }
+.root[data-ready][data-mode='live'][data-camera='zoom-pan'] .fore {
+  animation: cam-zoom-pan 34s cubic-bezier(0.22, 0.6, 0.35, 1) forwards;
+}
+.root[data-camera='pan-bounce'] .fore {
+  transform: none;
+}
+.root[data-ready][data-mode='live'][data-camera='pan-bounce'] .fore img {
+  animation: cam-pan-bounce 42s ease-in-out infinite alternate;
+}
 
 .root[data-mode='ghost'] .fore {
   animation: cam-ghost 40s ease-in-out infinite alternate;
@@ -133,6 +142,20 @@
   from { transform: translateZ(32px); }
   to { transform: translateZ(32px) scale(1.1); }
 }
+@keyframes cam-zoom-pan {
+  from { transform: translateZ(32px) scale(1.06) translate3d(5%, 4%, 0); }
+  to { transform: translateZ(32px) scale(1.42) translate3d(-8%, -6%, 0); }
+}
+@keyframes cam-pan-bounce {
+  0%,
+  7% {
+    object-position: 0% 50%;
+  }
+  93%,
+  100% {
+    object-position: 100% 50%;
+  }
+}
 @keyframes cam-ghost {
   from { transform: translateZ(32px); }
   to { transform: translateZ(32px) scale(1.05) translate3d(1%, 0, 0); }
@@ -143,6 +166,28 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+.root[data-camera='pan-bounce'] .fore img {
+  object-position: 0% 50%;
+}
+
+.root[data-camera='pan-bounce'] .backPlate,
+.root[data-camera='pan-bounce'] .sheen {
+  display: none;
+}
+
+.root[data-camera='pan-bounce'] .midGlow {
+  opacity: 0.28;
+}
+
+.root[data-camera='pan-bounce'] .vignette {
+  background:
+    radial-gradient(
+      ellipse 94% 86% at 50% 48%,
+      transparent 64%,
+      color-mix(in srgb, #000 16%, transparent) 100%
+    );
 }
 
 .root[data-fit='contain'] .fore {
@@ -289,6 +334,7 @@
   }
   .stage,
   .fore,
+  .fore img,
   .sheen {
     animation: none !important;
     will-change: auto;

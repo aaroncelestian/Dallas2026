@@ -26,18 +26,6 @@ const DISPLAY = {
 
 const GUESTS = [
   {
-    id: 'doxorubicin',
-    file: 'doxorubicin_3D.pdb',
-    carbon: '#f0c4a8',
-    minClear: -0.35,
-  },
-  {
-    id: 'vincristine',
-    file: 'vincristine_3D.pdb',
-    carbon: '#c5d8e6',
-    minClear: -0.45,
-  },
-  {
     id: 'cisplatin',
     file: 'cisplatin_3D.pdb',
     carbon: '#d0d6de',
@@ -48,6 +36,18 @@ const GUESTS = [
     file: 'temozolomide_3D.pdb',
     carbon: '#e6d08a',
     minClear: -0.25,
+  },
+  {
+    id: 'doxorubicin',
+    file: 'doxorubicin_3D.pdb',
+    carbon: '#f0c4a8',
+    minClear: -0.35,
+  },
+  {
+    id: 'vincristine',
+    file: 'vincristine_3D.pdb',
+    carbon: '#c5d8e6',
+    minClear: -0.45,
   },
 ]
 
@@ -354,12 +354,20 @@ for (let i = 1; i < n; i++) {
 }
 
 sites.sort((p, q) => q.score - p.score)
+
+const MIN_CAGE_R = 5.5
+const CAGE_SEP = 9
+const allLarge = []
+for (const site of sites) {
+  if (site.r < MIN_CAGE_R) continue
+  if (allLarge.some((c) => Math.hypot(site.x - c.x, site.y - c.y, site.z - c.z) < CAGE_SEP)) continue
+  allLarge.push(site)
+}
+allLarge.sort((p, q) => q.z + 0.3 * q.x + 0.2 * q.y - (p.z + 0.3 * p.x + 0.2 * p.y))
+const large = allLarge.slice(0, 6)
 console.log(
-  `Cage maxima: ${sites.length} · top ` +
-    sites
-      .slice(0, 8)
-      .map((s) => `r=${s.r.toFixed(2)} zFace=${s.zFace.toFixed(1)}`)
-      .join(' · '),
+  `Large open cages: ${allLarge.length} total, using ${large.length} toward camera · ` +
+    large.map((s) => `r=${s.r.toFixed(2)} z=${s.z.toFixed(1)}`).join(' · '),
 )
 
 function guestClearance(placed) {
@@ -430,24 +438,21 @@ for (const spec of GUESTS) {
   const mol = parsePdb(pdbPath)
   console.log(`${spec.id}: ${mol.atoms.length} heavy atoms, radius ${mol.radius.toFixed(1)} Å`)
   let chosen = null
-  for (const site of sites.slice(0, 40)) {
-    if (site.zFace < 2.4 || site.zFace > 11) continue
-    if (occupied.some((o) => Math.hypot(site.x - o.x, site.y - o.y, site.z - o.z) < o.span + 2)) continue
+  for (const site of large) {
+    if (occupied.some((o) => Math.hypot(site.x - o.x, site.y - o.y, site.z - o.z) < CAGE_SEP)) continue
     const trial = dock(mol, site, occupied)
-    if (!trial) continue
-    if (trial.clear < spec.minClear) continue
-    if (!chosen || trial.score > chosen.score) {
-      chosen = { ...trial, site }
-    }
+    if (!trial || trial.clear < spec.minClear) continue
+    chosen = { ...trial, site }
+    break
   }
   if (!chosen) {
-    console.log(`  skipped — no cage near the +Z face accepted it`)
+    console.log(`  skipped — no large open cage accepted it`)
     continue
   }
   console.log(
-    `  docked at zFace=${chosen.site.zFace.toFixed(1)} Å  clearance=${chosen.clear.toFixed(2)} Å  view=${chosen.view.toFixed(2)}`,
+    `  docked in large cage r=${chosen.site.r.toFixed(2)} Å  zFace=${chosen.site.zFace.toFixed(1)} Å  clearance=${chosen.clear.toFixed(2)} Å`,
   )
-  const pull = Math.max(0, chosen.site.zFace - (mol.radius < 5 ? 1.6 : 2.4))
+  const pull = 0.4
   occupied.push({
     x: chosen.site.x,
     y: chosen.site.y,

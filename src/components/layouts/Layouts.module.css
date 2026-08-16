@@ -181,6 +181,17 @@
   margin-bottom: calc(var(--pad-y) + 16px);
 }
 
+.scene[data-camera='pan-bounce'] .stageScrim {
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 58%,
+      color-mix(in srgb, var(--color-bg) 28%, transparent) 82%,
+      color-mix(in srgb, var(--color-bg) 52%, transparent) 100%
+    );
+}
+
 .stageCopy h2 {
   font-size: clamp(2.4rem, 5.4vw, 4.4rem);
   font-weight: 700;

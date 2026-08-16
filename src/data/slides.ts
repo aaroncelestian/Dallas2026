@@ -33,6 +33,8 @@ export type CameraKind =
   | 'fall'
   | 'rack'
   | 'drift'
+  | 'zoom-pan'
+  | 'pan-bounce'
   | 'hold'
 
 export type SceneLayerKind = 'image' | 'motif' | 'video'
@@ -44,6 +46,7 @@ export interface SceneLayer {
   poster?: string
   alt?: string
   fit?: 'cover' | 'contain'
+  camera?: CameraKind
   motif?: MotifKind
 }
 
@@ -481,7 +484,8 @@ export const slides: Slide[] = [
         kind: 'image',
         src: asset('images/stromatolite.jpg'),
         alt: 'Stromatolite thin section, blue epoxy in the pores',
-        fit: 'contain',
+        fit: 'cover',
+        camera: 'zoom-pan',
       },
       {
         id: 'biofilm',
@@ -545,8 +549,9 @@ export const slides: Slide[] = [
         id: 'mars',
         kind: 'image',
         src: asset('images/mars-analog.jpg'),
-        alt: 'Mars-analog evaporite with microbial texture',
-        fit: 'contain',
+        alt: 'Halobacterium on Mars: Isidis basin, hopper salt, fluid inclusions. Watercolor, B.D. 2017',
+        fit: 'cover',
+        camera: 'pan-bounce',
       },
     ],
     scene: [
@@ -565,7 +570,7 @@ export const slides: Slide[] = [
         title: 'If salt is a shelter here,\nask where else.',
         layers: ['mars'],
         notes:
-          'If mineral encasement is a survival strategy on this planet, it doesn’t stay confined to this planet. Mars-analog evaporites. Halophile carotenoid biosignatures. The same shelter-building strategy, looked for somewhere no one’s confirmed biology ever existed at all.',
+          'Don’t advance yet. The plate is the argument — let the camera walk it, left to right, and bounce. Microbes, Isidis, hopper crystals, inclusions. If mineral encasement is a survival strategy on this planet, it doesn’t stay confined to this planet. Mars-analog evaporites. Halophile carotenoid biosignatures. The same shelter-building strategy, looked for somewhere no one’s confirmed biology ever existed at all.',
       },
     ],
   },
