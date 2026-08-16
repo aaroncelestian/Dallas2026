@@ -16,10 +16,10 @@ const cifPath = join(root, 'original_images', 'supporting', 'rowleyite.cif')
 const outPath = join(root, 'src', 'data', 'rowleyiteVoid.json')
 
 const GRID = 52
-const PROBE = 0.88
+const PROBE = 0.98
 const MIN_VOID_VOXELS = 120
 const SMOOTH_ITERS = 10
-const RADII = { O: 0.92, V: 1.15, P: 1.08, As: 1.10 }
+const RADII = { O: 1.01, V: 1.24, P: 1.15, As: 1.19 }
 
 const cif = readFileSync(cifPath, 'utf8')
 

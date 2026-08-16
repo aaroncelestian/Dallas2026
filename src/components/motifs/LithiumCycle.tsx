@@ -14,9 +14,8 @@ type CycleBeat = 'brine' | 'absorb' | 'air' | 'product' | 'award' | 'recycle'
 type StationId = (typeof STATIONS)[number]['id']
 
 const RING = 118
-const REPLAY_LOOPS = 5
 const REPLAY_DELAY_MS = 3000
-const REPLAY_LOOP_S = 0.62
+const REPLAY_LOOP_S = 4
 const ORDER: CycleBeat[] = ['brine', 'absorb', 'air', 'product', 'award', 'recycle']
 const ANGLE: Record<CycleBeat, number> = {
   brine: 180,
@@ -129,9 +128,10 @@ export function LithiumCycle({ active }: { active: boolean }) {
     let replay: ReturnType<typeof animate> | undefined
     const start = window.setTimeout(() => {
       const from = angle.get()
-      replay = animate(angle, from + 360 * REPLAY_LOOPS, {
-        duration: REPLAY_LOOP_S * REPLAY_LOOPS,
+      replay = animate(angle, from + 360, {
+        duration: REPLAY_LOOP_S,
         ease: 'linear',
+        repeat: Infinity,
       })
     }, REPLAY_DELAY_MS)
 

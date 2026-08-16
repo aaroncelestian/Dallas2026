@@ -364,7 +364,7 @@ export const slides: Slide[] = [
         title: 'The spinel comes back.',
         layers: ['cycle'],
         notes:
-          'One hundred percent recyclable. The dashed line is the return — after the CO₂ wash, the empty spinel goes back to the brine. Hold. The loop will run itself. Then rowleyite — that same structural selectivity doesn’t stop at extraction.',
+          'One hundred percent recyclable. The dashed line is the return — after the CO₂ wash, the empty spinel goes back to the brine. Hold. The loop will keep running. Then rowleyite — that same structural selectivity doesn’t stop at extraction.',
       },
     ],
   },
