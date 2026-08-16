@@ -238,22 +238,22 @@ export const slides: Slide[] = [
       detail: asset('images/cabinet-doorway.webp'),
       marks: [
         {
-          label: 'Quartz',
-          x: 0.448,
-          y: 0.328,
-          w: 0.132,
-          h: 0.036,
-          src: asset('images/cabinet-agate.webp'),
-          tint: '#c4a0d4',
-        },
-        {
           label: 'Agate',
           x: 0.462,
           y: 0.244,
           w: 0.105,
           h: 0.048,
-          src: asset('images/cabinet-quartz.webp'),
+          src: asset('images/cabinet-agate.webp'),
           tint: '#d47848',
+        },
+        {
+          label: 'Quartz',
+          x: 0.448,
+          y: 0.328,
+          w: 0.132,
+          h: 0.036,
+          src: asset('images/cabinet-quartz.webp'),
+          tint: '#c4a0d4',
         },
         {
           label: 'Travertine',

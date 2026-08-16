@@ -15,7 +15,9 @@ const GOLD_HOT = '#f0c878'
 const CREAM = '#f3eee4'
 const FLIGHT_S = 1.85
 const ALIGN_S = 0.72
-const ORBIT_IN_S = 0.9
+const ORBIT_IN_S = 1.4
+const HOLD_YAW_DEG = 0.7
+const HOLD_PITCH_DEG = 0.45
 const PULL_S = 2.3
 const REPLAY_DELAY_MS = 3000
 const REPLAY_LOOP_S = 4
@@ -42,11 +44,9 @@ const STATIONS: { id: StationId; html: ReactNode; angle: number; from: number }[
 const WIDE_POS = new THREE.Vector3(6.4, 5.6, 6.9)
 const WIDE_LOOK = new THREE.Vector3(0, 0, 0)
 const RIDE_FOG: [number, number] = [0.85, 3.35]
+const TURN_FOG: [number, number] = [1.05, 5.8]
 const STOP_FOG: [number, number] = [1.2, 5.4]
 const WIDE_FOG: [number, number] = [9, 24]
-const ARC_BEHIND = 18
-const ARC_AHEAD = 74
-const ARC_RAD = ((ARC_BEHIND + ARC_AHEAD) * Math.PI) / 180
 
 function focusStation(beat: CycleBeat): StationId | 'all' {
   if (beat === 'recycle') return 'all'
@@ -153,10 +153,11 @@ function CycleRig({
   const alignFromLook = useMemo(() => new THREE.Vector3(), [])
   const side = useMemo(() => new THREE.Vector3(), [])
   const viewDir = useMemo(() => new THREE.Vector3(), [])
+  const radial = useMemo(() => new THREE.Vector3(), [])
+  const camUp = useMemo(() => new THREE.Vector3(), [])
   const li = useRef<THREE.Mesh>(null)
   const co2 = useRef<THREE.Mesh>(null)
   const returnLine = useRef<THREE.Group>(null)
-  const arc = useRef<THREE.Group>(null)
   const fullRing = useRef<THREE.Mesh>(null)
 
   useEffect(() => {
@@ -173,12 +174,12 @@ function CycleRig({
       camera.getWorldDirection(viewDir)
       alignFromPos.copy(camera.position)
       alignFromLook.copy(camera.position).addScaledVector(viewDir, 3.2)
-      anim.current.pendingTo = next
-      anim.current.align = 0
-      anim.current.flight = 1
-      anim.current.orbitMix = 0
       anim.current.from = anim.current.angle
-      anim.current.to = anim.current.angle
+      anim.current.to = next
+      anim.current.pendingTo = null
+      anim.current.align = 1
+      anim.current.flight = 0
+      anim.current.orbitMix = 0
     }
     looping.current = false
     if (!recycled) {
@@ -245,42 +246,54 @@ function CycleRig({
 
     liPos.copy(onRing(t))
     if (li.current) li.current.position.copy(liPos)
-    const radial = liPos.clone().setY(0).normalize()
+    radial.copy(liPos).setY(0).normalize()
     side.crossVectors(tan, WORLD_UP).normalize()
 
     const holding = !recycled && a.align >= 1 && a.flight >= 1 && !reduced
+    const flying = !reduced && !recycled && a.flight < 1
+    const flightTurn = flying
+      ? THREE.MathUtils.smoothstep(0, 0.16, a.flight) * THREE.MathUtils.smoothstep(1, 0.74, a.flight)
+      : 0
     a.reveal = reduced
       ? holding
         ? 1
         : 0
       : THREE.MathUtils.damp(a.reveal, holding ? 1 : 0, holding ? 1.5 : 2.6, dt)
     const shown = holding ? a.reveal : 0
-    const back = THREE.MathUtils.lerp(1.35, 2.05, shown)
-    const height = THREE.MathUtils.lerp(0.34, 0.58, shown)
-    const out = THREE.MathUtils.lerp(0.22, 0.38, shown)
+    const back = THREE.MathUtils.lerp(THREE.MathUtils.lerp(1.35, 2.05, shown), 1.48, flightTurn)
+    const height = THREE.MathUtils.lerp(THREE.MathUtils.lerp(0.34, 0.58, shown), 0.7, flightTurn)
+    const out = THREE.MathUtils.lerp(THREE.MathUtils.lerp(0.22, 0.38, shown), 0.82, flightTurn)
 
     travelPos
       .copy(liPos)
       .addScaledVector(tan, -back)
       .addScaledVector(radial, out)
       .setY(height)
-    travelLook.copy(liPos).addScaledVector(tan, THREE.MathUtils.lerp(1.7, 2.35, shown)).setY(0.12)
+    travelLook
+      .copy(liPos)
+      .addScaledVector(tan, THREE.MathUtils.lerp(THREE.MathUtils.lerp(1.7, 2.35, shown), 1.15, flightTurn))
+      .addScaledVector(radial, -0.7 * flightTurn)
+      .setY(0.1)
 
     if (holding) {
       a.orbitMix = Math.min(1, a.orbitMix + dt / ORBIT_IN_S)
       a.orbitClock += dt
       const k = easeOut(a.orbitMix)
-      const w = a.orbitClock * 0.38
-      travelPos
-        .addScaledVector(side, Math.sin(w) * 0.42 * k)
-        .addScaledVector(WORLD_UP, (0.06 + Math.cos(w) * 0.16) * k)
-        .addScaledVector(tan, Math.cos(w * 0.85) * 0.16 * k)
-      travelLook
-        .addScaledVector(side, Math.sin(w) * 0.12 * k)
-        .addScaledVector(WORLD_UP, Math.cos(w) * 0.04 * k)
+      viewDir.copy(travelPos).sub(travelLook)
+      viewDir.applyAxisAngle(WORLD_UP, THREE.MathUtils.degToRad(HOLD_YAW_DEG) * a.orbitClock * k)
+      side.crossVectors(WORLD_UP, viewDir).normalize()
+      viewDir.applyAxisAngle(
+        side,
+        Math.sin(a.orbitClock * 0.12) * THREE.MathUtils.degToRad(HOLD_PITCH_DEG) * k,
+      )
+      travelPos.copy(travelLook).add(viewDir)
     }
 
-    if (a.align < 1 && !reduced) {
+    if (flying) {
+      const k = easeOut(Math.min(1, a.flight / 0.14))
+      ridePos.lerpVectors(alignFromPos, travelPos, k)
+      rideLook.lerpVectors(alignFromLook, travelLook, k)
+    } else if (a.align < 1 && !reduced) {
       const k = easeOut(a.align)
       ridePos.lerpVectors(alignFromPos, travelPos, k)
       rideLook.lerpVectors(alignFromLook, travelLook, k)
@@ -291,29 +304,21 @@ function CycleRig({
 
     camPos.lerpVectors(ridePos, WIDE_POS, easeOut(a.pull))
     camLook.lerpVectors(rideLook, WIDE_LOOK, easeOut(a.pull))
+    camUp.copy(WORLD_UP).addScaledVector(radial, -0.2 * flightTurn * (1 - a.pull)).normalize()
 
     if (!wide) {
-      camera.up.copy(WORLD_UP)
+      camera.up.copy(camUp)
       camera.position.copy(camPos)
       camera.lookAt(camLook)
     } else {
       camera.up.copy(WORLD_UP)
     }
 
-    if (arc.current) {
-      arc.current.rotation.y = -THREE.MathUtils.degToRad(t - ARC_BEHIND)
-      arc.current.visible = a.pull < 0.92
-      arc.current.traverse((child) => {
-        const mesh = child as THREE.Mesh
-        const mat = mesh.material as THREE.MeshStandardMaterial | undefined
-        if (mat && 'opacity' in mat) mat.opacity = 1 - easeOut(a.pull)
-      })
-    }
     if (fullRing.current) {
       const mat = fullRing.current.material as THREE.MeshStandardMaterial
-      mat.opacity = easeOut(a.pull)
+      mat.opacity = THREE.MathUtils.lerp(0.9, 1, easeOut(a.pull))
       mat.transparent = true
-      fullRing.current.visible = a.pull > 0.08
+      fullRing.current.visible = true
     }
     const persp = camera as THREE.PerspectiveCamera
     persp.fov = THREE.MathUtils.lerp(60, 40, easeOut(a.pull))
@@ -322,8 +327,16 @@ function CycleRig({
 
     const fog = scene.fog as THREE.Fog | null
     if (fog) {
-      const near = THREE.MathUtils.lerp(RIDE_FOG[0], STOP_FOG[0], a.reveal)
-      const far = THREE.MathUtils.lerp(RIDE_FOG[1], STOP_FOG[1], a.reveal)
+      const near = THREE.MathUtils.lerp(
+        THREE.MathUtils.lerp(RIDE_FOG[0], STOP_FOG[0], a.reveal),
+        TURN_FOG[0],
+        flightTurn,
+      )
+      const far = THREE.MathUtils.lerp(
+        THREE.MathUtils.lerp(RIDE_FOG[1], STOP_FOG[1], a.reveal),
+        TURN_FOG[1],
+        flightTurn,
+      )
       fog.near = THREE.MathUtils.lerp(near, WIDE_FOG[0], a.pull)
       fog.far = THREE.MathUtils.lerp(far, WIDE_FOG[1], a.pull)
     }
@@ -355,32 +368,16 @@ function CycleRig({
       <directionalLight position={[3, 7, 2]} intensity={0.7} color={CREAM} />
       <pointLight position={[0, 2.2, 0]} intensity={0.35} color={GOLD} />
 
-      <group ref={arc}>
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[RING, 0.042, 14, 48, ARC_RAD]} />
-          <meshStandardMaterial
-            color={GOLD}
-            roughness={0.38}
-            metalness={0.55}
-            emissive={GOLD}
-            emissiveIntensity={0.22}
-            transparent
-            opacity={1}
-            depthWrite={false}
-          />
-        </mesh>
-      </group>
-
-      <mesh ref={fullRing} rotation={[Math.PI / 2, 0, 0]} visible={false}>
+      <mesh ref={fullRing} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[RING, 0.042, 14, 128]} />
         <meshStandardMaterial
           color={GOLD}
           roughness={0.38}
           metalness={0.55}
           emissive={GOLD}
-          emissiveIntensity={0.18}
+          emissiveIntensity={0.2}
           transparent
-          opacity={0}
+          opacity={0.9}
         />
       </mesh>
 
@@ -403,7 +400,8 @@ function CycleRig({
       {STATIONS.map((station) => {
         const focus = focusStation(beat)
         const here = focus === 'all' || station.id === focus
-        const live = here && (recycled || reached >= station.from)
+        const live = recycled || reached >= station.from
+        const labeled = here
         const lit = glow === station.id
         const p = onRing(station.angle)
         const label = onRing(station.angle, RING + 0.62)
@@ -417,8 +415,8 @@ function CycleRig({
                 emissiveIntensity={lit ? 1.1 : 0.55}
               />
             </mesh>
-            {live && (
-              <Html
+            {labeled && (
+              <Html>
                 position={[label.x, 0.48, label.z]}
                 center
                 transform={false}
@@ -462,6 +460,7 @@ function CycleRig({
         enabled={wide && !reduced}
         enablePan={false}
         enableZoom={false}
+        rotateSpeed={0.32}
         makeDefault={wide}
       />
     </>
