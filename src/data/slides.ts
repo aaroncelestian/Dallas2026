@@ -212,12 +212,12 @@ export const slides: Slide[] = [
       marks: [
         {
           label: 'Quartz',
-          x: 0.492,
-          y: 0.192,
-          w: 0.046,
-          h: 0.028,
+          x: 0.448,
+          y: 0.328,
+          w: 0.132,
+          h: 0.036,
           src: asset('images/cabinet-quartz.webp'),
-          tint: '#f0e6d0',
+          tint: '#c4a0d4',
         },
         {
           label: 'Agate',
