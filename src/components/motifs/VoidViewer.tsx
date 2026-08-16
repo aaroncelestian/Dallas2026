@@ -1,7 +1,8 @@
-import { Suspense, useMemo, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Line, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import mesh from '../../data/rowleyiteVoid.json'
 import guests from '../../data/rowleyiteGuests.json'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
@@ -78,17 +79,9 @@ function Bond({ a, b }: { a: [number, number, number]; b: [number, number, numbe
     return { len, quat, pos: A.clone().add(B).multiplyScalar(0.5) }
   }, [a, b])
   return (
-    <mesh position={mid.pos.toArray()} quaternion={mid.quat} renderOrder={20}>
+    <mesh position={mid.pos.toArray()} quaternion={mid.quat}>
       <cylinderGeometry args={[0.055, 0.055, mid.len, 6]} />
-      <meshStandardMaterial
-        color="#6a5a4a"
-        roughness={0.65}
-        metalness={0.08}
-        transparent
-        opacity={1}
-        depthTest={false}
-        depthWrite={false}
-      />
+      <meshStandardMaterial color="#6a5a4a" roughness={0.55} metalness={0.12} />
     </mesh>
   )
 }
@@ -105,18 +98,14 @@ function GuestMolecules() {
             return <Bond key={`${mol.name}-${i}-${j}`} a={[A.x, A.y, A.z]} b={[B.x, B.y, B.z]} />
           })}
           {mol.atoms.map((atom) => (
-            <mesh key={`${mol.name}-${atom.id}`} position={[atom.x, atom.y, atom.z]} renderOrder={20}>
+            <mesh key={`${mol.name}-${atom.id}`} position={[atom.x, atom.y, atom.z]}>
               <sphereGeometry args={[atom.radius, 16, 16]} />
               <meshStandardMaterial
                 color={atom.color}
-                roughness={0.3}
-                metalness={0.12}
+                roughness={0.28}
+                metalness={0.18}
                 emissive={atom.color}
-                emissiveIntensity={0.55}
-                transparent
-                opacity={1}
-                depthTest={false}
-                depthWrite={false}
+                emissiveIntensity={0.22}
               />
             </mesh>
           ))}
@@ -124,6 +113,21 @@ function GuestMolecules() {
       ))}
     </>
   )
+}
+
+function LocalEnvironment() {
+  const { gl, scene } = useThree()
+  useEffect(() => {
+    const pmrem = new THREE.PMREMGenerator(gl)
+    const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+    scene.environment = env
+    return () => {
+      scene.environment = null
+      env.dispose()
+      pmrem.dispose()
+    }
+  }, [gl, scene])
+  return null
 }
 
 function Scene({ active, showGuests }: { active: boolean; showGuests: boolean }) {
@@ -145,36 +149,36 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
 
   return (
     <>
-      <ambientLight intensity={0.48} />
-      <directionalLight position={[6, 8, 4]} intensity={1.05} color="#fff4e0" />
-      <directionalLight position={[-5, -2, -6]} intensity={0.34} color="#9ec4d4" />
-      <pointLight position={[0, 0.4, 3.2]} intensity={1.15} color={VOID_IN} distance={18} />
+      <ambientLight intensity={0.22} />
+      <directionalLight position={[7, 9, 5]} intensity={1.55} color="#fff3dc" />
+      <directionalLight position={[-6, 3, -4]} intensity={0.55} color="#9ec4d4" />
+      <directionalLight position={[2, -5, 6]} intensity={0.35} color="#f0c878" />
+      <LocalEnvironment />
       <group ref={group} scale={SCALE}>
         <CellWire size={mesh.cell.a} />
-        <mesh geometry={geometry} renderOrder={0}>
-          <meshStandardMaterial
+        <mesh geometry={geometry}>
+          <meshPhysicalMaterial
             color={VOID_OUT}
-            roughness={0.36}
-            metalness={0.18}
-            emissive={VOID_OUT}
-            emissiveIntensity={0.12}
-            transparent
-            opacity={0.82}
+            roughness={0.38}
+            metalness={0.22}
+            clearcoat={0.45}
+            clearcoatRoughness={0.35}
+            sheen={0.28}
+            sheenColor="#f0d4a0"
+            envMapIntensity={0.95}
             side={THREE.FrontSide}
-            depthWrite={false}
           />
         </mesh>
-        <mesh geometry={geometry} renderOrder={0}>
-          <meshStandardMaterial
+        <mesh geometry={geometry}>
+          <meshPhysicalMaterial
             color={VOID_IN}
-            roughness={0.42}
-            metalness={0.08}
-            emissive={VOID_IN}
-            emissiveIntensity={0.2}
-            transparent
-            opacity={0.88}
+            roughness={0.62}
+            metalness={0.06}
+            clearcoat={0.08}
+            sheen={0.18}
+            sheenColor="#b8e0e8"
+            envMapIntensity={0.55}
             side={THREE.BackSide}
-            depthWrite={false}
           />
         </mesh>
         {showGuests && <GuestMolecules />}

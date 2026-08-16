@@ -579,7 +579,41 @@ export const slides: Slide[] = [
         label: 'Signature',
         title: 'The same signature.\nThree scales apart.',
         notes:
-          'Hinge of the talk. A kidney stone’s biofilm layers, a stromatolite’s laminae, a halophile’s salt-crystal shelter, a Mars-analog evaporite’s texture — not four unrelated curiosities, but one recurring strategy, read at scales from a human body to a planet nobody’s stood on. No single specimen could show that pattern. It only became visible because the specimens existed together, waiting to be read against each other. Close Act I here.',
+          'Hinge of the talk. A kidney stone’s biofilm layers, a stromatolite’s laminae, a halophile’s salt-crystal shelter, a Mars-analog evaporite’s texture — not four unrelated curiosities, but one recurring strategy, read at scales from a human body to a planet nobody’s stood on. No single specimen could show that pattern. It only became visible because the specimens existed together, waiting to be read against each other. Then step back.',
+      },
+    ],
+  },
+  {
+    id: 'treasure',
+    label: 'Treasure',
+    chapter: 'research',
+    layout: 'stage',
+    clearPlate: true,
+    scene: [
+      {
+        id: 'rare-beautiful-functional',
+        label: 'Rare, beautiful, functional',
+        title: 'Rare. Beautiful. Functional.',
+        subtitle: 'A treasure holds all three.',
+        notes:
+          'Step back. Rare alone is just scarcity. Beautiful alone is decoration. Functional alone is utility. A treasure is what happens when one specimen holds all three at once — and every specimen in the last twenty minutes earned that word without me saying it. The zeolite. The rowleyite. The biofilm inside a kidney stone. Same pattern, every time.',
+      },
+    ],
+  },
+  {
+    id: 'story',
+    label: 'Story',
+    chapter: 'research',
+    layout: 'stage',
+    clearPlate: true,
+    scene: [
+      {
+        id: 'what-a-mineral-holds',
+        label: 'What a mineral holds',
+        title: 'A Picasso is a story.',
+        subtitle: 'So is a mineral.',
+        notes:
+          'Any real work of art is never just an object to look at — it’s a story, about a place and time, or about what was happening inside the person who made it. A mineral holds a story too. Not a metaphor. Literal information: how it formed, when, what changed around it while it grew. Beauty is one way to read that story. It was never the only one.',
       },
     ],
   },
@@ -593,7 +627,7 @@ export const slides: Slide[] = [
     ghostNum: '02',
     title: 'Exhibition as the same bet,\npointed at the public',
     notes:
-      'Research infrastructure is the half of the mission the public doesn’t see. Exhibition is the half they do. Same acquisition logic, different audience. Name Unearthed.',
+      'Research infrastructure is the half of the mission the public doesn’t see. Exhibition is the half they do. Same acquisition logic, different audience, same story, read differently. Name Unearthed.',
   },
   {
     id: 'unearthed',
