@@ -81,16 +81,48 @@ function Bond({ a, b }: { a: [number, number, number]; b: [number, number, numbe
     return { len, quat, pos: A.clone().add(B).multiplyScalar(0.5) }
   }, [a, b])
   return (
-    <mesh position={mid.pos.toArray()} quaternion={mid.quat} castShadow>
+    <mesh position={mid.pos.toArray()} quaternion={mid.quat} castShadow userData={{ guestBond: true }}>
       <cylinderGeometry args={[0.055, 0.055, mid.len, 6]} />
-      <meshStandardMaterial color="#6a5a4a" roughness={0.55} metalness={0.12} />
+      <meshStandardMaterial
+        color="#6a5a4a"
+        roughness={0.55}
+        metalness={0.12}
+        transparent
+        opacity={0}
+        depthWrite
+      />
     </mesh>
   )
 }
 
-function GuestMolecules() {
+function GuestMolecules({ visible, reduced }: { visible: boolean; reduced: boolean }) {
+  const group = useRef<THREE.Group>(null)
+  const opacity = useRef(visible ? 1 : 0)
+
+  useFrame((_, dt) => {
+    const root = group.current
+    if (!root) return
+    const target = visible ? 1 : 0
+    if (reduced) {
+      opacity.current = target
+    } else {
+      opacity.current += (target - opacity.current) * Math.min(1, dt * 2.15)
+      if (Math.abs(opacity.current - target) < 0.004) opacity.current = target
+    }
+    const a = opacity.current
+    root.visible = a > 0.012
+    root.traverse((obj) => {
+      const mesh = obj as THREE.Mesh
+      const mat = mesh.material as THREE.MeshStandardMaterial | undefined
+      if (!mat || mat.opacity == null) return
+      const isBond = Boolean(obj.userData.guestBond)
+      mat.opacity = isBond ? a * 0.92 : a
+      if (!isBond) mat.emissiveIntensity = 0.22 * a
+    })
+  })
+
   return (
-    <>
+    <group ref={group} visible={false}>
       {guests.molecules.map((mol) => (
         <group key={mol.name}>
           {mol.bonds.map(([i, j]) => {
@@ -107,13 +139,16 @@ function GuestMolecules() {
                 roughness={0.28}
                 metalness={0.18}
                 emissive={atom.color}
-                emissiveIntensity={0.22}
+                emissiveIntensity={0}
+                transparent
+                opacity={0}
+                depthWrite
               />
             </mesh>
           ))}
         </group>
       ))}
-    </>
+    </group>
   )
 }
 
@@ -197,7 +232,7 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
             side={THREE.BackSide}
           />
         </mesh>
-        {showGuests && <GuestMolecules />}
+        <GuestMolecules visible={showGuests} reduced={reduced} />
       </group>
       <ContactShadows
         position={[0, -2.85, 0]}
@@ -229,13 +264,16 @@ export function VoidViewer({ active, guests: showGuests = false }: { active: boo
             {row.label}
           </div>
         ))}
-        {showGuests &&
-          LEGEND_GUESTS.map((row) => (
-            <div key={row.label} className={styles.legendRow}>
-              <span className={styles.swatch} style={{ background: row.color }} />
-              {row.label}
-            </div>
-          ))}
+        <div className={styles.legendGuests} data-on={showGuests || undefined}>
+          <div className={styles.legendGuestsInner}>
+            {LEGEND_GUESTS.map((row) => (
+              <div key={row.label} className={styles.legendRow}>
+                <span className={styles.swatch} style={{ background: row.color }} />
+                {row.label}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
       <Canvas
         dpr={[1, 1.75]}
@@ -249,9 +287,11 @@ export function VoidViewer({ active, guests: showGuests = false }: { active: boo
         </Suspense>
       </Canvas>
       <div className={styles.crystalCaption}>
-        {showGuests
-          ? 'Rowleyite · four cargos in the near cages · drag to orbit'
-          : 'Rowleyite · void space · drag to orbit'}
+        <span className={styles.captionSizer} aria-hidden>
+          Rowleyite · four cargos in the near cages · drag to orbit
+        </span>
+        <span data-on={!showGuests || undefined}>Rowleyite · void space · drag to orbit</span>
+        <span data-on={showGuests || undefined}>Rowleyite · four cargos in the near cages · drag to orbit</span>
       </div>
     </div>
   )
