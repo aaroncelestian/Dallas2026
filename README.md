@@ -46,7 +46,7 @@ That launches Chrome/Edge as an app window (`--app`), which is the cleanest shar
 | Drag | Orbit the Lokelma structure or the rowleyite void (on those beats) |
 | Hover counter | Jump to a slide or a scene beat |
 
-Chrome (counter, TOC, Resources) stays invisible until you hover. Cursor hides after a beat of stillness. The counter opens a slide list. Resources open over the talk — **Back to talk** or Esc returns.
+Chrome (counter, Resources) stays invisible until you hover. Cursor hides after a beat of stillness. The counter opens a slide list. Resources open in a new tab.
 
 ## Build for projector / USB
 

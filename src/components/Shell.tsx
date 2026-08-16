@@ -37,8 +37,6 @@ const RESOURCES = [
   },
   {
     href: 'https://lacnhm.maps.arcgis.com/apps/mapviewer/index.html?webmap=6f3eb85811d645059fe7afe5441a1480',
-    embed:
-      'https://lacnhm.maps.arcgis.com/apps/Embed/index.html?webmap=6f3eb85811d645059fe7afe5441a1480',
     title: 'Agate trade routes',
     detail: 'ArcGIS map',
   },
@@ -48,8 +46,6 @@ const RESOURCES = [
     detail: 'Cabinet essay',
   },
 ] as const
-
-type Resource = (typeof RESOURCES)[number]
 
 function chapterLabel(id: ChapterId) {
   if (id === 'open') return 'Open'
@@ -107,7 +103,6 @@ export function Shell() {
   const [fullscreen, setFullscreen] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [resourcesOpen, setResourcesOpen] = useState(false)
-  const [resource, setResource] = useState<Resource | null>(null)
   const pickerRef = useRef<HTMLDivElement>(null)
   const resourcesRef = useRef<HTMLDivElement>(null)
   const activePickRef = useRef<HTMLButtonElement>(null)
@@ -328,10 +323,6 @@ export function Shell() {
 
       if (e.key === 'Escape') {
         e.preventDefault()
-        if (resource) {
-          setResource(null)
-          return
-        }
         if (pickerOpen || resourcesOpen) {
           setPickerOpen(false)
           setResourcesOpen(false)
@@ -363,12 +354,7 @@ export function Shell() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [presenting, pickerOpen, resourcesOpen, resource, toggleFullscreen])
-
-  useEffect(() => {
-    document.documentElement.toggleAttribute('data-resource', Boolean(resource))
-    return () => document.documentElement.removeAttribute('data-resource')
-  }, [resource])
+  }, [presenting, pickerOpen, resourcesOpen, toggleFullscreen])
 
   useEffect(() => {
     setPickerOpen(false)
@@ -464,8 +450,6 @@ export function Shell() {
         />
       </div>
 
-      {!resource && (
-      <>
       <div className={styles.chrome} data-open={chromeOpen || undefined}>
         <div className={styles.pickerWrap} ref={pickerRef}>
           {pickerOpen && (
@@ -559,7 +543,7 @@ export function Shell() {
                   role="menuitem"
                   onClick={() => {
                     setResourcesOpen(false)
-                    setResource(item)
+                    window.open(item.href, '_blank', 'noreferrer')
                   }}
                 >
                   <span className={styles.resourceTitle}>{item.title}</span>
@@ -607,36 +591,6 @@ export function Shell() {
           </button>
         )}
       </div>
-      </>
-      )}
-
-      {resource && (
-        <div className={styles.resourceStage}>
-          <header className={styles.resourceBar}>
-            <button
-              type="button"
-              className={styles.resourceBack}
-              onClick={() => setResource(null)}
-            >
-              Back to talk
-            </button>
-            <p className={styles.resourceNow}>{resource.title}</p>
-            <a
-              className={styles.resourceExt}
-              href={resource.href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open separately
-            </a>
-          </header>
-          <iframe
-            className={styles.resourceFrame}
-            src={'embed' in resource ? resource.embed : resource.href}
-            title={resource.title}
-          />
-        </div>
-      )}
     </SceneProvider>
     </NavContext.Provider>
   )
