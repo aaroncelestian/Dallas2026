@@ -18,6 +18,7 @@ export type MotifKind =
   | 'ion-chart'
   | 'crystal-viewer'
   | 'void-viewer'
+  | 'lithium-cycle'
   | 'criteria-overlap'
   | 'prep-modes'
   | 'color-reveal'
@@ -295,6 +296,11 @@ export const slides: Slide[] = [
         alt: 'Spinel octahedron',
         fit: 'contain',
       },
+      {
+        id: 'cycle',
+        kind: 'motif',
+        motif: 'lithium-cycle',
+      },
     ],
     scene: [
       {
@@ -307,40 +313,49 @@ export const slides: Slide[] = [
           'First research case. Hold the spinel. This is not lithium ore. Nobody accessioned it as a battery plant. Natural structures already know how to host a small cation, how to be selective, how to let something in and hold it. Sometimes we never put the specimen in the reactor. We take the property and build with it. That inspiration is the point of this story.',
       },
       {
-        id: 'waste',
-        label: 'Waste liquids',
+        id: 'brine',
+        label: 'Brine',
         kicker: 'Resource security',
-        title: 'The lithium is already\nin the waste.',
-        layers: ['spinel'],
+        title: 'Desalination already\nconcentrated the brine.',
+        layers: ['cycle'],
         notes:
-          'Mine leachate. Oil-field brine. Spent batteries. Oak Ridge, Element3, and this museum — a method for taking lithium out of liquids we already produce. Not a new evaporative pond. Not a new pit in the Atacama.',
+          'The plant already did the hard work. Reject brine, sitting there. This is not a new evaporative pond. Not a new pit in the Atacama. The lithium is in a liquid we already make.',
       },
       {
-        id: 'water',
-        label: 'Water cost',
+        id: 'absorb',
+        label: 'Absorb',
         kicker: 'Resource security',
-        title: 'The Atacama cannot\nspare the water.',
-        layers: ['spinel'],
+        title: 'The spinel takes\nthe lithium.',
+        layers: ['cycle'],
         notes:
-          'The incumbent method is evaporation. Water cost, ecosystem impact. Let the sentence carry the politics. Then leave it.',
+          'H₂MnO₄ — the protonated manganese spinel. Size-selective uptake. Lithium fits. The bigger cations in seawater do not. Watch it move in. We used the property, not the specimen.',
       },
       {
-        id: 'vacancy',
-        label: 'Vacancy',
+        id: 'air',
+        label: 'Air',
         kicker: 'Resource security',
-        title: 'A hole the size\nof lithium.',
-        layers: ['spinel'],
+        title: 'The acid comes\nfrom the air.',
+        layers: ['cycle'],
         notes:
-          'The working chemistry is aluminum hydroxide — common, cheap, already in the crust. Amorphous, not the crystalline gibbsite people had been using. It takes lithium up and holds it: at least five times the load of the old sorbents. The reason is a vacancy so small that only lithium fits. Sodium and potassium are too big. Works from pH 5 to 11. Runs at 140 °C. No acid roast. Traditional routes cook mined rock with acid at 250, or cook it at 800 to 1000 without acid. This one doesn’t.',
+          'CO₂ out of the atmosphere, turned into carbonic acid. That is the wash. No mined acid. No roast. The air does the stripping.',
+      },
+      {
+        id: 'product',
+        label: 'Li₂CO₃',
+        kicker: 'Resource security',
+        title: 'Li₂CO₃.\nReady for a battery.',
+        layers: ['cycle'],
+        notes:
+          'The wash is also the product. Lithium carbonate, the feedstock battery plants already know how to use. Loop closed.',
       },
       {
         id: 'award',
         label: 'R&D 100',
         kicker: 'Resource security',
         title: 'An R&D 100.',
-        layers: ['spinel'],
+        layers: ['cycle'],
         notes:
-          'R&D World. Global competition. The stamp that a mineral-inspired process left the cabinet and entered a live supply-chain conversation — U.S. battery metal from waste, a third the material and energy of the standard route, a sorbent you rinse with hot water and use again. The prize is not the point for this room. The point is that a museum was on the team because someone had spent years watching how natural structures already solve the problem. Then rowleyite — that same structural selectivity doesn’t stop at extraction.',
+          'R&D World. Global competition. The stamp that a mineral-inspired process left the cabinet and entered a live supply-chain conversation. The prize is not the point for this room. The point is that a museum was on the team because someone had spent years watching how natural structures already solve the problem. Then rowleyite — that same structural selectivity doesn’t stop at extraction.',
       },
     ],
   },

@@ -33,6 +33,9 @@ function motifLine(slide: Slide): string | undefined {
   if (slide.motif === 'void-viewer') {
     return 'Motif: Rowleyite void space — cages and channels, no atoms (drag to orbit)'
   }
+  if (slide.motif === 'lithium-cycle') {
+    return 'Motif: lithium loop — brine → H₂MnO₄ → CO₂ → Li₂CO₃'
+  }
   if (slide.motif === 'criteria-overlap') {
     return 'Motif: aesthetic judgment overlapping scientific standing'
   }
@@ -81,6 +84,19 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
             ? 'Motif: Rowleyite void — doxorubicin, vincristine, cisplatin, temozolomide in the near-face cages (drag to orbit)'
             : 'Motif: Rowleyite void space — cages and channels, no atoms (drag to orbit)',
         )
+      }
+      if (layer?.kind === 'motif' && layer.motif === 'lithium-cycle') {
+        const cycle =
+          beat?.id === 'brine'
+            ? 'Motif: lithium loop — desalination brine live'
+            : beat?.id === 'absorb'
+              ? 'Motif: lithium loop — Li moves into H₂MnO₄'
+              : beat?.id === 'air'
+                ? 'Motif: lithium loop — CO₂ falls in from the air'
+                : beat?.id === 'product'
+                  ? 'Motif: lithium loop — Li₂CO₃, ready for a battery'
+                  : 'Motif: lithium loop — brine → H₂MnO₄ → CO₂ → Li₂CO₃'
+        lines.push(cycle)
       }
     }
   } else if (slide.image) {

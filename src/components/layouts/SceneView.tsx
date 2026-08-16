@@ -4,6 +4,7 @@ import type { SceneLayer, SceneSlide, Slide } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
 import { CrystalViewer } from '../motifs/CrystalViewer'
+import { LithiumCycle } from '../motifs/LithiumCycle'
 import { VoidViewer } from '../motifs/VoidViewer'
 import { DepthField } from './DepthField'
 import styles from './Layouts.module.css'
@@ -146,6 +147,14 @@ function LayerView({
     return (
       <div className={styles.sceneMotif}>
         <VoidViewer active={active} guests={showGuests} />
+      </div>
+    )
+  }
+
+  if (layer.kind === 'motif' && layer.motif === 'lithium-cycle') {
+    return (
+      <div className={styles.sceneMotif}>
+        <LithiumCycle active={active} />
       </div>
     )
   }
