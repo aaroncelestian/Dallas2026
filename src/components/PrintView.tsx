@@ -83,14 +83,16 @@ export function PrintView() {
                   {(() => {
                     const layer = beat.slide.layers?.find(
                       (item) =>
-                        item.kind === 'image' &&
-                        item.src &&
+                        (item.kind === 'image' || item.kind === 'video') &&
+                        (item.poster || item.src) &&
                         (!beat.sceneLabel ||
                           beat.slide.scene
                             ?.find((s) => s.label === beat.sceneLabel)
                             ?.layers?.includes(item.id)),
                     )
-                    const src = layer?.src ?? beat.slide.image?.src
+                    const src =
+                      (layer?.kind === 'video' ? layer.poster : layer?.src) ??
+                      beat.slide.image?.src
                     const alt = layer?.alt ?? beat.slide.image?.alt
                     if (!src) return null
                     return (

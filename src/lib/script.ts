@@ -59,7 +59,9 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
   if (beat?.layers && slide.layers) {
     for (const id of beat.layers) {
       const layer = slide.layers.find((item) => item.id === id)
-      if (layer?.alt) lines.push(`Image: ${layer.alt}`)
+      if (layer?.alt) {
+        lines.push(layer.kind === 'video' ? `Video: ${layer.alt}` : `Image: ${layer.alt}`)
+      }
       if (layer?.kind === 'motif' && layer.motif === 'crystal-viewer') {
         if (beat?.id === 'protons') {
           lines.push('Motif: ZS-9 — K removed, H pointing at the vacant site (H to step)')

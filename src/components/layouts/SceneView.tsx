@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useRef } from 'react'
 import type { SceneLayer, Slide } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
@@ -17,6 +18,49 @@ function TitleLines({ text }: { text: string }) {
         </span>
       ))}
     </>
+  )
+}
+
+function SceneVideo({
+  src,
+  poster,
+  alt,
+  active,
+  fit = 'contain',
+}: {
+  src: string
+  poster?: string
+  alt?: string
+  active: boolean
+  fit?: 'cover' | 'contain'
+}) {
+  const ref = useRef<HTMLVideoElement>(null)
+  const reduced = usePrefersReducedMotion()
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (reduced || !active) {
+      el.pause()
+      return
+    }
+    el.currentTime = 0
+    void el.play()
+  }, [active, reduced, src])
+
+  return (
+    <video
+      ref={ref}
+      className={styles.sceneVideo}
+      data-fit={fit}
+      src={src}
+      poster={poster}
+      muted
+      loop
+      playsInline
+      preload="auto"
+      aria-label={alt}
+    />
   )
 }
 
@@ -47,14 +91,12 @@ function LayerView({
 
   if (layer.kind === 'video' && layer.src) {
     return (
-      <video
-        className={styles.sceneVideo}
+      <SceneVideo
         src={layer.src}
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-label={layer.alt}
+        poster={layer.poster}
+        alt={layer.alt}
+        active={active}
+        fit={layer.fit}
       />
     )
   }

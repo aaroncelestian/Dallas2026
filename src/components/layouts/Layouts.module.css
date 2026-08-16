@@ -255,6 +255,10 @@
   background: #000;
 }
 
+.sceneVideo[data-fit='cover'] {
+  object-fit: cover;
+}
+
 .voidSlide {
   flex: 1;
   display: flex;

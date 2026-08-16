@@ -41,6 +41,7 @@ export interface SceneLayer {
   id: string
   kind: SceneLayerKind
   src?: string
+  poster?: string
   alt?: string
   fit?: 'cover' | 'contain'
   motif?: MotifKind
@@ -469,10 +470,11 @@ export const slides: Slide[] = [
       },
       {
         id: 'ct',
-        kind: 'image',
-        src: asset('images/ks78-cut.jpg'),
-        alt: 'CT volume of a kidney stone, voids opened',
-        fit: 'contain',
+        kind: 'video',
+        src: asset('images/ks78-thickness.mp4'),
+        poster: asset('images/ks78-cut.jpg'),
+        alt: 'CT thickness map of a kidney stone, orbiting',
+        fit: 'cover',
       },
       {
         id: 'stromatolite',

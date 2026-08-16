@@ -74,7 +74,8 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `spinel.jpg` | Lithium |
 | `rowleyite.jpg` | Rowleyite |
 | `stone-polish.jpg` | Kidney stone cut |
-| `ks78-cut.jpg` | Kidney stone CT |
+| `ks78-cut.jpg` | Kidney stone CT poster |
+| `ks78-thickness.mp4` | Kidney stone CT orbit |
 | `stromatolite.jpg` | Stromatolite thin section |
 | `stone-biofilm.jpg` | Stone biofilm SEM |
 | `halite-trona.jpg` | Salt as shelter |

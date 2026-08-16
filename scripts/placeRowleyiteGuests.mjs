@@ -20,8 +20,8 @@ const DISPLAY = {
   C: { color: '#e8d4c0', radius: 0.2 },
   N: { color: '#5b7ec7', radius: 0.19 },
   O: { color: '#e24b4b', radius: 0.18 },
-  PT: { color: '#d0d6de', radius: 0.34 },
-  CL: { color: '#5aaa5a', radius: 0.24 },
+  PT: { color: '#d0d6de', radius: 0.42 },
+  CL: { color: '#5aaa5a', radius: 0.28 },
 }
 
 const GUESTS = [
@@ -156,7 +156,13 @@ function parsePdb(path) {
   for (const line of text.split('\n')) {
     if (line.startsWith('HETATM') || line.startsWith('ATOM  ')) {
       const serial = Number(line.slice(6, 11))
-      const element = (line.slice(76, 78).trim() || line.slice(12, 16).trim()[0]).toUpperCase()
+      const col = line.length >= 78 ? line.slice(76, 78).trim() : ''
+      const name = line.slice(12, 16).trim()
+      const tail = line.trim().split(/\s+/).pop() ?? ''
+      let element = (col || (/^[A-Za-z]{1,2}$/.test(tail) ? tail : '') || name.replace(/[^A-Za-z]/g, '')).toUpperCase()
+      if (element === 'T' && /pt/i.test(name + tail)) element = 'PT'
+      if (element === 'L' && /cl/i.test(name + tail)) element = 'CL'
+      if (element.length > 2) element = element.slice(0, 2)
       raw.push({
         serial,
         element,
@@ -441,10 +447,11 @@ for (const spec of GUESTS) {
   console.log(
     `  docked at zFace=${chosen.site.zFace.toFixed(1)} Å  clearance=${chosen.clear.toFixed(2)} Å  view=${chosen.view.toFixed(2)}`,
   )
+  const pull = Math.max(0, chosen.site.zFace - (mol.radius < 5 ? 1.6 : 2.4))
   occupied.push({
     x: chosen.site.x,
     y: chosen.site.y,
-    z: chosen.site.z + chosen.dz,
+    z: chosen.site.z + chosen.dz + pull,
     span: mol.radius + 1.5,
   })
   placedGuests.push({
@@ -453,7 +460,7 @@ for (const spec of GUESTS) {
     site: {
       x: chosen.site.x - a * 0.5,
       y: chosen.site.y - a * 0.5,
-      z: chosen.site.z + chosen.dz - a * 0.5,
+      z: chosen.site.z + chosen.dz + pull - a * 0.5,
     },
     atoms: chosen.placed.map((p, i) => {
       const look = DISPLAY[p.element] ?? DISPLAY.C
@@ -462,7 +469,7 @@ for (const spec of GUESTS) {
         element: p.element,
         x: p.x - a * 0.5,
         y: p.y - a * 0.5,
-        z: p.z - a * 0.5,
+        z: p.z + pull - a * 0.5,
         color: p.element === 'C' ? spec.carbon : look.color,
         radius: look.radius,
       }
