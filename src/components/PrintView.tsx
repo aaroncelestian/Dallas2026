@@ -14,6 +14,7 @@ export function PrintView() {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
+    document.documentElement.setAttribute('data-print', '')
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault()
@@ -21,7 +22,10 @@ export function PrintView() {
       }
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.documentElement.removeAttribute('data-print')
+    }
   }, [])
 
   const copyScript = async () => {

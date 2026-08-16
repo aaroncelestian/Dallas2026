@@ -143,3 +143,41 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Print view: unlock the deck's locked dark viewport before the print dialog. */
+html[data-print] {
+  color-scheme: light;
+}
+
+html[data-print],
+html[data-print] body,
+html[data-print] #root {
+  height: auto;
+  min-height: 100%;
+  overflow: auto;
+  background: #f4efe6;
+  color: #1a1815;
+}
+
+@media print {
+  @page {
+    size: letter;
+    margin: 0.6in;
+  }
+
+  html,
+  html[data-print],
+  html[data-print] body,
+  html[data-print] #root,
+  body,
+  #root {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #1a1815 !important;
+    color-scheme: light;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

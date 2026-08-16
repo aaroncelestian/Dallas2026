@@ -8,13 +8,16 @@ import { useScene } from '../../hooks/useSceneBeats'
 import {
   CELL_SHRUNK,
   buildExchangeSites,
+  buildPoreWindows,
   hydroxylAt,
   phaseForBeat,
   sampleExchange,
   sampleHEntry,
+  samplePore,
   type CrystalPhase,
   type ExchangeAnim,
   type Hydroxyl,
+  type PoreWindow,
   type Vec3,
 } from '../../lib/lokelmaExchange'
 import styles from './Motifs.module.css'
@@ -34,10 +37,14 @@ const LEGEND = [
 
 const CAPTION: Record<CrystalPhase, string> = {
   k: 'ZS-9 · K⁺ in the channels · drag to orbit',
+  pore: 'ZS-9 · ~3 Å 7-ring · drag to orbit',
   'h-point': 'H in · the cell contracts',
   exchange: 'H out · the cell opens · K locks',
   locked: 'K locked · cell restored',
 }
+
+const PORE_COLOR = '#f3cc7a'
+const PORE_FREE = 1.5
 
 function scaled(p: Vec3): Vec3 {
   return [p[0] * SCALE, p[1] * SCALE, p[2] * SCALE]
@@ -252,6 +259,116 @@ function PotassiumSites({
   )
 }
 
+function circlePoints(center: Vec3, normal: Vec3, radius: number, steps = 48): Vec3[] {
+  const n = new THREE.Vector3(...normal)
+  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), n)
+  const pts: Vec3[] = []
+  for (let i = 0; i <= steps; i++) {
+    const a = (i / steps) * Math.PI * 2
+    const p = new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0)
+    p.applyQuaternion(q)
+    pts.push([center[0] + p.x, center[1] + p.y, center[2] + p.z])
+  }
+  return pts
+}
+
+function PoreWindows({
+  windows,
+  anim,
+}: {
+  windows: PoreWindow[]
+  anim: MutableRefObject<ExchangeAnim>
+}) {
+  const group = useRef<THREE.Group>(null)
+  const loops = useMemo(
+    () =>
+      windows.map((w) => {
+        const center = scaled(w.center)
+        const aperture = circlePoints(center, w.normal, PORE_FREE * SCALE)
+        const window = [...w.oxygens.map(scaled), scaled(w.oxygens[0])]
+        const quat = new THREE.Quaternion().setFromUnitVectors(
+          new THREE.Vector3(0, 0, 1),
+          new THREE.Vector3(...w.normal),
+        )
+        return { id: w.id, center, quat, aperture, window, oxygens: w.oxygens.map(scaled) }
+      }),
+    [windows],
+  )
+
+  useFrame((state) => {
+    const root = group.current
+    if (!root) return
+    const { poreOp } = anim.current
+    root.visible = poreOp > 0.02
+    const pulse = 0.82 + 0.18 * Math.sin(state.clock.elapsedTime * 2.1)
+    const op = poreOp * pulse
+    for (const child of root.children) {
+      const ring = child as THREE.Group
+      for (const node of ring.children) {
+        const mesh = node as THREE.Mesh & { material?: THREE.Material | THREE.Material[] }
+        const mat = mesh.material
+        if (!mat || Array.isArray(mat)) continue
+        if ('opacity' in mat) {
+          const base = (mesh.userData.opacity as number | undefined) ?? 1
+          mat.opacity = base * op
+        }
+        if (mat instanceof THREE.MeshStandardMaterial) {
+          mat.emissiveIntensity = ((mesh.userData.emissive as number | undefined) ?? 0.8) * op
+        }
+      }
+    }
+  })
+
+  return (
+    <group ref={group} visible={false}>
+      {loops.map((loop) => (
+        <group key={loop.id}>
+          <Line
+            points={loop.aperture}
+            color={PORE_COLOR}
+            lineWidth={2.4}
+            transparent
+            opacity={0.95}
+            userData={{ opacity: 0.95 }}
+          />
+          <Line
+            points={loop.window}
+            color={PORE_COLOR}
+            lineWidth={1.45}
+            transparent
+            opacity={0.7}
+            userData={{ opacity: 0.7 }}
+          />
+          <mesh position={loop.center} quaternion={loop.quat} userData={{ opacity: 0.16 }}>
+            <circleGeometry args={[PORE_FREE * SCALE, 32]} />
+            <meshBasicMaterial
+              color={PORE_COLOR}
+              transparent
+              opacity={0.16}
+              side={THREE.DoubleSide}
+              depthWrite={false}
+            />
+          </mesh>
+          {loop.oxygens.map((pos, i) => (
+            <mesh key={i} position={pos} userData={{ opacity: 0.95, emissive: 1.15 }}>
+              <sphereGeometry args={[0.085, 12, 12]} />
+              <meshStandardMaterial
+                color={PORE_COLOR}
+                emissive={PORE_COLOR}
+                emissiveIntensity={1.15}
+                roughness={0.28}
+                transparent
+                opacity={0.95}
+                depthWrite={false}
+              />
+            </mesh>
+          ))}
+        </group>
+      ))}
+    </group>
+  )
+}
+
 const REST: ExchangeAnim = {
   hMix: 0,
   hOp: 0,
@@ -259,6 +376,17 @@ const REST: ExchangeAnim = {
   kLock: 0,
   cellScale: 1,
   cellGlow: 0,
+  poreOp: 0,
+}
+
+const PORE_HELD: ExchangeAnim = {
+  hMix: 0,
+  hOp: 0,
+  kOp: 0.12,
+  kLock: 0,
+  cellScale: 1,
+  cellGlow: 0.22,
+  poreOp: 1,
 }
 
 const HELD: ExchangeAnim = {
@@ -268,6 +396,7 @@ const HELD: ExchangeAnim = {
   kLock: 0,
   cellScale: CELL_SHRUNK,
   cellGlow: 1,
+  poreOp: 0,
 }
 
 const LOCKED: ExchangeAnim = {
@@ -277,17 +406,26 @@ const LOCKED: ExchangeAnim = {
   kLock: 1,
   cellScale: 1,
   cellGlow: 0,
+  poreOp: 0,
 }
 
-function applyPhase(phase: CrystalPhase, progress: number, reduced: boolean): ExchangeAnim {
+function applyPhase(
+  phase: CrystalPhase,
+  progress: number,
+  reduced: boolean,
+  kStart = 1,
+): ExchangeAnim {
   if (phase === 'k') return REST
-  if (phase === 'h-point') return reduced ? HELD : sampleHEntry(progress)
+  if (phase === 'pore') return reduced ? PORE_HELD : samplePore(progress)
+  if (phase === 'h-point') return reduced ? HELD : sampleHEntry(progress, kStart)
   if (phase === 'locked' || (phase === 'exchange' && reduced)) return LOCKED
   return sampleExchange(progress)
 }
 
 function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
   const group = useRef<THREE.Group>(null)
+  const prevPhase = useRef(phase)
+  const kStart = useRef(1)
   const progress = useRef(phase === 'locked' || phase === 'k' ? 1 : 0)
   const anim = useRef<ExchangeAnim>(applyPhase(phase, progress.current, false))
   const reduced = usePrefersReducedMotion()
@@ -296,11 +434,14 @@ function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
   const framework = useMemo(() => atoms.filter((atom) => atom.element !== 'K'), [atoms])
   const kAtoms = useMemo(() => atoms.filter((atom) => atom.element === 'K'), [atoms])
   const sites = useMemo(() => buildExchangeSites(atoms), [atoms])
+  const pores = useMemo(() => buildPoreWindows(atoms, bonds), [atoms, bonds])
 
   useEffect(() => {
-    const live = (phase === 'h-point' || phase === 'exchange') && !reduced
+    kStart.current = phase === 'h-point' && prevPhase.current === 'pore' ? 0.12 : 1
+    const live = (phase === 'pore' || phase === 'h-point' || phase === 'exchange') && !reduced
     progress.current = live ? 0 : 1
-    anim.current = applyPhase(phase, progress.current, reduced)
+    anim.current = applyPhase(phase, progress.current, reduced, kStart.current)
+    prevPhase.current = phase
   }, [phase, reduced])
 
   useFrame((_, dt) => {
@@ -308,12 +449,12 @@ function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
     if (root && !reduced && active) {
       root.rotation.y += dt * 0.1
     }
-    const live = (phase === 'h-point' || phase === 'exchange') && !reduced
+    const live = (phase === 'pore' || phase === 'h-point' || phase === 'exchange') && !reduced
     if (live && progress.current < 1) {
-      const dur = phase === 'exchange' ? 3.6 : 1.65
+      const dur = phase === 'exchange' ? 3.6 : phase === 'pore' ? 1.85 : 1.65
       progress.current = Math.min(1, progress.current + dt / dur)
     }
-    anim.current = applyPhase(phase, progress.current, reduced)
+    anim.current = applyPhase(phase, progress.current, reduced, kStart.current)
     if (root) {
       const s = anim.current.cellScale
       root.scale.setScalar(s)
@@ -328,7 +469,7 @@ function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
       <pointLight
         position={[0, 0.4, 2.2]}
         intensity={phase === 'h-point' || phase === 'exchange' ? 0.85 : 1.15}
-        color={phase === 'h-point' || phase === 'exchange' ? H_COLOR : K_COLOR}
+        color={phase === 'h-point' || phase === 'exchange' ? H_COLOR : PORE_COLOR}
         distance={14}
       />
       <group ref={group}>
@@ -356,6 +497,7 @@ function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
           </mesh>
         ))}
         <PotassiumSites atoms={kAtoms} anim={anim} />
+        <PoreWindows windows={pores} anim={anim} />
         <Hydroxyls sites={sites.hydroxyls} anim={anim} />
       </group>
       <OrbitControls enablePan={false} enableZoom={false} makeDefault />
@@ -394,7 +536,12 @@ export function CrystalViewer({ active }: { active: boolean }) {
 
   const phase = override ?? beatPhase
   const showH = phase === 'h-point' || phase === 'exchange'
-  const legend = showH ? LEGEND : LEGEND.filter((row) => row.label !== 'H')
+  const legend =
+    phase === 'pore'
+      ? [...LEGEND.filter((row) => row.label !== 'K⁺' && row.label !== 'H'), { color: PORE_COLOR, label: '3 Å' }]
+      : showH
+        ? LEGEND
+        : LEGEND.filter((row) => row.label !== 'H')
 
   return (
     <div className={styles.crystal} aria-label={CAPTION[phase]}>

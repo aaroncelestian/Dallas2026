@@ -229,7 +229,7 @@ export const slides: Slide[] = [
           y: 0.328,
           w: 0.132,
           h: 0.036,
-          src: asset('images/cabinet-quartz.webp'),
+          src: asset('images/cabinet-agate.webp'),
           tint: '#c4a0d4',
         },
         {
@@ -238,7 +238,7 @@ export const slides: Slide[] = [
           y: 0.244,
           w: 0.105,
           h: 0.048,
-          src: asset('images/cabinet-agate.webp'),
+          src: asset('images/cabinet-quartz.webp'),
           tint: '#d47848',
         },
         {
@@ -439,7 +439,7 @@ export const slides: Slide[] = [
         id: 'zeolite',
         kind: 'image',
         src: asset('images/zeolite.jpg'),
-        alt: 'Zeolite specimen, stellarite',
+        alt: 'Porous mineral specimen, stellarite',
         fit: 'contain',
       },
       {
@@ -451,7 +451,7 @@ export const slides: Slide[] = [
     scene: [
       {
         id: 'specimen',
-        label: 'Zeolite',
+        label: 'Porous mineral',
         kicker: 'Channel structure',
         title: 'Nobody bought this\nas medicine.',
         layers: ['zeolite'],
@@ -461,7 +461,7 @@ export const slides: Slide[] = [
       {
         id: 'precedents',
         label: 'Precedents',
-        kicker: 'Zeolite → Lokelma',
+        kicker: 'Porous mineral → Lokelma',
         title: 'Georgechaoite.\nUmbite.\nSitinakite.',
         layers: ['zeolite'],
         notes:
@@ -470,7 +470,7 @@ export const slides: Slide[] = [
       {
         id: 'gut',
         label: 'Gut',
-        kicker: 'Zeolite → Lokelma',
+        kicker: 'Porous mineral → Lokelma',
         title: 'Not blood.\nNot kidney.\nGut.',
         layers: ['structure'],
         notes:
@@ -479,16 +479,16 @@ export const slides: Slide[] = [
       {
         id: 'pore',
         label: 'Pore',
-        kicker: 'Zeolite → Lokelma',
+        kicker: 'Porous mineral → Lokelma',
         title: 'A ~3 Å pore, built to\nmimic a K⁺ channel.',
         layers: ['structure'],
         notes:
-          'The crystal lattice opens a pore about three angstroms wide, engineered to mimic the selectivity of the body’s own potassium channels. Extremely selective over Na⁺, Ca²⁺, Mg²⁺. It captures potassium as food moves through the intestine, before the kidney would ever have to clear it. Deployed exactly where the kidney isn’t, because the kidney is the organ that’s failing.',
+          'K fades first — then the 3 Å window. The crystal lattice opens a pore about three angstroms wide, engineered to mimic the selectivity of the body’s own potassium channels. Extremely selective over Na⁺, Ca²⁺, Mg²⁺. It captures potassium as food moves through the intestine, before the kidney would ever have to clear it. Deployed exactly where the kidney isn’t, because the kidney is the organ that’s failing.',
       },
       {
         id: 'protons',
         label: 'Protons',
-        kicker: 'Zeolite → Lokelma',
+        kicker: 'Porous mineral → Lokelma',
         title: 'Protons point\nat the empty site.',
         layers: ['structure'],
         notes:
@@ -497,7 +497,7 @@ export const slides: Slide[] = [
       {
         id: 'lock',
         label: 'Lock',
-        kicker: 'Zeolite → Lokelma',
+        kicker: 'Porous mineral → Lokelma',
         title: 'They bend.\nThey leave.\nK stays.',
         layers: ['structure'],
         notes:
@@ -506,7 +506,7 @@ export const slides: Slide[] = [
       {
         id: 'patients',
         label: '3 million',
-        kicker: 'Zeolite → Lokelma',
+        kicker: 'Porous mineral → Lokelma',
         title: 'Size-selective exchange\nbecomes a drug.',
         subtitle: '3 million patients.',
         layers: ['structure'],
@@ -672,7 +672,7 @@ export const slides: Slide[] = [
         title: 'Rare. Beautiful. Functional.',
         subtitle: 'A treasure holds all three.',
         notes:
-          'Step back. Rare alone is just scarcity. Beautiful alone is decoration. Functional alone is utility. A treasure is what happens when one specimen holds all three at once — and every specimen in the last twenty minutes earned that word without me saying it. The spinel that taught a sorbent. The zeolite. The rowleyite. The biofilm inside a kidney stone. Same pattern, every time.',
+          'Step back. Rare alone is just scarcity. Beautiful alone is decoration. Functional alone is utility. A treasure is what happens when one specimen holds all three at once — and every specimen in the last twenty minutes earned that word without me saying it. The spinel that taught a sorbent. The porous mineral. The rowleyite. The biofilm inside a kidney stone. Same pattern, every time.',
       },
     ],
   },

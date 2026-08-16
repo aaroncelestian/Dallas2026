@@ -159,17 +159,7 @@
   max-height: 160px;
   object-fit: contain;
   object-position: left center;
-  background: #1a1815;
-}
-
-:global(html:has([data-print-root])),
-:global(html:has([data-print-root]) body),
-:global(html:has([data-print-root]) #root) {
-  height: auto;
-  min-height: 100%;
-  overflow: auto;
-  background: #f4efe6;
-  color: #1a1815;
+  background: #ece6db;
 }
 
 @media (max-width: 700px) {
@@ -186,11 +176,10 @@
     display: none;
   }
 
-  .page,
-  :global(html:has([data-print-root])),
-  :global(html:has([data-print-root]) body),
-  :global(html:has([data-print-root]) #root) {
+  .page {
     background: #fff;
+    min-height: 0;
+    color: #1a1815;
   }
 
   .doc {
@@ -200,7 +189,7 @@
 
   .figure img {
     max-height: 120px;
-    background: #111;
+    background: transparent;
   }
 
   .beat {

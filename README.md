@@ -70,7 +70,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | File | Beat |
 |------|------|
 | `gold.jpg` | Cold open, title, close |
-| `zeolite.jpg` | Lokelma · zeolite |
+| `zeolite.jpg` | Lokelma · porous mineral |
 | `spinel.jpg` | Lithium |
 | `rowleyite.jpg` | Rowleyite |
 | `stone-polish.jpg` | Kidney stone cut |
@@ -100,7 +100,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 - Act II Unearthed + loans: ~16 min
 - Return + close: ~6 min
 
-Breathe on the cold open, zeolite/Lokelma structure, Blue Wave reveal, prep spectrum, and the closing return to gold.
+Breathe on the cold open, porous mineral/Lokelma structure, Blue Wave reveal, prep spectrum, and the closing return to gold.
 
 Regenerate the Lokelma atoms or the rowleyite void mesh after CIF changes:
 

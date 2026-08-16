@@ -14,6 +14,8 @@ const GOLD = '#d4a04a'
 const GOLD_HOT = '#f0c878'
 const CREAM = '#f3eee4'
 const FLIGHT_S = 1.85
+const ALIGN_S = 0.72
+const ORBIT_IN_S = 0.9
 const PULL_S = 2.3
 const REPLAY_DELAY_MS = 3000
 const REPLAY_LOOP_S = 4
@@ -28,16 +30,6 @@ const ANGLE: Record<CycleBeat, number> = {
   recycle: 450,
 }
 
-/** Roll around the rail. 0 = curve right, π = left, 3π/2 = up, 2π = right again. */
-const ROLL: Record<CycleBeat, number> = {
-  brine: 0,
-  absorb: Math.PI,
-  air: Math.PI * 1.5,
-  product: Math.PI * 2,
-  award: Math.PI * 2,
-  recycle: Math.PI * 2,
-}
-
 const WORLD_UP = new THREE.Vector3(0, 1, 0)
 
 const STATIONS: { id: StationId; html: ReactNode; angle: number; from: number }[] = [
@@ -50,9 +42,10 @@ const STATIONS: { id: StationId; html: ReactNode; angle: number; from: number }[
 const WIDE_POS = new THREE.Vector3(6.4, 5.6, 6.9)
 const WIDE_LOOK = new THREE.Vector3(0, 0, 0)
 const RIDE_FOG: [number, number] = [0.85, 3.35]
+const STOP_FOG: [number, number] = [1.2, 5.4]
 const WIDE_FOG: [number, number] = [9, 24]
-const ARC_BEHIND = 14
-const ARC_AHEAD = 52
+const ARC_BEHIND = 18
+const ARC_AHEAD = 74
 const ARC_RAD = ((ARC_BEHIND + ARC_AHEAD) * Math.PI) / 180
 
 function focusStation(beat: CycleBeat): StationId | 'all' {
@@ -105,10 +98,12 @@ type Anim = {
   angle: number
   from: number
   to: number
-  roll: number
-  rollFrom: number
-  rollTo: number
+  pendingTo: number | null
   flight: number
+  align: number
+  orbitMix: number
+  orbitClock: number
+  reveal: number
   pull: number
   loop: boolean
   time: number
@@ -137,22 +132,27 @@ function CycleRig({
     angle: ANGLE[beat],
     from: ANGLE[beat],
     to: ANGLE[beat],
-    roll: ROLL[beat],
-    rollFrom: ROLL[beat],
-    rollTo: ROLL[beat],
+    pendingTo: null,
     flight: 1,
+    align: 1,
+    orbitMix: 0,
+    orbitClock: 0,
+    reveal: 0,
     pull: recycled ? 1 : 0,
     loop: false,
     time: 0,
   })
   const ridePos = useMemo(() => new THREE.Vector3(), [])
   const rideLook = useMemo(() => new THREE.Vector3(), [])
+  const travelPos = useMemo(() => new THREE.Vector3(), [])
+  const travelLook = useMemo(() => new THREE.Vector3(), [])
   const camPos = useMemo(() => new THREE.Vector3(), [])
   const camLook = useMemo(() => new THREE.Vector3(), [])
   const liPos = useMemo(() => new THREE.Vector3(), [])
-  const offset = useMemo(() => new THREE.Vector3(), [])
-  const lookOff = useMemo(() => new THREE.Vector3(), [])
-  const camUp = useMemo(() => new THREE.Vector3(), [])
+  const alignFromPos = useMemo(() => new THREE.Vector3(), [])
+  const alignFromLook = useMemo(() => new THREE.Vector3(), [])
+  const side = useMemo(() => new THREE.Vector3(), [])
+  const viewDir = useMemo(() => new THREE.Vector3(), [])
   const li = useRef<THREE.Mesh>(null)
   const co2 = useRef<THREE.Mesh>(null)
   const returnLine = useRef<THREE.Group>(null)
@@ -161,25 +161,31 @@ function CycleRig({
 
   useEffect(() => {
     const next = ANGLE[beat]
-    const nextRoll = ROLL[beat]
-    const same =
-      Math.abs(next - anim.current.angle) < 0.5 &&
-      Math.abs(nextRoll - anim.current.roll) < 0.01
-    anim.current.from = anim.current.angle
-    anim.current.to = next
-    anim.current.rollFrom = anim.current.roll
-    anim.current.rollTo = nextRoll
-    anim.current.flight = reduced || same ? 1 : 0
+    const same = Math.abs(next - anim.current.angle) < 0.5
     if (reduced || same) {
       anim.current.angle = next
-      anim.current.roll = nextRoll
+      anim.current.from = next
+      anim.current.to = next
+      anim.current.pendingTo = null
+      anim.current.flight = 1
+      anim.current.align = 1
+    } else {
+      camera.getWorldDirection(viewDir)
+      alignFromPos.copy(camera.position)
+      alignFromLook.copy(camera.position).addScaledVector(viewDir, 3.2)
+      anim.current.pendingTo = next
+      anim.current.align = 0
+      anim.current.flight = 1
+      anim.current.orbitMix = 0
+      anim.current.from = anim.current.angle
+      anim.current.to = anim.current.angle
     }
     looping.current = false
     if (!recycled) {
       glowRef.current = null
       onGlow(null)
     }
-  }, [beat, onGlow, recycled, reduced])
+  }, [alignFromLook, alignFromPos, beat, camera, onGlow, recycled, reduced, viewDir])
 
   useEffect(() => {
     if (!recycled) {
@@ -210,14 +216,23 @@ function CycleRig({
         glowRef.current = nextGlow
         onGlow(nextGlow)
       }
+    } else if (a.align < 1) {
+      a.align = Math.min(1, a.align + cap / ALIGN_S)
+      if (a.align >= 1 && a.pendingTo !== null) {
+        a.from = a.angle
+        a.to = a.pendingTo
+        a.pendingTo = null
+        a.flight = 0
+      }
     } else if (a.flight < 1) {
       a.flight = Math.min(1, a.flight + cap / FLIGHT_S)
-      const k = easeOut(a.flight)
-      a.angle = a.from + (a.to - a.from) * k
-      a.roll = a.rollFrom + (a.rollTo - a.rollFrom) * k
+      a.angle = a.from + (a.to - a.from) * easeOut(a.flight)
+      if (a.flight >= 1) {
+        a.orbitMix = 0
+        a.orbitClock = 0
+      }
     } else {
       a.angle = a.to
-      a.roll = a.rollTo
     }
 
     const wantPull = recycled ? 1 : 0
@@ -231,27 +246,54 @@ function CycleRig({
     liPos.copy(onRing(t))
     if (li.current) li.current.position.copy(liPos)
     const radial = liPos.clone().setY(0).normalize()
+    side.crossVectors(tan, WORLD_UP).normalize()
 
-    offset
-      .set(0, 0, 0)
-      .addScaledVector(tan, -1.35)
-      .addScaledVector(radial, 0.22)
-      .addScaledVector(WORLD_UP, 0.34)
-      .applyAxisAngle(tan, a.roll)
-    lookOff
-      .set(0, 0, 0)
-      .addScaledVector(tan, 1.7)
-      .addScaledVector(WORLD_UP, 0.12)
-      .applyAxisAngle(tan, a.roll)
-    ridePos.copy(liPos).add(offset)
-    rideLook.copy(liPos).add(lookOff)
-    camUp.copy(WORLD_UP).applyAxisAngle(tan, a.roll).lerp(WORLD_UP, easeOut(a.pull)).normalize()
+    const holding = !recycled && a.align >= 1 && a.flight >= 1 && !reduced
+    a.reveal = reduced
+      ? holding
+        ? 1
+        : 0
+      : THREE.MathUtils.damp(a.reveal, holding ? 1 : 0, holding ? 1.5 : 2.6, dt)
+    const shown = holding ? a.reveal : 0
+    const back = THREE.MathUtils.lerp(1.35, 2.05, shown)
+    const height = THREE.MathUtils.lerp(0.34, 0.58, shown)
+    const out = THREE.MathUtils.lerp(0.22, 0.38, shown)
+
+    travelPos
+      .copy(liPos)
+      .addScaledVector(tan, -back)
+      .addScaledVector(radial, out)
+      .setY(height)
+    travelLook.copy(liPos).addScaledVector(tan, THREE.MathUtils.lerp(1.7, 2.35, shown)).setY(0.12)
+
+    if (holding) {
+      a.orbitMix = Math.min(1, a.orbitMix + dt / ORBIT_IN_S)
+      a.orbitClock += dt
+      const k = easeOut(a.orbitMix)
+      const w = a.orbitClock * 0.38
+      travelPos
+        .addScaledVector(side, Math.sin(w) * 0.42 * k)
+        .addScaledVector(WORLD_UP, (0.06 + Math.cos(w) * 0.16) * k)
+        .addScaledVector(tan, Math.cos(w * 0.85) * 0.16 * k)
+      travelLook
+        .addScaledVector(side, Math.sin(w) * 0.12 * k)
+        .addScaledVector(WORLD_UP, Math.cos(w) * 0.04 * k)
+    }
+
+    if (a.align < 1 && !reduced) {
+      const k = easeOut(a.align)
+      ridePos.lerpVectors(alignFromPos, travelPos, k)
+      rideLook.lerpVectors(alignFromLook, travelLook, k)
+    } else {
+      ridePos.copy(travelPos)
+      rideLook.copy(travelLook)
+    }
 
     camPos.lerpVectors(ridePos, WIDE_POS, easeOut(a.pull))
     camLook.lerpVectors(rideLook, WIDE_LOOK, easeOut(a.pull))
 
     if (!wide) {
-      camera.up.copy(camUp)
+      camera.up.copy(WORLD_UP)
       camera.position.copy(camPos)
       camera.lookAt(camLook)
     } else {
@@ -280,8 +322,10 @@ function CycleRig({
 
     const fog = scene.fog as THREE.Fog | null
     if (fog) {
-      fog.near = THREE.MathUtils.lerp(RIDE_FOG[0], WIDE_FOG[0], a.pull)
-      fog.far = THREE.MathUtils.lerp(RIDE_FOG[1], WIDE_FOG[1], a.pull)
+      const near = THREE.MathUtils.lerp(RIDE_FOG[0], STOP_FOG[0], a.reveal)
+      const far = THREE.MathUtils.lerp(RIDE_FOG[1], STOP_FOG[1], a.reveal)
+      fog.near = THREE.MathUtils.lerp(near, WIDE_FOG[0], a.pull)
+      fog.far = THREE.MathUtils.lerp(far, WIDE_FOG[1], a.pull)
     }
 
     if (co2.current) {
@@ -377,8 +421,9 @@ function CycleRig({
               <Html
                 position={[label.x, 0.48, label.z]}
                 center
-                distanceFactor={7.2}
+                transform={false}
                 occlude={false}
+                wrapperClass={styles.cycleFormulaWrap}
                 style={{ pointerEvents: 'none' }}
               >
                 <span className={styles.cycleFormula} data-glow={lit || undefined}>
@@ -437,7 +482,7 @@ export function LithiumCycle({ active }: { active: boolean }) {
       aria-label="Lithium extraction loop"
     >
       <Canvas
-        dpr={[1, 1.75]}
+        dpr={[1, 2]}
         camera={{ position: [-4.47, 0.34, 1.35], fov: 60, near: 0.12, far: 40 }}
         gl={{ antialias: true, alpha: false }}
         style={{ width: '100%', height: '100%' }}

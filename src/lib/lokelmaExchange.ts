@@ -1,6 +1,6 @@
 export type Vec3 = [number, number, number]
 
-export type CrystalPhase = 'k' | 'h-point' | 'exchange' | 'locked'
+export type CrystalPhase = 'k' | 'pore' | 'h-point' | 'exchange' | 'locked'
 
 export type Hydroxyl = {
   id: string
@@ -13,6 +13,14 @@ export type Hydroxyl = {
 export type Potassium = {
   id: number
   pos: Vec3
+}
+
+export type PoreWindow = {
+  id: string
+  center: Vec3
+  normal: Vec3
+  radius: number
+  oxygens: Vec3[]
 }
 
 type Atom = {
@@ -85,6 +93,7 @@ export function smooth(t: number) {
 }
 
 export function phaseForBeat(id?: string): CrystalPhase {
+  if (id === 'pore') return 'pore'
   if (id === 'protons') return 'h-point'
   if (id === 'lock') return 'exchange'
   if (id === 'patients') return 'locked'
@@ -124,6 +133,104 @@ export function buildExchangeSites(atoms: Atom[]) {
   return { potassium, hydroxyls }
 }
 
+function pairKey(a: number, b: number) {
+  return a < b ? `${a},${b}` : `${b},${a}`
+}
+
+export function buildPoreWindows(atoms: Atom[], bonds: [number, number][]): PoreWindow[] {
+  const oxygenOf = new Map<number, number[]>()
+  for (const [i, j] of bonds) {
+    const list = oxygenOf.get(i)
+    if (list) list.push(j)
+    else oxygenOf.set(i, [j])
+  }
+
+  const neighbors = new Map<number, Set<number>>()
+  const bridge = new Map<string, number>()
+  const tIds = [...oxygenOf.keys()].filter((id) => {
+    const el = atoms[id]?.element
+    return el === 'Si' || el === 'Zr'
+  })
+
+  for (let a = 0; a < tIds.length; a++) {
+    const i = tIds[a]
+    const oi = oxygenOf.get(i) ?? []
+    for (let b = a + 1; b < tIds.length; b++) {
+      const j = tIds[b]
+      const shared = (oxygenOf.get(j) ?? []).find((o) => oi.includes(o))
+      if (shared == null) continue
+      if (!neighbors.has(i)) neighbors.set(i, new Set())
+      if (!neighbors.has(j)) neighbors.set(j, new Set())
+      neighbors.get(i)!.add(j)
+      neighbors.get(j)!.add(i)
+      bridge.set(pairKey(i, j), shared)
+    }
+  }
+
+  const cycles: number[][] = []
+  const seen = new Set<string>()
+  const nodes = [...neighbors.keys()].sort((a, b) => a - b)
+
+  function walk(start: number, cur: number, path: number[], used: Set<number>) {
+    if (path.length === 7) {
+      if (!neighbors.get(cur)?.has(start)) return
+      const key = [...path].sort((a, b) => a - b).join('-')
+      if (seen.has(key)) return
+      seen.add(key)
+      cycles.push([...path])
+      return
+    }
+    for (const next of neighbors.get(cur) ?? []) {
+      if (next < start || used.has(next)) continue
+      used.add(next)
+      path.push(next)
+      walk(start, next, path, used)
+      path.pop()
+      used.delete(next)
+    }
+  }
+
+  for (const start of nodes) walk(start, start, [start], new Set([start]))
+
+  const windows: PoreWindow[] = []
+  for (const cycle of cycles) {
+    const oxygenIds: number[] = []
+    for (let i = 0; i < cycle.length; i++) {
+      const o = bridge.get(pairKey(cycle[i], cycle[(i + 1) % cycle.length]))
+      if (o == null) break
+      oxygenIds.push(o)
+    }
+    if (oxygenIds.length !== 7) continue
+    const oxygens = oxygenIds.map((id) => v(atoms[id].x, atoms[id].y, atoms[id].z))
+    const center = scale(
+      oxygens.reduce((sum, p) => add(sum, p), v(0, 0, 0)),
+      1 / oxygens.length,
+    )
+    if (len(center) < 2.2) continue
+    let nx = 0
+    let ny = 0
+    let nz = 0
+    for (let i = 0; i < oxygens.length; i++) {
+      const a = sub(oxygens[i], center)
+      const b = sub(oxygens[(i + 1) % oxygens.length], center)
+      const n = cross(a, b)
+      nx += n[0]
+      ny += n[1]
+      nz += n[2]
+    }
+    const radius = oxygens.reduce((sum, p) => sum + len(sub(p, center)), 0) / oxygens.length
+    windows.push({
+      id: oxygenIds.join('-'),
+      center,
+      normal: nrm([nx, ny, nz]),
+      radius,
+      oxygens,
+    })
+  }
+
+  return windows
+}
+
 export type ExchangeAnim = {
   hMix: number
   hOp: number
@@ -131,6 +238,7 @@ export type ExchangeAnim = {
   kLock: number
   cellScale: number
   cellGlow: number
+  poreOp: number
 }
 
 export const CELL_OPEN = 1
@@ -149,16 +257,30 @@ function openScale(t: number) {
   return 1.04 - 0.04 * smooth((s - 0.78) / 0.22)
 }
 
-export function sampleHEntry(progress: number): ExchangeAnim {
+export function sampleHEntry(progress: number, kStart = 1): ExchangeAnim {
   const p = Math.max(0, Math.min(1, progress))
   const t = smooth(p)
   return {
     hMix: 0,
     hOp: t,
-    kOp: 1 - 0.86 * t,
+    kOp: kStart + (0.14 - kStart) * t,
     kLock: 0,
     cellScale: shrinkScale(p),
     cellGlow: t,
+    poreOp: 0,
+  }
+}
+
+export function samplePore(progress: number): ExchangeAnim {
+  const p = Math.max(0, Math.min(1, progress))
+  return {
+    hMix: 0,
+    hOp: 0,
+    kOp: 1 - 0.88 * smooth(p / 0.4),
+    kLock: 0,
+    cellScale: 1,
+    cellGlow: 0.22 * smooth((p - 0.36) / 0.4),
+    poreOp: smooth((p - 0.38) / 0.48),
   }
 }
 
@@ -184,6 +306,7 @@ export function sampleExchange(progress: number): ExchangeAnim {
     kLock: smooth((p - 0.78) / 0.22),
     cellScale: openScale(opening),
     cellGlow: 1 - opening,
+    poreOp: 0,
   }
 }
 

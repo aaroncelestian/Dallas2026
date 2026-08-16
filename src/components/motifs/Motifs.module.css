@@ -322,18 +322,24 @@
   pointer-events: auto;
 }
 
+.cycleFormulaWrap {
+  filter: none;
+}
+
 .cycleFormula {
+  display: block;
   font-family: var(--font-heading);
-  font-size: 30px;
+  font-size: 42px;
   font-weight: 700;
+  font-optical-sizing: none;
+  font-variation-settings: "opsz" 60;
   color: var(--color-text);
   letter-spacing: 0.01em;
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
-  text-shadow:
-    0 0 10px #070605,
-    0 1px 8px #070605;
+  -webkit-font-smoothing: subpixel-antialiased;
+  text-rendering: geometricPrecision;
 }
 
 .cycleFormula sub {

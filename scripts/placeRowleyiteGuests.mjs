@@ -13,8 +13,8 @@ const cifPath = join(root, 'original_images', 'supporting', 'rowleyite.cif')
 const outPath = join(root, 'src', 'data', 'rowleyiteGuests.json')
 
 const GRID = 52
-const PROBE = 0.98
-const RADII = { O: 1.01, V: 1.24, P: 1.15, As: 1.19 }
+const PROBE = 1.35
+const RADII = { O: 1.32, V: 1.58, P: 1.48, As: 1.52 }
 const GUEST_CLEAR = 0.45
 const DISPLAY = {
   C: { color: '#e8d4c0', radius: 0.2 },
