@@ -1,13 +1,13 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Billboard, Line, OrbitControls, Text } from '@react-three/drei'
+import { Html, Line, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
 import styles from './Motifs.module.css'
 
 type CycleBeat = 'brine' | 'absorb' | 'air' | 'product' | 'award' | 'recycle'
-type StationId = (typeof STATIONS)[number]['id']
+type StationId = 'brine' | 'spinel' | 'air' | 'product'
 
 const RING = 4.25
 const GOLD = '#d4a04a'
@@ -28,34 +28,24 @@ const ANGLE: Record<CycleBeat, number> = {
   recycle: 450,
 }
 
-type Glyph = { t: string; sub?: boolean }
+/** Roll around the rail. 0 = curve right, π = left, 3π/2 = up, 2π = right again. */
+const ROLL: Record<CycleBeat, number> = {
+  brine: 0,
+  absorb: Math.PI,
+  air: Math.PI * 1.5,
+  product: Math.PI * 2,
+  award: Math.PI * 2,
+  recycle: Math.PI * 2,
+}
 
-const STATIONS = [
-  { id: 'brine', glyphs: [{ t: 'brine' }] as Glyph[], angle: 180, from: 0 },
-  {
-    id: 'spinel',
-    glyphs: [
-      { t: 'H' },
-      { t: '2', sub: true },
-      { t: 'MnO' },
-      { t: '4', sub: true },
-    ] as Glyph[],
-    angle: 270,
-    from: 1,
-  },
-  { id: 'air', glyphs: [{ t: 'CO' }, { t: '2', sub: true }] as Glyph[], angle: 0, from: 2 },
-  {
-    id: 'product',
-    glyphs: [
-      { t: 'Li' },
-      { t: '2', sub: true },
-      { t: 'CO' },
-      { t: '3', sub: true },
-    ] as Glyph[],
-    angle: 90,
-    from: 3,
-  },
-] as const
+const WORLD_UP = new THREE.Vector3(0, 1, 0)
+
+const STATIONS: { id: StationId; html: ReactNode; angle: number; from: number }[] = [
+  { id: 'brine', html: 'brine', angle: 180, from: 0 },
+  { id: 'spinel', html: <>H<sub>2</sub>MnO<sub>4</sub></>, angle: 270, from: 1 },
+  { id: 'air', html: <>CO<sub>2</sub></>, angle: 0, from: 2 },
+  { id: 'product', html: <>Li<sub>2</sub>CO<sub>3</sub></>, angle: 90, from: 3 },
+]
 
 const WIDE_POS = new THREE.Vector3(6.4, 5.6, 6.9)
 const WIDE_LOOK = new THREE.Vector3(0, 0, 0)
@@ -96,43 +86,6 @@ function tangent(deg: number): THREE.Vector3 {
   return new THREE.Vector3(-Math.sin(rad), 0, Math.cos(rad)).normalize()
 }
 
-function Formula({
-  glyphs,
-  fontSize,
-  color,
-}: {
-  glyphs: readonly Glyph[]
-  fontSize: number
-  color: string
-}) {
-  const widths = glyphs.map((g) => g.t.length * fontSize * (g.sub ? 0.4 : 0.58))
-  const total = widths.reduce((sum, w) => sum + w, 0)
-  let cursor = -total / 2
-  return (
-    <group>
-      {glyphs.map((g, i) => {
-        const width = widths[i]
-        const x = cursor + width / 2
-        cursor += width
-        return (
-          <Text
-            key={`${g.t}-${i}`}
-            position={[x, g.sub ? -fontSize * 0.22 : 0, 0]}
-            fontSize={g.sub ? fontSize * 0.62 : fontSize}
-            color={color}
-            anchorX="center"
-            anchorY="middle"
-            outlineWidth={0.012}
-            outlineColor="#070605"
-          >
-            {g.t}
-          </Text>
-        )
-      })}
-    </group>
-  )
-}
-
 function nearestStation(deg: number): StationId {
   const a = wrapAngle(deg)
   let best: StationId = 'brine'
@@ -152,6 +105,9 @@ type Anim = {
   angle: number
   from: number
   to: number
+  roll: number
+  rollFrom: number
+  rollTo: number
   flight: number
   pull: number
   loop: boolean
@@ -181,6 +137,9 @@ function CycleRig({
     angle: ANGLE[beat],
     from: ANGLE[beat],
     to: ANGLE[beat],
+    roll: ROLL[beat],
+    rollFrom: ROLL[beat],
+    rollTo: ROLL[beat],
     flight: 1,
     pull: recycled ? 1 : 0,
     loop: false,
@@ -191,6 +150,9 @@ function CycleRig({
   const camPos = useMemo(() => new THREE.Vector3(), [])
   const camLook = useMemo(() => new THREE.Vector3(), [])
   const liPos = useMemo(() => new THREE.Vector3(), [])
+  const offset = useMemo(() => new THREE.Vector3(), [])
+  const lookOff = useMemo(() => new THREE.Vector3(), [])
+  const camUp = useMemo(() => new THREE.Vector3(), [])
   const li = useRef<THREE.Mesh>(null)
   const co2 = useRef<THREE.Mesh>(null)
   const returnLine = useRef<THREE.Group>(null)
@@ -199,11 +161,19 @@ function CycleRig({
 
   useEffect(() => {
     const next = ANGLE[beat]
-    const same = Math.abs(next - anim.current.angle) < 0.5
+    const nextRoll = ROLL[beat]
+    const same =
+      Math.abs(next - anim.current.angle) < 0.5 &&
+      Math.abs(nextRoll - anim.current.roll) < 0.01
     anim.current.from = anim.current.angle
     anim.current.to = next
+    anim.current.rollFrom = anim.current.roll
+    anim.current.rollTo = nextRoll
     anim.current.flight = reduced || same ? 1 : 0
-    if (reduced || same) anim.current.angle = next
+    if (reduced || same) {
+      anim.current.angle = next
+      anim.current.roll = nextRoll
+    }
     looping.current = false
     if (!recycled) {
       glowRef.current = null
@@ -242,9 +212,12 @@ function CycleRig({
       }
     } else if (a.flight < 1) {
       a.flight = Math.min(1, a.flight + cap / FLIGHT_S)
-      a.angle = a.from + (a.to - a.from) * easeOut(a.flight)
+      const k = easeOut(a.flight)
+      a.angle = a.from + (a.to - a.from) * k
+      a.roll = a.rollFrom + (a.rollTo - a.rollFrom) * k
     } else {
       a.angle = a.to
+      a.roll = a.rollTo
     }
 
     const wantPull = recycled ? 1 : 0
@@ -254,32 +227,35 @@ function CycleRig({
 
     const t = a.angle
     const tan = tangent(t)
-    const moving = a.flight < 1 && Math.abs(a.to - a.from) > 0.5 && !reduced
-    const turn = moving ? Math.sin(a.flight * Math.PI) : 0
 
     liPos.copy(onRing(t))
     if (li.current) li.current.position.copy(liPos)
     const radial = liPos.clone().setY(0).normalize()
 
-    // Outside the rail, low. A left-hand bend — never a view across the ring.
-    ridePos
-      .copy(liPos)
+    offset
+      .set(0, 0, 0)
       .addScaledVector(tan, -1.35)
-      .addScaledVector(radial, 0.22 + turn * 0.12)
-      .setY(0.34)
-    rideLook
-      .copy(liPos)
+      .addScaledVector(radial, 0.22)
+      .addScaledVector(WORLD_UP, 0.34)
+      .applyAxisAngle(tan, a.roll)
+    lookOff
+      .set(0, 0, 0)
       .addScaledVector(tan, 1.7)
-      .addScaledVector(radial, -turn * 0.95)
-      .setY(0.12)
+      .addScaledVector(WORLD_UP, 0.12)
+      .applyAxisAngle(tan, a.roll)
+    ridePos.copy(liPos).add(offset)
+    rideLook.copy(liPos).add(lookOff)
+    camUp.copy(WORLD_UP).applyAxisAngle(tan, a.roll).lerp(WORLD_UP, easeOut(a.pull)).normalize()
 
     camPos.lerpVectors(ridePos, WIDE_POS, easeOut(a.pull))
     camLook.lerpVectors(rideLook, WIDE_LOOK, easeOut(a.pull))
 
     if (!wide) {
+      camera.up.copy(camUp)
       camera.position.copy(camPos)
       camera.lookAt(camLook)
-      if (turn > 0.001) camera.rotateZ(turn * 0.2)
+    } else {
+      camera.up.copy(WORLD_UP)
     }
 
     if (arc.current) {
@@ -398,13 +374,17 @@ function CycleRig({
               />
             </mesh>
             {live && (
-              <Billboard follow position={[label.x, 0.42, label.z]}>
-                <Formula
-                  glyphs={station.glyphs}
-                  fontSize={0.3}
-                  color={lit ? GOLD_HOT : CREAM}
-                />
-              </Billboard>
+              <Html
+                position={[label.x, 0.48, label.z]}
+                center
+                distanceFactor={7.2}
+                occlude={false}
+                style={{ pointerEvents: 'none' }}
+              >
+                <span className={styles.cycleFormula} data-glow={lit || undefined}>
+                  {station.html}
+                </span>
+              </Html>
             )}
           </group>
         )
