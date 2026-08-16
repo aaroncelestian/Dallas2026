@@ -103,10 +103,10 @@
 }
 
 .prepStrip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  display: flex;
+  gap: 6px;
   flex: none;
+  width: min(420px, 48vw);
 }
 
 .prepCell {
@@ -116,6 +116,7 @@
   padding: 0;
   cursor: pointer;
   overflow: hidden;
+  flex: 1;
   aspect-ratio: 16 / 10;
   text-align: left;
 }
@@ -135,14 +136,16 @@
 
 .prepCell span {
   position: absolute;
-  left: 10px;
-  bottom: 8px;
-  font-size: 11px;
+  left: 6px;
+  right: 4px;
+  bottom: 5px;
+  font-size: 8px;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
   text-transform: uppercase;
   color: #fff;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
 }
 
 .prepCell[data-focus] {
@@ -164,16 +167,10 @@
   justify-content: center;
 }
 
-.prepFeature img {
+.prepMedia {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-}
-
-.prepGhost {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
 }
 
 .prepCaption {

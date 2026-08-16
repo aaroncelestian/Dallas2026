@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import styles from './Motifs.module.css'
@@ -10,7 +10,48 @@ export type PrepMode = {
   src: string
   alt: string
   objectPosition?: string
-  ghost?: boolean
+  video?: string
+  poster?: string
+}
+
+function FeatureMedia({
+  mode,
+  active,
+}: {
+  mode: PrepMode
+  active: boolean
+}) {
+  const ref = useRef<HTMLVideoElement>(null)
+  const reduced = usePrefersReducedMotion()
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el || !mode.video) return
+    if (reduced || !active) {
+      el.pause()
+      return
+    }
+    el.currentTime = 0
+    void el.play()
+  }, [active, mode.video, reduced])
+
+  if (mode.video) {
+    return (
+      <video
+        ref={ref}
+        className={styles.prepMedia}
+        src={mode.video}
+        poster={mode.poster ?? mode.src}
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-label={mode.alt}
+      />
+    )
+  }
+
+  return <img className={styles.prepMedia} src={mode.src} alt={mode.alt} />
 }
 
 export function PrepModes({
@@ -77,8 +118,7 @@ export function PrepModes({
               exit={reduced ? undefined : { opacity: 0 }}
               transition={{ duration: 0.35 }}
             >
-              <img src={current.src} alt={current.alt} />
-              {current.ghost && <div className={styles.prepGhost} aria-hidden />}
+              <FeatureMedia mode={current} active={active} />
               <div className={styles.prepCaption}>
                 <h3>{current.title}</h3>
                 <p>{current.body}</p>

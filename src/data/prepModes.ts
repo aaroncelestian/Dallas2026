@@ -29,6 +29,7 @@ export const PREP_MODES = [
     body: 'Ammolite with Pepper’s Ghost — meaning added in light.',
     src: asset('images/prep-ammolite.jpg'),
     alt: 'Ammolite ammonite in swimming position',
-    ghost: true,
+    video: asset('images/prep-ammolite.mp4'),
+    poster: asset('images/prep-ammolite-poster.jpg'),
   },
 ]

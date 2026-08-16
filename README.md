@@ -92,7 +92,8 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `prep-teapot.jpg` | Prep mode 1 |
 | `prep-chrysanthemum.jpg` | Prep mode 2 |
 | `prep-malachite.jpg` | Prep mode 3 · malachite feet |
-| `prep-ammolite.jpg` | Prep mode 4 |
+| `prep-ammolite.jpg` | Prep mode 4 · thumb |
+| `prep-ammolite.mp4` | Prep mode 4 · swimming reconstruction |
 
 1620 is typographic on purpose.
 
