@@ -17,7 +17,7 @@ Open the URL Vite prints (usually `http://localhost:5173`).
 
 Do **not** use browser fullscreen — Zoom keeps sharing the old window and the slides freeze.
 
-From the rehearsal tab, press **P** (or click **Stage**). That opens a chrome-less window for Zoom. Share **that window**. The chapter outline, slide index, and Resources stay available on hover.
+From the rehearsal tab, press **P** (or click **Stage**). That opens a chrome-less window for Zoom. Share **that window**. The slide index and Resources stay available on hover.
 
 Or, with the server already running:
 
@@ -59,7 +59,7 @@ Output is in `dist/` with relative `base: './'` — open `dist/index.html` local
 
 ## How to play it
 
-The screen holds the specimen and a sentence. Everything else is in `notes` on each beat in `src/data/slides.ts`. Hold the cold open. Hold Blue Wave after the reveal. Hold the return to gold.
+The screen holds the specimen and a sentence. Everything else is in `notes` on each beat in `src/data/slides.ts`. Hold the cold open. Hold Blue Wave after the reveal. Hold the closing aquamarine.
 
 Argument source: `docs/Dallas_Symposium_Talk_Outline.md`.
 
@@ -69,7 +69,8 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 
 | File | Beat |
 |------|------|
-| `gold.jpg` | Cold open, title, close |
+| `gold.jpg` | Cold open, title |
+| `aquamarine.jpg` | Close |
 | `zeolite.jpg` | Lokelma · porous mineral |
 | `spinel.jpg` | Lithium |
 | `rowleyite.jpg` | Rowleyite |
@@ -82,6 +83,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `halite-trona.jpg` | Salt as shelter |
 | `mars-analog.jpg` | Salt and Mars |
 | `emerald.jpg` | Unearthed |
+| `bluecap.jpg` | Blue Cap · criteria |
 | `blue-wave.jpg` | Color reveal |
 | `stibnite.jpg` | Preservation |
 | `fluorite.jpg` | Provenance |
@@ -89,7 +91,6 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `unearthed-gallery.jpg` | Loans |
 | `prep-teapot.jpg` | Prep mode 1 |
 | `prep-chrysanthemum.jpg` | Prep mode 2 |
-| `prep-turquoise.jpg` | Prep mode 3 · Hubei turquoise |
 | `prep-malachite.jpg` | Prep mode 3 · malachite feet |
 | `prep-ammolite.jpg` | Prep mode 4 |
 
@@ -101,7 +102,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 - Act II Unearthed + loans: ~16 min
 - Return + close: ~6 min
 
-Breathe on the cold open, porous mineral/Lokelma structure, Blue Wave reveal, prep spectrum, and the closing return to gold.
+Breathe on the cold open, porous mineral/Lokelma structure, Blue Wave reveal, prep spectrum, and the closing aquamarine.
 
 Regenerate the Lokelma atoms or the rowleyite void mesh after CIF changes:
 

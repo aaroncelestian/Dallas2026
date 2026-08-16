@@ -7,6 +7,7 @@ import { CrystalViewer } from '../motifs/CrystalViewer'
 import { LithiumCycle } from '../motifs/LithiumCycle'
 import { VoidViewer } from '../motifs/VoidViewer'
 import { DepthField } from './DepthField'
+import { SpecimenCallouts } from './SpecimenCallouts'
 import styles from './Layouts.module.css'
 
 function TitleLines({ text }: { text: string }) {
@@ -228,12 +229,16 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
   const hasPlate = layers.length > 0
   const duration = reduced ? 0 : 0.7
   const camera = layers[0]?.camera
+  const marks = layers.flatMap((layer) => layer.marks ?? [])
+  const callouts = beat?.callouts ?? []
 
   return (
     <div
       className={styles.scene}
+      data-scene=""
       data-empty={!hasPlate || undefined}
       data-camera={camera}
+      data-callouts={callouts.length ? '' : undefined}
     >
       <div className={styles.sceneStage}>
         <AnimatePresence>
@@ -252,6 +257,7 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
         </AnimatePresence>
       </div>
       {hasPlate && <div className={styles.stageScrim} aria-hidden />}
+      <SpecimenCallouts marks={marks} visible={callouts} active={active} />
       <AnimatePresence mode="wait">
         {(beat?.kicker || beat?.title || beat?.subtitle) && (
           <motion.div

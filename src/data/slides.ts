@@ -19,7 +19,6 @@ export type MotifKind =
   | 'crystal-viewer'
   | 'void-viewer'
   | 'lithium-cycle'
-  | 'criteria-overlap'
   | 'prep-modes'
   | 'color-reveal'
 
@@ -59,6 +58,17 @@ export interface SceneLayer {
   dwellMs?: [number, number]
   /** Seconds. Play once, then hold this frame. */
   holdAt?: number
+  marks?: SpecimenCallout[]
+}
+
+export interface SpecimenCallout {
+  id: string
+  x: number
+  y: number
+  side?: 'left' | 'right'
+  title: string
+  formula?: string
+  body?: string
 }
 
 export interface SceneBeat {
@@ -69,6 +79,8 @@ export interface SceneBeat {
   subtitle?: string
   layers?: string[]
   guests?: boolean
+  /** Callout ids from the visible image layer. */
+  callouts?: string[]
   notes?: string
 }
 
@@ -727,15 +739,91 @@ export const slides: Slide[] = [
   },
   {
     id: 'criteria',
-    label: 'Criteria',
+    label: 'Blue Cap',
     chapter: 'exhibition',
-    layout: 'hero',
-    kicker: 'The same act of looking',
-    heroNum: '=',
-    title: 'Aesthetic judgment\nand scientific standing.',
-    motif: 'criteria-overlap',
-    notes:
-      'Size, form, color, transparency, luster, matrix, provenance — the checklist that makes a specimen beautiful also makes it a better dataset. Not parallel tracks. Same looking. A complete crystal face is a better object and an uninterrupted growth history.',
+    layout: 'stage',
+    clearPlate: true,
+    layers: [
+      {
+        id: 'bluecap',
+        kind: 'image',
+        src: asset('images/bluecap.jpg'),
+        alt: 'Blue Cap tourmaline on quartz, Tourmaline Queen mine, Carnegie collection',
+        fit: 'contain',
+        camera: 'hold',
+        marks: [
+          {
+            id: 'termination',
+            x: 0.36,
+            y: 0.198,
+            side: 'right',
+            title: 'Complete termination.',
+            body: 'Uninterrupted growth history.',
+          },
+          {
+            id: 'cap',
+            x: 0.36,
+            y: 0.218,
+            side: 'right',
+            title: 'Fe in the last pulse.',
+            formula: 'Na(Li,Al)₃Al₆(BO₃)₃Si₆O₁₈(OH)₄',
+            body: 'Mn-pink body → Fe-blue cap. Same crystal, one fluid change.',
+          },
+          {
+            id: 'body',
+            x: 0.344,
+            y: 0.38,
+            side: 'left',
+            title: 'Mn³⁺.',
+            body: 'The color collectors pay for is the chromophore.',
+          },
+          {
+            id: 'pocket',
+            x: 0.59,
+            y: 0.55,
+            side: 'right',
+            title: 'Tourmaline Queen, 1972.',
+            body: 'One pocket. Never again.',
+          },
+        ],
+      },
+    ],
+    scene: [
+      {
+        id: 'alone',
+        label: 'Alone',
+        layers: ['bluecap'],
+        notes:
+          'Hold. Do not name it. Unearthed’s first instruction is still in force: the mineral stands alone. Let the room look.',
+      },
+      {
+        id: 'termination',
+        label: 'Termination',
+        title: 'A complete face.',
+        layers: ['bluecap'],
+        callouts: ['termination'],
+        notes:
+          'Collectors pay for that termination. It is also an uninterrupted growth history. Size, form, matrix stay in your mouth, not on the wall.',
+      },
+      {
+        id: 'cap',
+        label: 'The cap',
+        title: 'The cap is the data.',
+        layers: ['bluecap'],
+        callouts: ['cap', 'body'],
+        notes:
+          'Talk the Mn → Fe shift off the formulae. The indigo rind is why it is famous and a chemical change written into the crystal. Same looking.',
+      },
+      {
+        id: 'same',
+        label: 'Same looking',
+        title: 'Same looking.',
+        layers: ['bluecap'],
+        callouts: ['cap', 'pocket'],
+        notes:
+          'Carnegie kept it for the first reason. Aesthetic standing and scientific standing are one act. Then Blue Wave for the color case.',
+      },
+    ],
   },
   {
     id: 'blue-wave',
@@ -777,7 +865,7 @@ export const slides: Slide[] = [
     title: 'Where does geology end\nand intention begin?',
     motif: 'prep-modes',
     notes:
-      'Unearthed holds the open question with four deliberate modes. Use [ ] or , . to pull focus: citrine teapot (total transformation), chrysanthemum stone (subtraction), Hubei turquoise and the malachite feet in azurite (architecture exposed — cut and polished), ammolite with Pepper’s Ghost (interpretive reconstruction). Don’t resolve the question.',
+      'Unearthed holds the open question with four deliberate modes. Use [ ] or , . to pull focus: citrine teapot (total transformation), chrysanthemum stone (subtraction), malachite feet in azurite (architecture exposed — cut and polished), ammolite in swimming position with Pepper’s Ghost still to come (interpretive reconstruction). Don’t resolve the question.',
   },
   {
     id: 'provenance',
@@ -865,23 +953,21 @@ export const slides: Slide[] = [
     layout: 'void',
     title: 'Today’s specimen is\ntomorrow’s unanswered\nquestion.',
     notes:
-      'Run on an instrument not yet built — or seen by a visitor who hasn’t yet learned how to look. Strategic collecting is scientific and cultural infrastructure. Restate the abstract closing claim, then return to the gold.',
+      'Run on an instrument not yet built — or seen by a visitor who hasn’t yet learned how to look. Strategic collecting is scientific and cultural infrastructure. Restate the abstract closing claim, then return to the aquamarine — full frame, no type.',
   },
   {
     id: 'close',
     label: 'Close',
     chapter: 'close',
-    layout: 'stage',
+    layout: 'image',
     camera: 'push',
-    kicker: 'The longer bet',
-    title: 'It’s you.',
     image: {
-      src: asset('images/gold.jpg'),
-      alt: 'Crystallized gold, now with the talk attached',
-      fit: 'contain',
+      src: asset('images/aquamarine.jpg'),
+      alt: 'Aquamarine crystals in albite with schorl, Unearthed',
+      fit: 'cover',
     },
     yaw: 1,
     notes:
-      'Return to the opening image. Land this spoken, not on the wall: Unearthed closes April 2027. Nearly everything is on loan. That’s not a weakness; it’s the argument. What NHMLAC is betting on isn’t these objects — it’s you. A private collection can show you something extraordinary once. A public museum is making a longer bet: that showing you something extraordinary, even temporarily, changes what you notice in what’s already, permanently, yours. Then thank-yous. Not before.',
+      'Full blast. No type. Land this spoken, not on the wall: Unearthed closes April 2027. Nearly everything is on loan. That’s not a weakness; it’s the argument. What NHMLAC is betting on isn’t these objects — it’s you. A private collection can show you something extraordinary once. A public museum is making a longer bet: that showing you something extraordinary, even temporarily, changes what you notice in what’s already, permanently, yours. Then thank-yous. Not before.',
   },
 ]

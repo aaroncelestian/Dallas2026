@@ -85,7 +85,6 @@ export function Shell() {
   const scene = useSceneController(slide)
   const sceneRef = useRef(scene)
   sceneRef.current = scene
-  const activeChapter = slide?.chapter
   const [fullscreen, setFullscreen] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [resourcesOpen, setResourcesOpen] = useState(false)
@@ -265,11 +264,6 @@ export function Shell() {
   activeIndexRef.current = activeIndex
   const goToRef = useRef(goTo)
   goToRef.current = goTo
-
-  const chapterStarts = CHAPTERS.map((ch) => ({
-    ...ch,
-    index: slides.findIndex((s) => s.chapter === ch.id && s.layout === 'divider'),
-  }))
 
   useEffect(() => {
     const sync = () => {
@@ -454,20 +448,6 @@ export function Shell() {
 
       {!resource && (
       <>
-      <nav className={styles.toc} aria-label="Chapters">
-        {chapterStarts.map((ch) => (
-          <button
-            key={ch.id}
-            type="button"
-            className={styles.tocBtn}
-            data-active={activeChapter === ch.id}
-            onClick={() => goTo(Math.max(0, ch.index))}
-          >
-            {ch.num} {ch.title}
-          </button>
-        ))}
-      </nav>
-
       <div className={styles.chrome} data-open={chromeOpen || undefined}>
         <div className={styles.pickerWrap} ref={pickerRef}>
           {pickerOpen && (

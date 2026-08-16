@@ -7,7 +7,6 @@ import { IonChart } from '../motifs/IonChart'
 import { CrystalViewer } from '../motifs/CrystalViewer'
 import { LithiumCycle } from '../motifs/LithiumCycle'
 import { VoidViewer } from '../motifs/VoidViewer'
-import { CriteriaOverlap } from '../motifs/CriteriaOverlap'
 import { PrepModes } from '../motifs/PrepModes'
 import { ColorReveal } from '../motifs/ColorReveal'
 import { PREP_MODES } from '../../data/prepModes'
@@ -79,8 +78,6 @@ function Motif({ kind, active, slide }: { kind: MotifKind; active: boolean; slid
       return <VoidViewer active={active} />
     case 'lithium-cycle':
       return <LithiumCycle active={active} />
-    case 'criteria-overlap':
-      return <CriteriaOverlap active={active} />
     case 'prep-modes':
       return <PrepModes active={active} modes={PREP_MODES} />
     case 'color-reveal':

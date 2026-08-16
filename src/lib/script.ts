@@ -36,9 +36,6 @@ function motifLine(slide: Slide): string | undefined {
   if (slide.motif === 'lithium-cycle') {
     return 'Motif: lithium ride — first-person on the loop, then pullback'
   }
-  if (slide.motif === 'criteria-overlap') {
-    return 'Motif: aesthetic judgment overlapping scientific standing'
-  }
   if (slide.motif === 'color-reveal') return 'Motif: color reveal (Enter / R)'
   return undefined
 }
@@ -66,6 +63,13 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
         for (const plate of layer.slides) lines.push(`Image: ${plate.alt}`)
       } else if (layer?.alt) {
         lines.push(layer.kind === 'video' ? `Video: ${layer.alt}` : `Image: ${layer.alt}`)
+      }
+      if (layer?.marks && beat?.callouts?.length) {
+        for (const mark of layer.marks) {
+          if (!beat.callouts.includes(mark.id)) continue
+          const bits = [mark.title, mark.formula, mark.body].filter(Boolean)
+          if (bits.length) lines.push(bits.join(' '))
+        }
       }
       if (layer?.kind === 'motif' && layer.motif === 'crystal-viewer') {
         if (beat?.id === 'pore') {
@@ -109,10 +113,7 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
     lines.push(`Image: ${slide.image.alt}`)
   }
   if (slide.motif === 'prep-modes') {
-    for (const mode of PREP_MODES) {
-      lines.push(`• ${mode.title} — ${mode.body}`)
-      if (mode.extra) lines.push(`• ${mode.title} — ${mode.extra.body}`)
-    }
+    for (const mode of PREP_MODES) lines.push(`• ${mode.title} — ${mode.body}`)
   } else {
     const motif = motifLine(slide)
     if (motif && !beat) lines.push(motif)

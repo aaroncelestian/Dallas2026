@@ -9,11 +9,8 @@ export type PrepMode = {
   body: string
   src: string
   alt: string
-  extra?: {
-    src: string
-    alt: string
-    body: string
-  }
+  objectPosition?: string
+  ghost?: boolean
 }
 
 export function PrepModes({
@@ -25,6 +22,7 @@ export function PrepModes({
 }) {
   const reduced = usePrefersReducedMotion()
   const [focus, setFocus] = useState(0)
+  const current = modes[focus]
 
   useEffect(() => {
     if (!active) {
@@ -49,7 +47,7 @@ export function PrepModes({
 
   return (
     <div className={styles.prep} aria-label="Spectrum of preparation modes">
-      <div className={styles.prepGrid}>
+      <div className={styles.prepStrip}>
         {modes.map((m, i) => (
           <button
             key={m.id}
@@ -59,52 +57,37 @@ export function PrepModes({
             onClick={() => setFocus(i)}
             aria-pressed={i === focus}
           >
-            <div className={m.extra ? styles.prepCellPair : undefined}>
-              <motion.img
-                src={m.src}
-                alt={m.alt}
-                animate={{
-                  filter:
-                    i === focus || !active
-                      ? 'blur(0px) brightness(1)'
-                      : 'blur(3px) brightness(0.92)',
-                  scale: i === focus && active && !m.extra ? 1.02 : 1,
-                }}
-                transition={{ duration: reduced ? 0 : 0.45 }}
-              />
-              {m.extra && (
-                <motion.img
-                  src={m.extra.src}
-                  alt={m.extra.alt}
-                  animate={{
-                    filter:
-                      i === focus || !active
-                        ? 'blur(0px) brightness(1)'
-                        : 'blur(3px) brightness(0.92)',
-                  }}
-                  transition={{ duration: reduced ? 0 : 0.45 }}
-                />
-              )}
-            </div>
+            <img
+              src={m.src}
+              alt={m.alt}
+              style={m.objectPosition ? { objectPosition: m.objectPosition } : undefined}
+            />
             <span>{m.title}</span>
           </button>
         ))}
       </div>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={modes[focus]?.id}
-          className={styles.prepCaption}
-          initial={reduced ? false : { opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={reduced ? undefined : { opacity: 0, y: -6 }}
-          transition={{ duration: 0.35 }}
-        >
-          <h3>{modes[focus]?.title}</h3>
-          <p>{modes[focus]?.body}</p>
-          {modes[focus]?.extra && <p>{modes[focus].extra.body}</p>}
-          <span className={styles.prepHint}>[ ] or , . to pull focus</span>
-        </motion.div>
-      </AnimatePresence>
+      <div className={styles.prepStage}>
+        <AnimatePresence mode="wait">
+          {current && (
+            <motion.div
+              key={current.id}
+              className={styles.prepFeature}
+              initial={reduced ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reduced ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <img src={current.src} alt={current.alt} />
+              {current.ghost && <div className={styles.prepGhost} aria-hidden />}
+              <div className={styles.prepCaption}>
+                <h3>{current.title}</h3>
+                <p>{current.body}</p>
+                <span className={styles.prepHint}>[ ] or , . to pull focus</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

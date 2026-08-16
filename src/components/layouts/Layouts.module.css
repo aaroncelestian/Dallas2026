@@ -181,6 +181,7 @@
   margin-bottom: calc(var(--pad-y) + 16px);
 }
 
+.scene[data-callouts] .stageScrim,
 .scene[data-camera='pan-bounce'] .stageScrim {
   background:
     linear-gradient(
@@ -205,24 +206,35 @@
   position: relative;
   z-index: 2;
   flex: 1;
-  display: grid;
-  grid-template-columns: minmax(18rem, 1fr) minmax(22rem, 1.15fr);
-  align-items: center;
-  column-gap: 48px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   padding: var(--pad-y) var(--pad-x);
 }
 
 .stagePad .stageCopy {
   margin: 0;
   padding: 0;
-  max-width: 28em;
+  max-width: none;
+}
+
+.stage[data-motif='prep-modes'] .stageCopy h2 {
+  font-size: clamp(1.6rem, 3.2vw, 2.5rem);
 }
 
 .stageMotifWide {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  min-width: 0;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.stageMotifWide > * {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
 }
 
 .stage[data-motif='color-reveal'],
@@ -476,14 +488,6 @@
 }
 
 @media (max-width: 900px) {
-  .stagePad {
-    grid-template-columns: 1fr;
-    align-items: start;
-    row-gap: 24px;
-  }
-  .stageMotifWide {
-    justify-content: center;
-  }
   .hero,
   .split,
   .splitFlip {

@@ -148,7 +148,7 @@ export function DepthField({
           </div>
           <div className={styles.midGlow} aria-hidden />
           <div className={styles.fore}>
-            <img src={src} alt={alt} />
+            <img src={src} alt={alt} data-plate="" />
           </div>
           <div className={styles.sheen} aria-hidden />
           <div className={styles.vignette} aria-hidden />
