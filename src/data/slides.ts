@@ -766,7 +766,7 @@ export const slides: Slide[] = [
             y: 0.218,
             side: 'right',
             title: 'Fe in the last pulse.',
-            formula: 'Na(Li,Al)₃Al₆(BO₃)₃Si₆O₁₈(OH)₄',
+            formula: 'Na(Li,Al,Fe²⁺)₃Al₆(BO₃)₃Si₆O₁₈(OH)₄',
             body: 'Mn-pink body → Fe-blue cap. Same crystal, one fluid change.',
           },
           {

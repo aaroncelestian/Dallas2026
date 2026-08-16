@@ -21,7 +21,7 @@ const LEGEND_GUESTS = [
   { color: '#f0c4a8', label: 'doxorubicin' },
   { color: '#c5d8e6', label: 'vincristine' },
   { color: '#d0d6de', label: 'cisplatin' },
-  { color: '#e6d08a', label: 'temozolomide' },
+  { color: '#e8a0c8', label: 'temozolomide' },
 ] as const
 
 function CellWire({ size }: { size: number }) {

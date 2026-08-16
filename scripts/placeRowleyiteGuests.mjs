@@ -26,30 +26,36 @@ const DISPLAY = {
 
 const GUESTS = [
   {
-    id: 'doxorubicin',
-    file: 'doxorubicin_3D.pdb',
-    carbon: '#f0c4a8',
-    minClear: -0.15,
-    thorough: true,
-  },
-  {
-    id: 'vincristine',
-    file: 'vincristine_3D.pdb',
-    carbon: '#c5d8e6',
-    minClear: -0.2,
-    thorough: true,
+    id: 'temozolomide',
+    file: 'temozolomide_3D.pdb',
+    carbon: '#e8a0c8',
+    minClear: -0.25,
+    pull: 1.6,
   },
   {
     id: 'cisplatin',
     file: 'cisplatin_3D.pdb',
     carbon: '#d0d6de',
     minClear: -0.2,
+    pull: 1.6,
   },
   {
-    id: 'temozolomide',
-    file: 'temozolomide_3D.pdb',
-    carbon: '#e6d08a',
-    minClear: -0.25,
+    id: 'doxorubicin',
+    file: 'doxorubicin_3D.pdb',
+    carbon: '#f0c4a8',
+    minClear: 0.05,
+    thorough: true,
+    pull: 0.7,
+    scale: 0.86,
+  },
+  {
+    id: 'vincristine',
+    file: 'vincristine_3D.pdb',
+    carbon: '#c5d8e6',
+    minClear: 0.05,
+    thorough: true,
+    pull: 0.7,
+    scale: 0.78,
   },
 ]
 
@@ -206,6 +212,17 @@ function parsePdb(path) {
   let maxR = 0
   for (const p of local) maxR = Math.max(maxR, Math.hypot(p.x, p.y, p.z))
   return { atoms: local, bonds, radius: maxR }
+}
+
+function scaleMol(mol, scale = 1) {
+  if (scale === 1) return mol
+  const atoms = mol.atoms.map((p) => ({
+    ...p,
+    x: p.x * scale,
+    y: p.y * scale,
+    z: p.z * scale,
+  }))
+  return { atoms, bonds: mol.bonds, radius: mol.radius * scale }
 }
 
 function rotMat(rx, ry, rz) {
@@ -365,11 +382,11 @@ for (const site of sites) {
   if (allLarge.some((c) => Math.hypot(site.x - c.x, site.y - c.y, site.z - c.z) < CAGE_SEP)) continue
   allLarge.push(site)
 }
-allLarge.sort((p, q) => q.z + 0.3 * q.x + 0.2 * q.y - (p.z + 0.3 * p.x + 0.2 * p.y))
-const large = allLarge.slice(0, 6)
+allLarge.sort((p, q) => q.z + 0.35 * q.x + 0.2 * q.y - (p.z + 0.35 * p.x + 0.2 * p.y))
+const large = allLarge.filter((s) => s.zFace < 16).slice(0, 6)
 console.log(
   `Large open cages: ${allLarge.length} total, using ${large.length} toward camera · ` +
-    large.map((s) => `r=${s.r.toFixed(2)} z=${s.z.toFixed(1)}`).join(' · '),
+    large.map((s) => `r=${s.r.toFixed(2)} zFace=${s.zFace.toFixed(1)} z=${s.z.toFixed(1)}`).join(' · '),
 )
 
 function guestClearance(placed) {
@@ -519,7 +536,8 @@ function dock(mol, site, occupied, thorough = false) {
       return
     }
     const clear = guestClearance(placed)
-    if (!best || clear > best.clear) best = { placed, clear, score: clear, dz: t[2], m, t }
+    const score = clear + 0.2 * t[2]
+    if (!best || score > best.score) best = { placed, clear, score, dz: t[2], m, t }
   }
 
   for (const s of signs) {
@@ -597,15 +615,18 @@ const occupied = []
 
 for (const spec of GUESTS) {
   const pdbPath = join(root, 'original_images', 'supporting', spec.file)
-  const mol = parsePdb(pdbPath)
-  console.log(`${spec.id}: ${mol.atoms.length} heavy atoms, radius ${mol.radius.toFixed(1)} Å`)
+  const mol = scaleMol(parsePdb(pdbPath), spec.scale ?? 1)
+  console.log(
+    `${spec.id}: ${mol.atoms.length} heavy atoms, radius ${mol.radius.toFixed(1)} Å` +
+      (spec.scale && spec.scale !== 1 ? ` (×${spec.scale})` : ''),
+  )
   let chosen = null
   for (const site of large) {
     if (occupied.some((o) => Math.hypot(site.x - o.x, site.y - o.y, site.z - o.z) < CAGE_SEP)) continue
     const trial = dock(mol, site, occupied, spec.thorough)
     if (!trial || trial.clear < spec.minClear) continue
-    if (!chosen || trial.clear > chosen.clear) chosen = { ...trial, site }
-    if (!spec.thorough) break
+    chosen = { ...trial, site }
+    break
   }
   if (!chosen) {
     console.log(`  skipped — no large open cage accepted it`)
@@ -614,7 +635,7 @@ for (const spec of GUESTS) {
   console.log(
     `  docked in large cage r=${chosen.site.r.toFixed(2)} Å  zFace=${chosen.site.zFace.toFixed(1)} Å  clearance=${chosen.clear.toFixed(2)} Å`,
   )
-  const pull = spec.thorough ? 0 : 0.4
+  const pull = spec.pull ?? 0.5
   occupied.push({
     x: chosen.site.x,
     y: chosen.site.y,
