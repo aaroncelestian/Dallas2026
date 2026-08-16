@@ -28,12 +28,14 @@ function SceneVideo({
   alt,
   active,
   fit = 'contain',
+  holdAt,
 }: {
   src: string
   poster?: string
   alt?: string
   active: boolean
   fit?: 'cover' | 'contain'
+  holdAt?: number
 }) {
   const ref = useRef<HTMLVideoElement>(null)
   const reduced = usePrefersReducedMotion()
@@ -49,6 +51,24 @@ function SceneVideo({
     void el.play()
   }, [active, reduced, src])
 
+  useEffect(() => {
+    const el = ref.current
+    if (!el || holdAt == null) return
+
+    const hold = () => {
+      if (el.currentTime + 0.04 < holdAt) return
+      el.pause()
+      el.currentTime = holdAt
+    }
+
+    el.addEventListener('timeupdate', hold)
+    el.addEventListener('ended', hold)
+    return () => {
+      el.removeEventListener('timeupdate', hold)
+      el.removeEventListener('ended', hold)
+    }
+  }, [holdAt, src])
+
   return (
     <video
       ref={ref}
@@ -57,7 +77,7 @@ function SceneVideo({
       src={src}
       poster={poster}
       muted
-      loop
+      loop={holdAt == null}
       playsInline
       preload="auto"
       aria-label={alt}
@@ -178,6 +198,7 @@ function LayerView({
         alt={layer.alt}
         active={active}
         fit={layer.fit}
+        holdAt={layer.holdAt}
       />
     )
   }

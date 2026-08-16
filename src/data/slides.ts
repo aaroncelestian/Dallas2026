@@ -57,6 +57,8 @@ export interface SceneLayer {
   slides?: SceneSlide[]
   /** First plate hold, then each later plate. */
   dwellMs?: [number, number]
+  /** Seconds. Play once, then hold this frame. */
+  holdAt?: number
 }
 
 export interface SceneBeat {
@@ -536,6 +538,7 @@ export const slides: Slide[] = [
         poster: asset('images/ks78-cut.jpg'),
         alt: 'CT thickness map of a kidney stone, orbiting',
         fit: 'cover',
+        holdAt: 39,
       },
       {
         id: 'stromatolite',
