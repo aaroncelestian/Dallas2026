@@ -6,11 +6,14 @@ import structure from '../../data/lokelmaAtoms.json'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
 import {
+  CELL_SHRUNK,
   buildExchangeSites,
   hydroxylAt,
   phaseForBeat,
   sampleExchange,
+  sampleHEntry,
   type CrystalPhase,
+  type ExchangeAnim,
   type Hydroxyl,
   type Vec3,
 } from '../../lib/lokelmaExchange'
@@ -31,9 +34,9 @@ const LEGEND = [
 
 const CAPTION: Record<CrystalPhase, string> = {
   k: 'ZS-9 · K⁺ in the channels · drag to orbit',
-  'h-point': 'H pointing at the K site · H to step',
-  exchange: 'H bends, then exchanges out',
-  locked: 'K locked in the 7-ring',
+  'h-point': 'H in · the cell contracts',
+  exchange: 'H out · the cell opens · K locks',
+  locked: 'K locked · cell restored',
 }
 
 function scaled(p: Vec3): Vec3 {
@@ -58,7 +61,14 @@ function Bond({ a, b }: { a: Vec3; b: Vec3 }) {
   )
 }
 
-function CellWire({ size }: { size: number }) {
+function CellWire({
+  size,
+  anim,
+}: {
+  size: number
+  anim: MutableRefObject<ExchangeAnim>
+}) {
+  const group = useRef<THREE.Group>(null)
   const edges = useMemo(() => {
     const h = size / 2
     const c: Vec3[] = [
@@ -88,13 +98,28 @@ function CellWire({ size }: { size: number }) {
     return pairs.map(([i, j]) => [c[i], c[j]] as [Vec3, Vec3])
   }, [size])
 
+  useFrame(() => {
+    const root = group.current
+    if (!root) return
+    const glow = anim.current.cellGlow
+    const opacity = 0.22 + glow * 0.52
+    const width = 1.05 + glow * 1.45
+    for (const child of root.children) {
+      const mat = (child as THREE.Object3D & { material?: { opacity: number; linewidth: number } })
+        .material
+      if (!mat) continue
+      mat.opacity = opacity
+      mat.linewidth = width
+    }
+  })
+
   return (
-    <group>
+    <group ref={group}>
       {edges.map((points, i) => (
         <Line
           key={i}
           points={points}
-          color="#d4a04a"
+          color="#e4b45a"
           lineWidth={1.05}
           transparent
           opacity={0.28}
@@ -112,13 +137,6 @@ function alignBond(mesh: THREE.Mesh, a: Vec3, b: Vec3) {
   mesh.position.copy(A.clone().add(B).multiplyScalar(0.5))
   mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize())
   mesh.scale.set(1, length, 1)
-}
-
-type ExchangeAnim = {
-  hMix: number
-  hOp: number
-  kOp: number
-  kLock: number
 }
 
 function Hydroxyls({
@@ -234,12 +252,37 @@ function PotassiumSites({
   )
 }
 
+const REST: ExchangeAnim = {
+  hMix: 0,
+  hOp: 0,
+  kOp: 1,
+  kLock: 0,
+  cellScale: 1,
+  cellGlow: 0,
+}
+
+const HELD: ExchangeAnim = {
+  hMix: 0,
+  hOp: 1,
+  kOp: 0.14,
+  kLock: 0,
+  cellScale: CELL_SHRUNK,
+  cellGlow: 1,
+}
+
+const LOCKED: ExchangeAnim = {
+  hMix: 2,
+  hOp: 0,
+  kOp: 1,
+  kLock: 1,
+  cellScale: 1,
+  cellGlow: 0,
+}
+
 function applyPhase(phase: CrystalPhase, progress: number, reduced: boolean): ExchangeAnim {
-  if (phase === 'k') return { hMix: 0, hOp: 0, kOp: 1, kLock: 0 }
-  if (phase === 'h-point') return { hMix: 0, hOp: 1, kOp: 0.14, kLock: 0 }
-  if (phase === 'locked' || (phase === 'exchange' && reduced)) {
-    return { hMix: 2, hOp: 0, kOp: 1, kLock: 1 }
-  }
+  if (phase === 'k') return REST
+  if (phase === 'h-point') return reduced ? HELD : sampleHEntry(progress)
+  if (phase === 'locked' || (phase === 'exchange' && reduced)) return LOCKED
   return sampleExchange(progress)
 }
 
@@ -255,18 +298,26 @@ function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
   const sites = useMemo(() => buildExchangeSites(atoms), [atoms])
 
   useEffect(() => {
-    progress.current = phase === 'exchange' && !reduced ? 0 : 1
+    const live = (phase === 'h-point' || phase === 'exchange') && !reduced
+    progress.current = live ? 0 : 1
     anim.current = applyPhase(phase, progress.current, reduced)
   }, [phase, reduced])
 
   useFrame((_, dt) => {
-    if (group.current && !reduced && active) {
-      group.current.rotation.y += dt * 0.1
+    const root = group.current
+    if (root && !reduced && active) {
+      root.rotation.y += dt * 0.1
     }
-    if (phase === 'exchange' && !reduced && progress.current < 1) {
-      progress.current = Math.min(1, progress.current + dt / 3.6)
+    const live = (phase === 'h-point' || phase === 'exchange') && !reduced
+    if (live && progress.current < 1) {
+      const dur = phase === 'exchange' ? 3.6 : 1.65
+      progress.current = Math.min(1, progress.current + dt / dur)
     }
     anim.current = applyPhase(phase, progress.current, reduced)
+    if (root) {
+      const s = anim.current.cellScale
+      root.scale.setScalar(s)
+    }
   })
 
   return (
@@ -281,7 +332,7 @@ function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
         distance={14}
       />
       <group ref={group}>
-        <CellWire size={structure.cell.a * SCALE} />
+        <CellWire size={structure.cell.a * SCALE} anim={anim} />
         {bonds.map(([i, j]) => {
           const A = atoms[i]
           const B = atoms[j]

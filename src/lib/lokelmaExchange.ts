@@ -124,7 +124,45 @@ export function buildExchangeSites(atoms: Atom[]) {
   return { potassium, hydroxyls }
 }
 
-export function sampleExchange(progress: number) {
+export type ExchangeAnim = {
+  hMix: number
+  hOp: number
+  kOp: number
+  kLock: number
+  cellScale: number
+  cellGlow: number
+}
+
+export const CELL_OPEN = 1
+export const CELL_SHRUNK = 0.82
+const CELL_CLAMP = 0.76
+
+function shrinkScale(t: number) {
+  const s = smooth(t)
+  if (s < 0.72) return CELL_OPEN - (CELL_OPEN - CELL_CLAMP) * smooth(s / 0.72)
+  return CELL_CLAMP + (CELL_SHRUNK - CELL_CLAMP) * smooth((s - 0.72) / 0.28)
+}
+
+function openScale(t: number) {
+  const s = smooth(t)
+  if (s < 0.78) return CELL_SHRUNK + (1.04 - CELL_SHRUNK) * smooth(s / 0.78)
+  return 1.04 - 0.04 * smooth((s - 0.78) / 0.22)
+}
+
+export function sampleHEntry(progress: number): ExchangeAnim {
+  const p = Math.max(0, Math.min(1, progress))
+  const t = smooth(p)
+  return {
+    hMix: 0,
+    hOp: t,
+    kOp: 1 - 0.86 * t,
+    kLock: 0,
+    cellScale: shrinkScale(p),
+    cellGlow: t,
+  }
+}
+
+export function sampleExchange(progress: number): ExchangeAnim {
   const p = Math.max(0, Math.min(1, progress))
   const hT = smooth(p / 0.84)
   let hMix = 0
@@ -138,11 +176,14 @@ export function sampleExchange(progress: number) {
     hMix = 1 + u
     hOp = 1 - u
   }
+  const opening = smooth((p - 0.46) / 0.42)
   return {
     hMix,
     hOp,
     kOp: smooth((p - 0.48) / 0.32),
     kLock: smooth((p - 0.78) / 0.22),
+    cellScale: openScale(opening),
+    cellGlow: 1 - opening,
   }
 }
 

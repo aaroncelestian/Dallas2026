@@ -430,7 +430,7 @@ export const slides: Slide[] = [
         title: 'Protons point\nat the empty site.',
         layers: ['structure'],
         notes:
-          'Strip the potassium. Hydrogens sit on the ring oxygens, pointing into the channel — toward the site K wants. This is the loaded trap, not the captured ion. H steps the exchange if you want to run it by hand.',
+          'Strip the potassium. Hydrogens sit on the ring oxygens, pointing into the channel — toward the site K wants. Watch the cell contract. The framework is doing the work, not a soak. H steps the exchange if you want to run it by hand.',
       },
       {
         id: 'lock',
@@ -439,7 +439,7 @@ export const slides: Slide[] = [
         title: 'They bend.\nThey leave.\nK stays.',
         layers: ['structure'],
         notes:
-          'The protons reorient, then exchange out. Potassium occupies the 7-ring and the window closes behind it. Size-selective capture, not a reversible soak.',
+          'The protons reorient, then exchange out. The cell opens as potassium occupies the 7-ring and the window closes behind it. Size-selective capture, not a reversible soak.',
       },
       {
         id: 'patients',
