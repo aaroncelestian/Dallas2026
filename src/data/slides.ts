@@ -55,6 +55,15 @@ export interface SceneBeat {
   notes?: string
 }
 
+export interface StoneMark {
+  label: string
+  x: number
+  y: number
+  w: number
+  h: number
+  shape?: 'oval' | 'rect'
+}
+
 export interface Slide {
   id: string
   label: string
@@ -79,6 +88,8 @@ export interface Slide {
     focus?: { x: number; y: number; w: number; h: number }
     /** High-res plate of `focus` — used for the zoomed-in hold, then faded as the full image pulls back. */
     detail?: string
+    /** Specimen callouts, normalized to the full image. */
+    marks?: StoneMark[]
   }
   motif?: MotifKind
   yaw?: 1 | -1
@@ -195,6 +206,12 @@ export const slides: Slide[] = [
       fit: 'contain',
       focus: { x: 0.347876, y: 0.427042, w: 0.342135, h: 0.176953 },
       detail: asset('images/cabinet-doorway.webp'),
+      marks: [
+        { label: 'Quartz', x: 0.492, y: 0.192, w: 0.046, h: 0.028, shape: 'oval' },
+        { label: 'Agate', x: 0.462, y: 0.244, w: 0.105, h: 0.048, shape: 'oval' },
+        { label: 'Travertine', x: 0.382, y: 0.388, w: 0.252, h: 0.040, shape: 'rect' },
+        { label: 'Lapis', x: 0.492, y: 0.614, w: 0.044, h: 0.020, shape: 'oval' },
+      ],
     },
     bullets: [
       'Made for Pope Paul V',
@@ -203,7 +220,7 @@ export const slides: Slide[] = [
       'Two populations. Two source rocks.',
     ],
     notes:
-      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Five seconds. Then it pulls back and it is a cabinet. Speak the facts as they appear: papal commission, the materials, then the science the object did not know it would be asked — moganite dating the agate, two populations from two source rocks. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
+      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Five seconds. Then it pulls back and it is a cabinet. Speak the facts as they appear: papal commission, the materials, then the science the object did not know it would be asked — moganite dating the agate, two populations from two source rocks. As the cabinet settles, the stones take their names: quartz, agate, travertine, lapis. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
   },
 
   // ── Act I ─────────────────────────────────────────────

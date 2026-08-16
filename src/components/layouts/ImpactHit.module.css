@@ -36,6 +36,52 @@
   object-fit: fill;
 }
 
+.markSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.markShape {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 5;
+}
+
+.calloutSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.calloutLine {
+  stroke: var(--color-accent);
+  stroke-width: 1.25;
+  stroke-opacity: 0.85;
+}
+
+.markLabel {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-100%, -50%);
+  padding-right: 10px;
+  font-family: var(--font-heading);
+  font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  color: var(--color-accent);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .facts {
   position: absolute;
   left: var(--pad-x);
