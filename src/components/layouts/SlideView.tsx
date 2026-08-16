@@ -67,7 +67,7 @@ function TitleLines({ text }: { text: string }) {
   )
 }
 
-function Motif({ kind, active, slide }: { kind: MotifKind; active: boolean; slide: Slide }) {
+function Motif({ kind, active }: { kind: MotifKind; active: boolean }) {
   switch (kind) {
     case 'ion-chart':
       return <IonChart active={active} />
@@ -269,7 +269,7 @@ export function SlideView({
         )}
         {slide.motif === 'crystal-viewer' && (
           <div className={styles.stageCrystal}>
-            <Motif kind="crystal-viewer" active={active} slide={slide} />
+            <Motif kind="crystal-viewer" active={active} />
           </div>
         )}
         <div className={styles.stageScrim} aria-hidden />
@@ -294,7 +294,7 @@ export function SlideView({
               )}
             </Rise>
             <Rise active={active} delay={0.14} className={styles.stageMotifWide}>
-              <Motif kind="prep-modes" active={active} slide={slide} />
+              <Motif kind="prep-modes" active={active} />
             </Rise>
           </div>
         ) : (
@@ -307,7 +307,7 @@ export function SlideView({
             )}
             {slide.motif && (
               <div className={styles.stageMotif}>
-                <Motif kind={slide.motif} active={active} slide={slide} />
+                <Motif kind={slide.motif} active={active} />
               </div>
             )}
           </Rise>
@@ -330,7 +330,7 @@ export function SlideView({
         </Rise>
         {slide.motif && (
           <Rise active={active} delay={0.16} className={styles.heroMotif}>
-            <Motif kind={slide.motif} active={active} slide={slide} />
+            <Motif kind={slide.motif} active={active} />
           </Rise>
         )}
       </div>
@@ -351,7 +351,7 @@ export function SlideView({
         </Rise>
         <Rise active={active} delay={0.1} className={styles.splitMedia}>
           {slide.motif ? (
-            <Motif kind={slide.motif} active={active} slide={slide} />
+            <Motif kind={slide.motif} active={active} />
           ) : slide.image ? (
             <div className={styles.splitDepth}>
               <DepthField
