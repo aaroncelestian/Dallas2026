@@ -99,10 +99,11 @@ export function buildExchangeSites(atoms: Atom[]) {
   const hydroxyls: Hydroxyl[] = []
 
   for (const k of potassium) {
-    const near = oxygens
+    const coordinated = oxygens
       .map((o) => ({ o, d: Math.hypot(o.x - k.pos[0], o.y - k.pos[1], o.z - k.pos[2]) }))
       .filter((row) => row.d > 0.5 && row.d < KO_CUTOFF)
       .sort((a, b) => a.d - b.d)
+    const near = coordinated.slice(0, Math.round(coordinated.length * 0.5))
 
     for (const { o } of near) {
       const oxygen = v(o.x, o.y, o.z)
@@ -125,21 +126,23 @@ export function buildExchangeSites(atoms: Atom[]) {
 
 export function sampleExchange(progress: number) {
   const p = Math.max(0, Math.min(1, progress))
-  const hT = smooth(p / 0.78)
+  const hT = smooth(p / 0.84)
   let hMix = 0
   let hOp = 1
-  if (hT < 0.42) {
-    hMix = smooth(hT / 0.42)
+  if (hT < 0.14) {
+    hMix = 0
+  } else if (hT < 0.64) {
+    hMix = smooth((hT - 0.14) / 0.5)
   } else {
-    const u = smooth((hT - 0.42) / 0.58)
+    const u = smooth((hT - 0.64) / 0.36)
     hMix = 1 + u
     hOp = 1 - u
   }
   return {
     hMix,
     hOp,
-    kOp: smooth((p - 0.32) / 0.38),
-    kLock: smooth((p - 0.68) / 0.32),
+    kOp: smooth((p - 0.48) / 0.32),
+    kLock: smooth((p - 0.78) / 0.22),
   }
 }
 

@@ -48,18 +48,17 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  mix-blend-mode: screen;
-  filter: blur(1.5px);
+  filter: blur(1.2px);
   animation: orbPulse 2.8s ease-in-out infinite;
 }
 
 @keyframes orbPulse {
   0%,
   100% {
-    filter: blur(1.5px) brightness(1);
+    filter: blur(1.2px) brightness(1);
   }
   50% {
-    filter: blur(2.5px) brightness(1.18);
+    filter: blur(2px) brightness(1.08);
   }
 }
 

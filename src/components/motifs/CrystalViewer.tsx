@@ -264,7 +264,7 @@ function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
       group.current.rotation.y += dt * 0.1
     }
     if (phase === 'exchange' && !reduced && progress.current < 1) {
-      progress.current = Math.min(1, progress.current + dt / 1.85)
+      progress.current = Math.min(1, progress.current + dt / 3.6)
     }
     anim.current = applyPhase(phase, progress.current, reduced)
   })

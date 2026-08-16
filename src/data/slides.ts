@@ -341,6 +341,7 @@ export const slides: Slide[] = [
         kicker: 'Channel architecture',
         title: 'The architecture\nis empty space.',
         layers: ['voids'],
+        guests: true,
         notes:
           'Don’t draw the atoms. The framework is vanadium and phosphate; what the structure actually offers is the hole — cages and a connected channel network. Drag if you want the room to look into a cage. That empty space is what made it more than a new species.',
       },

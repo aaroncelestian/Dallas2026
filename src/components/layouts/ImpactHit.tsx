@@ -333,7 +333,7 @@ export function ImpactHit({
                 <motion.div
                   className={styles.orb}
                   style={{
-                    background: `radial-gradient(circle, ${m.tint ?? '#e0b15c'}cc 0%, ${m.tint ?? '#e0b15c'}55 32%, transparent 72%)`,
+                    background: `radial-gradient(circle, ${m.tint ?? '#e0b15c'}f5 0%, ${m.tint ?? '#e0b15c'}d8 22%, ${m.tint ?? '#e0b15c'}88 48%, transparent 74%)`,
                   }}
                   initial={false}
                   animate={{

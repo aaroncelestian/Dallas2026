@@ -18,6 +18,7 @@ const outPath = join(root, 'src', 'data', 'rowleyiteVoid.json')
 const GRID = 52
 const PROBE = 1.35
 const MIN_VOID_VOXELS = 120
+const SMOOTH_ITERS = 10
 const RADII = { O: 1.32, V: 1.58, P: 1.48, As: 1.52 }
 
 const cif = readFileSync(cifPath, 'utf8')
@@ -411,6 +412,70 @@ for (let i = 1; i < n; i++) {
   }
 }
 
+function taubinSmooth(pos, faces, iterations, lambda = 0.5, mu = -0.53) {
+  const nV = pos.length / 3
+  const nbrs = Array.from({ length: nV }, () => new Set())
+  for (let t = 0; t < faces.length; t += 3) {
+    const a0 = faces[t]
+    const a1 = faces[t + 1]
+    const a2 = faces[t + 2]
+    nbrs[a0].add(a1)
+    nbrs[a0].add(a2)
+    nbrs[a1].add(a0)
+    nbrs[a1].add(a2)
+    nbrs[a2].add(a0)
+    nbrs[a2].add(a1)
+  }
+  const adj = nbrs.map((set) => [...set])
+
+  const pass = (factor) => {
+    const next = pos.slice()
+    for (let i = 0; i < nV; i++) {
+      const list = adj[i]
+      if (!list.length) continue
+      let ax = 0
+      let ay = 0
+      let az = 0
+      for (const j of list) {
+        ax += pos[j * 3]
+        ay += pos[j * 3 + 1]
+        az += pos[j * 3 + 2]
+      }
+      const inv = 1 / list.length
+      next[i * 3] = pos[i * 3] + factor * (ax * inv - pos[i * 3])
+      next[i * 3 + 1] = pos[i * 3 + 1] + factor * (ay * inv - pos[i * 3 + 1])
+      next[i * 3 + 2] = pos[i * 3 + 2] + factor * (az * inv - pos[i * 3 + 2])
+    }
+    for (let i = 0; i < pos.length; i++) pos[i] = next[i]
+  }
+
+  for (let k = 0; k < iterations; k++) {
+    pass(lambda)
+    pass(mu)
+  }
+}
+
+function projectToIso(pos) {
+  const step = a / n
+  for (let i = 0; i < pos.length; i += 3) {
+    const x = pos[i] + a * 0.5
+    const y = pos[i + 1] + a * 0.5
+    const z = pos[i + 2] + a * 0.5
+    const s = sdfAt(x, y, z) - iso
+    const gx = sdfAt(x + step, y, z) - sdfAt(x - step, y, z)
+    const gy = sdfAt(x, y + step, z) - sdfAt(x, y - step, z)
+    const gz = sdfAt(x, y, z + step) - sdfAt(x, y, z - step)
+    const len = Math.hypot(gx, gy, gz) || 1
+    pos[i] -= (s * gx) / len
+    pos[i + 1] -= (s * gy) / len
+    pos[i + 2] -= (s * gz) / len
+  }
+}
+
+console.log(`Smoothing pore surface (${SMOOTH_ITERS} Taubin iterations)…`)
+taubinSmooth(positions, index, SMOOTH_ITERS)
+projectToIso(positions)
+
 const normals = new Array(positions.length).fill(0)
 const step = a / n
 for (let i = 0; i < positions.length; i += 3) {
@@ -433,7 +498,7 @@ function round(v) {
 
 const payload = {
   mineral: 'Rowleyite',
-  source: 'rowleyite.cif · Fd-3m · framework void surface',
+  source: 'rowleyite.cif · Fd-3m · Taubin-smoothed void surface',
   cell: { a, b: a, c: a },
   probe: PROBE,
   positions: positions.map(round),

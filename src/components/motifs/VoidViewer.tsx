@@ -78,9 +78,9 @@ function Bond({ a, b }: { a: [number, number, number]; b: [number, number, numbe
     return { len, quat, pos: A.clone().add(B).multiplyScalar(0.5) }
   }, [a, b])
   return (
-    <mesh position={mid.pos.toArray()} quaternion={mid.quat}>
-      <cylinderGeometry args={[0.11, 0.11, mid.len, 6]} />
-      <meshStandardMaterial color="#6a5a4a" roughness={0.65} metalness={0.08} />
+    <mesh position={mid.pos.toArray()} quaternion={mid.quat} renderOrder={3}>
+      <cylinderGeometry args={[0.16, 0.16, mid.len, 6]} />
+      <meshStandardMaterial color="#6a5a4a" roughness={0.65} metalness={0.08} depthTest={false} />
     </mesh>
   )
 }
@@ -97,14 +97,15 @@ function GuestMolecules() {
             return <Bond key={`${mol.name}-${i}-${j}`} a={[A.x, A.y, A.z]} b={[B.x, B.y, B.z]} />
           })}
           {mol.atoms.map((atom) => (
-            <mesh key={`${mol.name}-${atom.id}`} position={[atom.x, atom.y, atom.z]}>
-              <sphereGeometry args={[atom.radius, 16, 16]} />
+            <mesh key={`${mol.name}-${atom.id}`} position={[atom.x, atom.y, atom.z]} renderOrder={3}>
+              <sphereGeometry args={[atom.radius * 1.45, 16, 16]} />
               <meshStandardMaterial
                 color={atom.color}
                 roughness={0.3}
                 metalness={0.12}
                 emissive={atom.color}
-                emissiveIntensity={0.28}
+                emissiveIntensity={0.42}
+                depthTest={false}
               />
             </mesh>
           ))}
@@ -126,11 +127,6 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
     return geo
   }, [])
 
-  const target = useMemo(
-    () => new THREE.Vector3(guests.focus.x * SCALE, guests.focus.y * SCALE, guests.focus.z * SCALE),
-    [],
-  )
-
   useFrame((_, dt) => {
     if (!group.current || reduced || !active) return
     group.current.rotation.y += dt * 0.08
@@ -138,57 +134,46 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
 
   return (
     <>
-      <ambientLight intensity={0.4} />
+      <ambientLight intensity={0.48} />
       <directionalLight position={[6, 8, 4]} intensity={1.05} color="#fff4e0" />
       <directionalLight position={[-5, -2, -6]} intensity={0.34} color="#9ec4d4" />
-      <pointLight
-        position={[guests.focus.x * SCALE, guests.focus.y * SCALE, guests.focus.z * SCALE + 1.2]}
-        intensity={1.35}
-        color={showGuests ? '#f0c4a8' : VOID_IN}
-        distance={14}
-      />
+      <pointLight position={[0, 0.4, 3.2]} intensity={1.15} color={VOID_IN} distance={18} />
       <group ref={group} scale={SCALE}>
         <CellWire size={mesh.cell.a} />
-        <mesh geometry={geometry}>
+        <mesh geometry={geometry} renderOrder={0}>
           <meshStandardMaterial
             color={VOID_OUT}
             roughness={0.36}
             metalness={0.18}
             emissive={VOID_OUT}
-            emissiveIntensity={0.14}
+            emissiveIntensity={0.12}
             transparent
-            opacity={showGuests ? 0.5 : 0.78}
+            opacity={0.38}
             side={THREE.FrontSide}
-            depthWrite={!showGuests}
+            depthWrite={false}
           />
         </mesh>
-        <mesh geometry={geometry}>
+        <mesh geometry={geometry} renderOrder={0}>
           <meshStandardMaterial
             color={VOID_IN}
             roughness={0.42}
             metalness={0.08}
             emissive={VOID_IN}
-            emissiveIntensity={0.22}
+            emissiveIntensity={0.2}
             transparent
-            opacity={showGuests ? 0.58 : 0.86}
+            opacity={0.46}
             side={THREE.BackSide}
-            depthWrite={!showGuests}
+            depthWrite={false}
           />
         </mesh>
         {showGuests && <GuestMolecules />}
       </group>
-      <OrbitControls enablePan={false} enableZoom={false} makeDefault target={target} />
+      <OrbitControls enablePan={false} enableZoom={false} makeDefault />
     </>
   )
 }
 
 export function VoidViewer({ active, guests: showGuests = false }: { active: boolean; guests?: boolean }) {
-  const cam = [
-    guests.focus.x * SCALE + 1.15,
-    guests.focus.y * SCALE + 0.85,
-    guests.focus.z * SCALE + 5.6,
-  ] as [number, number, number]
-
   return (
     <div
       className={styles.crystal}
@@ -215,7 +200,7 @@ export function VoidViewer({ active, guests: showGuests = false }: { active: boo
       </div>
       <Canvas
         dpr={[1, 1.75]}
-        camera={{ position: cam, fov: 34 }}
+        camera={{ position: [5.4, 3.2, 12.2], fov: 40 }}
         gl={{ antialias: true, alpha: true }}
         style={{ width: '100%', height: '100%' }}
       >
