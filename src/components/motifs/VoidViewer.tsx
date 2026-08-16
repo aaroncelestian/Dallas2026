@@ -8,8 +8,8 @@ import guests from '../../data/rowleyiteGuests.json'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import styles from './Motifs.module.css'
 
-const VOID_OUT = '#e0b15c'
-const VOID_IN = '#5aa8b8'
+const VOID_IN = '#e0b15c'
+const VOID_OUT = '#5aa8b8'
 const SCALE = 0.155
 
 const LEGEND_WALLS = [
@@ -209,7 +209,7 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
         <CellWire size={mesh.cell.a} />
         <mesh geometry={geometry} castShadow receiveShadow>
           <meshPhysicalMaterial
-            color={VOID_OUT}
+            color={VOID_IN}
             roughness={0.38}
             metalness={0.22}
             clearcoat={0.45}
@@ -222,7 +222,7 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
         </mesh>
         <mesh geometry={geometry} castShadow receiveShadow>
           <meshPhysicalMaterial
-            color={VOID_IN}
+            color={VOID_OUT}
             roughness={0.62}
             metalness={0.06}
             clearcoat={0.08}
