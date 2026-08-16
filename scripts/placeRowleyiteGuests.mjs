@@ -43,19 +43,19 @@ const GUESTS = [
     id: 'doxorubicin',
     file: 'doxorubicin_3D.pdb',
     carbon: '#f0c4a8',
-    minClear: 0.05,
+    minClear: 0.12,
     thorough: true,
-    pull: 0.7,
-    scale: 0.86,
+    pull: 0,
+    scale: 0.82,
   },
   {
     id: 'vincristine',
     file: 'vincristine_3D.pdb',
     carbon: '#c5d8e6',
-    minClear: 0.05,
+    minClear: 0.12,
     thorough: true,
-    pull: 0.7,
-    scale: 0.78,
+    pull: 0,
+    scale: 0.75,
   },
 ]
 
@@ -392,7 +392,8 @@ console.log(
 function guestClearance(placed) {
   let min = Infinity
   for (const p of placed) {
-    const d = sdfInterp(p.x, p.y, p.z) - GUEST_CLEAR
+    const wall = DISPLAY[p.element]?.radius ?? DISPLAY.C.radius
+    const d = sdfInterp(p.x, p.y, p.z) - PROBE - wall
     if (d < min) min = d
   }
   return min
@@ -536,7 +537,7 @@ function dock(mol, site, occupied, thorough = false) {
       return
     }
     const clear = guestClearance(placed)
-    const score = clear + 0.2 * t[2]
+    const score = clear - 0.06 * Math.hypot(t[0], t[1], t[2])
     if (!best || score > best.score) best = { placed, clear, score, dz: t[2], m, t }
   }
 
