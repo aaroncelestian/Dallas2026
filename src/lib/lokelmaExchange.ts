@@ -5,6 +5,7 @@ export type CrystalPhase = 'k' | 'pore' | 'h-point' | 'exchange' | 'locked'
 export type Hydroxyl = {
   id: string
   oxygen: Vec3
+  kPos: Vec3
   point: Vec3
   bend: Vec3
   out: Vec3
@@ -123,6 +124,7 @@ export function buildExchangeSites(atoms: Atom[]) {
       hydroxyls.push({
         id: `${k.id}-${o.id}`,
         oxygen,
+        kPos: k.pos,
         point: add(oxygen, scale(towardK, OH)),
         bend: add(oxygen, scale(bent, OH)),
         out: add(oxygen, scale(leaving, 2.35)),
@@ -239,10 +241,13 @@ export type ExchangeAnim = {
   cellScale: number
   cellGlow: number
   poreOp: number
+  flash: number
 }
 
 export const CELL_OPEN = 1
 export const CELL_SHRUNK = 0.82
+export const K_HELD = 0.14
+const K_READY = 0.4
 const CELL_CLAMP = 0.76
 
 function shrinkScale(t: number) {
@@ -263,11 +268,12 @@ export function sampleHEntry(progress: number, kStart = 1): ExchangeAnim {
   return {
     hMix: 0,
     hOp: t,
-    kOp: kStart + (0.14 - kStart) * t,
+    kOp: kStart + (K_HELD - kStart) * t,
     kLock: 0,
     cellScale: shrinkScale(p),
     cellGlow: t,
     poreOp: 0,
+    flash: 0,
   }
 }
 
@@ -281,36 +287,65 @@ export function samplePore(progress: number): ExchangeAnim {
     cellScale: 1,
     cellGlow: 0.22 * smooth((p - 0.36) / 0.4),
     poreOp: smooth((p - 0.38) / 0.48),
+    flash: 0,
   }
 }
 
+const RISE_END = 0.14
+const PAUSE_END = 0.32
+const FLASH_END = 0.42
+const FILL_END = 0.82
+
 export function sampleExchange(progress: number): ExchangeAnim {
   const p = Math.max(0, Math.min(1, progress))
-  const hT = smooth(p / 0.84)
+
+  let kOp = K_HELD
+  if (p < RISE_END) {
+    kOp = K_HELD + (K_READY - K_HELD) * smooth(p / RISE_END)
+  } else if (p < FLASH_END) {
+    kOp = K_READY
+  } else {
+    kOp = K_READY + (1 - K_READY) * smooth((p - FLASH_END) / (FILL_END - FLASH_END))
+  }
+
+  let flash = 0
+  if (p >= PAUSE_END && p < FLASH_END) {
+    const u = (p - PAUSE_END) / (FLASH_END - PAUSE_END)
+    flash = Math.sin(u * Math.PI) ** 1.25
+  }
+
   let hMix = 0
   let hOp = 1
-  if (hT < 0.14) {
-    hMix = 0
-  } else if (hT < 0.64) {
-    hMix = smooth((hT - 0.14) / 0.5)
-  } else {
-    const u = smooth((hT - 0.64) / 0.36)
-    hMix = 1 + u
-    hOp = 1 - u
+  if (p >= FLASH_END) {
+    const hT = smooth((p - FLASH_END) / 0.52)
+    if (hT < 0.42) {
+      hMix = hT / 0.42
+    } else {
+      const u = (hT - 0.42) / 0.58
+      hMix = 1 + u
+      hOp = 1 - u
+    }
   }
-  const opening = smooth((p - 0.46) / 0.42)
+
+  const opening = p < FLASH_END + 0.04 ? 0 : smooth((p - FLASH_END - 0.04) / 0.44)
+  const kLock = p < 0.76 ? 0 : smooth((p - 0.76) / 0.22)
   return {
     hMix,
     hOp,
-    kOp: smooth((p - 0.48) / 0.32),
-    kLock: smooth((p - 0.78) / 0.22),
+    kOp: Math.min(1, kOp),
+    kLock,
     cellScale: openScale(opening),
     cellGlow: 1 - opening,
     poreOp: 0,
+    flash,
   }
 }
 
 export function hydroxylAt(site: Hydroxyl, hMix: number): Vec3 {
   if (hMix <= 1) return lerp3(site.point, site.bend, hMix)
   return lerp3(site.bend, site.out, hMix - 1)
+}
+
+export function flashAt(site: Hydroxyl): Vec3 {
+  return lerp3(site.point, site.kPos, 0.5)
 }

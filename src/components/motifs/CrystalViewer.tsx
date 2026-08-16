@@ -7,8 +7,10 @@ import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
 import {
   CELL_SHRUNK,
+  K_HELD,
   buildExchangeSites,
   buildPoreWindows,
+  flashAt,
   hydroxylAt,
   phaseForBeat,
   sampleExchange,
@@ -209,6 +211,65 @@ function Hydroxyls({
   )
 }
 
+function ExchangeFlashes({
+  sites,
+  anim,
+}: {
+  sites: Hydroxyl[]
+  anim: MutableRefObject<ExchangeAnim>
+}) {
+  const group = useRef<THREE.Group>(null)
+  const mids = useMemo(() => sites.map((site) => scaled(flashAt(site))), [sites])
+
+  useFrame(() => {
+    const root = group.current
+    if (!root) return
+    const flash = anim.current.flash
+    root.visible = flash > 0.02
+    const grow = 0.55 + flash * 1.2
+    for (const child of root.children) {
+      const pair = child as THREE.Group
+      for (const node of pair.children) {
+        const mesh = node as THREE.Mesh
+        const mat = mesh.material as THREE.MeshBasicMaterial
+        const gain = (mesh.userData.gain as number | undefined) ?? 1
+        const scale = (mesh.userData.scale as number | undefined) ?? 1
+        mat.opacity = flash * gain
+        mesh.scale.setScalar(grow * scale)
+      }
+    }
+  })
+
+  return (
+    <group ref={group} visible={false}>
+      {mids.map((pos, i) => (
+        <group key={sites[i].id} position={pos}>
+          <mesh userData={{ gain: 1, scale: 1 }}>
+            <sphereGeometry args={[0.065, 12, 12]} />
+            <meshBasicMaterial
+              color="#fff6d0"
+              transparent
+              opacity={0}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+          <mesh userData={{ gain: 0.32, scale: 2.35 }}>
+            <sphereGeometry args={[0.065, 12, 12]} />
+            <meshBasicMaterial
+              color={K_COLOR}
+              transparent
+              opacity={0}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  )
+}
+
 function PotassiumSites({
   atoms,
   anim,
@@ -377,6 +438,7 @@ const REST: ExchangeAnim = {
   cellScale: 1,
   cellGlow: 0,
   poreOp: 0,
+  flash: 0,
 }
 
 const PORE_HELD: ExchangeAnim = {
@@ -387,16 +449,18 @@ const PORE_HELD: ExchangeAnim = {
   cellScale: 1,
   cellGlow: 0.22,
   poreOp: 1,
+  flash: 0,
 }
 
 const HELD: ExchangeAnim = {
   hMix: 0,
   hOp: 1,
-  kOp: 0.14,
+  kOp: K_HELD,
   kLock: 0,
   cellScale: CELL_SHRUNK,
   cellGlow: 1,
   poreOp: 0,
+  flash: 0,
 }
 
 const LOCKED: ExchangeAnim = {
@@ -407,6 +471,7 @@ const LOCKED: ExchangeAnim = {
   cellScale: 1,
   cellGlow: 0,
   poreOp: 0,
+  flash: 0,
 }
 
 function applyPhase(
@@ -451,7 +516,7 @@ function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
     }
     const live = (phase === 'pore' || phase === 'h-point' || phase === 'exchange') && !reduced
     if (live && progress.current < 1) {
-      const dur = phase === 'exchange' ? 3.6 : phase === 'pore' ? 1.85 : 1.65
+      const dur = phase === 'exchange' ? 5.2 : phase === 'pore' ? 1.85 : 1.65
       progress.current = Math.min(1, progress.current + dt / dur)
     }
     anim.current = applyPhase(phase, progress.current, reduced, kStart.current)
@@ -499,6 +564,7 @@ function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
         <PotassiumSites atoms={kAtoms} anim={anim} />
         <PoreWindows windows={pores} anim={anim} />
         <Hydroxyls sites={sites.hydroxyls} anim={anim} />
+        <ExchangeFlashes sites={sites.hydroxyls} anim={anim} />
       </group>
       <OrbitControls enablePan={false} enableZoom={false} makeDefault />
     </>
