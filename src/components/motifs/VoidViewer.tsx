@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Line, OrbitControls } from '@react-three/drei'
+import { ContactShadows, Line, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import mesh from '../../data/rowleyiteVoid.json'
@@ -20,6 +20,8 @@ const LEGEND_WALLS = [
 const LEGEND_GUESTS = [
   { color: '#f0c4a8', label: 'doxorubicin' },
   { color: '#c5d8e6', label: 'vincristine' },
+  { color: '#d0d6de', label: 'cisplatin' },
+  { color: '#e6d08a', label: 'temozolomide' },
 ] as const
 
 function CellWire({ size }: { size: number }) {
@@ -79,7 +81,7 @@ function Bond({ a, b }: { a: [number, number, number]; b: [number, number, numbe
     return { len, quat, pos: A.clone().add(B).multiplyScalar(0.5) }
   }, [a, b])
   return (
-    <mesh position={mid.pos.toArray()} quaternion={mid.quat}>
+    <mesh position={mid.pos.toArray()} quaternion={mid.quat} castShadow>
       <cylinderGeometry args={[0.055, 0.055, mid.len, 6]} />
       <meshStandardMaterial color="#6a5a4a" roughness={0.55} metalness={0.12} />
     </mesh>
@@ -98,7 +100,7 @@ function GuestMolecules() {
             return <Bond key={`${mol.name}-${i}-${j}`} a={[A.x, A.y, A.z]} b={[B.x, B.y, B.z]} />
           })}
           {mol.atoms.map((atom) => (
-            <mesh key={`${mol.name}-${atom.id}`} position={[atom.x, atom.y, atom.z]}>
+            <mesh key={`${mol.name}-${atom.id}`} position={[atom.x, atom.y, atom.z]} castShadow receiveShadow>
               <sphereGeometry args={[atom.radius, 16, 16]} />
               <meshStandardMaterial
                 color={atom.color}
@@ -149,14 +151,28 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
 
   return (
     <>
-      <ambientLight intensity={0.22} />
-      <directionalLight position={[7, 9, 5]} intensity={1.55} color="#fff3dc" />
-      <directionalLight position={[-6, 3, -4]} intensity={0.55} color="#9ec4d4" />
-      <directionalLight position={[2, -5, 6]} intensity={0.35} color="#f0c878" />
+      <ambientLight intensity={0.18} />
+      <directionalLight
+        position={[7, 9, 5]}
+        intensity={1.7}
+        color="#fff3dc"
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-bias={-0.00045}
+        shadow-normalBias={0.045}
+        shadow-camera-near={0.5}
+        shadow-camera-far={28}
+        shadow-camera-left={-7}
+        shadow-camera-right={7}
+        shadow-camera-top={7}
+        shadow-camera-bottom={-7}
+      />
+      <directionalLight position={[-6, 3, -4]} intensity={0.42} color="#9ec4d4" />
+      <directionalLight position={[2, -5, 6]} intensity={0.28} color="#f0c878" />
       <LocalEnvironment />
       <group ref={group} scale={SCALE}>
         <CellWire size={mesh.cell.a} />
-        <mesh geometry={geometry}>
+        <mesh geometry={geometry} castShadow receiveShadow>
           <meshPhysicalMaterial
             color={VOID_OUT}
             roughness={0.38}
@@ -169,7 +185,7 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
             side={THREE.FrontSide}
           />
         </mesh>
-        <mesh geometry={geometry}>
+        <mesh geometry={geometry} castShadow receiveShadow>
           <meshPhysicalMaterial
             color={VOID_IN}
             roughness={0.62}
@@ -183,6 +199,14 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
         </mesh>
         {showGuests && <GuestMolecules />}
       </group>
+      <ContactShadows
+        position={[0, -2.85, 0]}
+        opacity={0.48}
+        scale={14}
+        blur={2.1}
+        far={8}
+        color="#050403"
+      />
       <OrbitControls enablePan={false} enableZoom={false} makeDefault />
     </>
   )
@@ -194,7 +218,7 @@ export function VoidViewer({ active, guests: showGuests = false }: { active: boo
       className={styles.crystal}
       aria-label={
         showGuests
-          ? 'Rowleyite void space with doxorubicin and vincristine in near-face cages'
+          ? 'Rowleyite void space with doxorubicin, vincristine, cisplatin, and temozolomide in near-face cages'
           : 'Rowleyite void space — the cages and channels, not the atoms'
       }
     >
@@ -215,6 +239,7 @@ export function VoidViewer({ active, guests: showGuests = false }: { active: boo
       </div>
       <Canvas
         dpr={[1, 1.75]}
+        shadows
         camera={{ position: [5.4, 3.2, 12.2], fov: 40 }}
         gl={{ antialias: true, alpha: true }}
         style={{ width: '100%', height: '100%' }}
@@ -225,7 +250,7 @@ export function VoidViewer({ active, guests: showGuests = false }: { active: boo
       </Canvas>
       <div className={styles.crystalCaption}>
         {showGuests
-          ? 'Rowleyite · doxorubicin + vincristine in the near cages · drag to orbit'
+          ? 'Rowleyite · four cargos in the near cages · drag to orbit'
           : 'Rowleyite · void space · drag to orbit'}
       </div>
     </div>

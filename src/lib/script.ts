@@ -74,7 +74,7 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
       if (layer?.kind === 'motif' && layer.motif === 'void-viewer') {
         lines.push(
           beat?.guests
-            ? 'Motif: Rowleyite void — doxorubicin + vincristine in the near-face cages (drag to orbit)'
+            ? 'Motif: Rowleyite void — doxorubicin, vincristine, cisplatin, temozolomide in the near-face cages (drag to orbit)'
             : 'Motif: Rowleyite void space — cages and channels, no atoms (drag to orbit)',
         )
       }

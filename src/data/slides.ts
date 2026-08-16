@@ -349,11 +349,11 @@ export const slides: Slide[] = [
         id: 'cargo',
         label: 'Cargo',
         kicker: 'Host–guest',
-        title: 'Doxorubicin.\nVincristine.',
+        title: 'Doxorubicin. Vincristine.\nCisplatin. Temozolomide.',
         layers: ['voids'],
         guests: true,
         notes:
-          'Two chemotherapeutics sitting in openings on the near face of the cell. The cages are large enough. Don’t overclaim a calculated pose — this is the picture of the idea: the hole is the useful part. Drag to look in from the side.',
+          'Four chemotherapeutics sitting in openings on the near face of the cell. The cages are large enough. Don’t overclaim a calculated pose — this is the picture of the idea: the hole is the useful part. Drag to look in from the side.',
       },
       {
         id: 'lead',

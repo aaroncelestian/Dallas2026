@@ -20,6 +20,8 @@ const DISPLAY = {
   C: { color: '#e8d4c0', radius: 0.2 },
   N: { color: '#5b7ec7', radius: 0.19 },
   O: { color: '#e24b4b', radius: 0.18 },
+  PT: { color: '#d0d6de', radius: 0.34 },
+  CL: { color: '#5aaa5a', radius: 0.24 },
 }
 
 const GUESTS = [
@@ -34,6 +36,18 @@ const GUESTS = [
     file: 'vincristine_3D.pdb',
     carbon: '#c5d8e6',
     minClear: -0.45,
+  },
+  {
+    id: 'cisplatin',
+    file: 'cisplatin_3D.pdb',
+    carbon: '#d0d6de',
+    minClear: -0.2,
+  },
+  {
+    id: 'temozolomide',
+    file: 'temozolomide_3D.pdb',
+    carbon: '#e6d08a',
+    minClear: -0.25,
   },
 ]
 
@@ -410,7 +424,7 @@ for (const spec of GUESTS) {
   const mol = parsePdb(pdbPath)
   console.log(`${spec.id}: ${mol.atoms.length} heavy atoms, radius ${mol.radius.toFixed(1)} Å`)
   let chosen = null
-  for (const site of sites.slice(0, 24)) {
+  for (const site of sites.slice(0, 40)) {
     if (site.zFace < 2.4 || site.zFace > 11) continue
     if (occupied.some((o) => Math.hypot(site.x - o.x, site.y - o.y, site.z - o.z) < o.span + 2)) continue
     const trial = dock(mol, site, occupied)
@@ -471,7 +485,7 @@ const focus = placedGuests.reduce(
 )
 
 const payload = {
-  source: 'rowleyite.cif + doxorubicin_3D.pdb + vincristine_3D.pdb',
+  source: 'rowleyite.cif + doxorubicin, vincristine, cisplatin, temozolomide PDBs',
   cell: { a },
   focus: {
     x: Math.round(focus.x * 1000) / 1000,
