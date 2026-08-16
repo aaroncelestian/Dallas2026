@@ -17,6 +17,7 @@ export type LayoutKind =
 export type MotifKind =
   | 'ion-chart'
   | 'crystal-viewer'
+  | 'void-viewer'
   | 'criteria-overlap'
   | 'prep-modes'
   | 'color-reveal'
@@ -317,6 +318,11 @@ export const slides: Slide[] = [
         alt: 'Rowleyite crystals on matrix',
         fit: 'contain',
       },
+      {
+        id: 'voids',
+        kind: 'motif',
+        motif: 'void-viewer',
+      },
     ],
     scene: [
       {
@@ -329,12 +335,21 @@ export const slides: Slide[] = [
           'That same structural selectivity doesn’t stop at extraction. It goes into medicine too. Collector logic here was pure taxonomic curiosity — not medicine. Dallas may already know the species-description story. Don’t retell it.',
       },
       {
+        id: 'voids',
+        label: 'Void space',
+        kicker: 'Channel architecture',
+        title: 'The architecture\nis empty space.',
+        layers: ['voids'],
+        notes:
+          'Don’t draw the atoms. The framework is vanadium and phosphate; what the structure actually offers is the hole — cages and a connected channel network. Drag if you want the room to look into a cage. That empty space is what made it more than a new species.',
+      },
+      {
         id: 'lead',
         label: 'Therapeutic lead',
         title: 'Then a\ntherapeutic lead.',
-        layers: ['specimen'],
+        layers: ['voids'],
         notes:
-          'Vanadium-bearing framework, cytotoxic selectivity, controlled-release potential. Channel architecture informing targeted oncology. The delay between “new species” and “drug-design lead” is the point.',
+          'Vanadium-bearing framework, cytotoxic selectivity, controlled-release potential. The channel architecture is still on the wall. That is what informed targeted oncology. The delay between “new species” and “drug-design lead” is the point.',
       },
     ],
   },
@@ -385,6 +400,24 @@ export const slides: Slide[] = [
         layers: ['structure'],
         notes:
           'The crystal lattice opens a pore about three angstroms wide, engineered to mimic the selectivity of the body’s own potassium channels. Extremely selective over Na⁺, Ca²⁺, Mg²⁺. It captures potassium as food moves through the intestine, before the kidney would ever have to clear it. Deployed exactly where the kidney isn’t, because the kidney is the organ that’s failing.',
+      },
+      {
+        id: 'protons',
+        label: 'Protons',
+        kicker: 'Zeolite → Lokelma',
+        title: 'Protons point\nat the empty site.',
+        layers: ['structure'],
+        notes:
+          'Strip the potassium. Hydrogens sit on the ring oxygens, pointing into the channel — toward the site K wants. This is the loaded trap, not the captured ion. H steps the exchange if you want to run it by hand.',
+      },
+      {
+        id: 'lock',
+        label: 'Lock',
+        kicker: 'Zeolite → Lokelma',
+        title: 'They bend.\nThey leave.\nK stays.',
+        layers: ['structure'],
+        notes:
+          'The protons reorient, then exchange out. Potassium occupies the 7-ring and the window closes behind it. Size-selective capture, not a reversible soak.',
       },
       {
         id: 'patients',

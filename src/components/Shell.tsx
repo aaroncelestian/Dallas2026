@@ -42,6 +42,7 @@ function plateState(slide: Slide, last: Slide['image']) {
     slide.motif === 'color-reveal' ||
     slide.motif === 'prep-modes' ||
     slide.motif === 'crystal-viewer' ||
+    slide.motif === 'void-viewer' ||
     Boolean(slide.scene) ||
     slide.clearPlate ||
     slide.layout === 'impact' ||
@@ -103,6 +104,7 @@ export function Shell() {
     slide.motif !== 'color-reveal' &&
     slide.motif !== 'prep-modes' &&
     slide.motif !== 'crystal-viewer' &&
+    slide.motif !== 'void-viewer' &&
     !slide.scene
   ) {
     if (lastImage.current?.src !== slide.image.src) {

@@ -5,6 +5,7 @@ import { DepthField } from './DepthField'
 import { ImpactHit } from './ImpactHit'
 import { IonChart } from '../motifs/IonChart'
 import { CrystalViewer } from '../motifs/CrystalViewer'
+import { VoidViewer } from '../motifs/VoidViewer'
 import { CriteriaOverlap } from '../motifs/CriteriaOverlap'
 import { PrepModes } from '../motifs/PrepModes'
 import { ColorReveal } from '../motifs/ColorReveal'
@@ -73,6 +74,8 @@ function Motif({ kind, active, slide }: { kind: MotifKind; active: boolean; slid
       return <IonChart active={active} />
     case 'crystal-viewer':
       return <CrystalViewer active={active} />
+    case 'void-viewer':
+      return <VoidViewer active={active} />
     case 'criteria-overlap':
       return <CriteriaOverlap active={active} />
     case 'prep-modes':

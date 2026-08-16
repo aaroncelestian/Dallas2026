@@ -39,11 +39,12 @@ That launches Chrome/Edge as an app window (`--app`), which is the cleanest shar
 | Print button | Speaker script — copy for an AI, or print / save as PDF |
 | `Shift+F` | Native fullscreen (breaks Zoom window-share) |
 | `Enter` or `R` | Blue Wave color reveal (on that beat) |
+| `H` | Lokelma H/K exchange: K in → H pointing → bend/leave → locked |
 | `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
 | Space / → | Next scene beat, then next slide |
 | ← | Previous scene beat, then previous slide |
 | `1`–`9` | Jump to scene beat N |
-| Drag | Orbit the Lokelma structure (on that beat) |
+| Drag | Orbit the Lokelma structure or the rowleyite void (on those beats) |
 | Hover counter | Jump to a slide or a scene beat |
 
 Chrome (counter, TOC, Resources) stays invisible until you hover. Cursor hides after a beat of stillness. The counter opens a slide list. Resources open over the talk — **Back to talk** or Esc returns.
@@ -99,7 +100,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 
 Breathe on the cold open, zeolite/Lokelma structure, Blue Wave reveal, prep spectrum, and the closing return to gold.
 
-Regenerate the Lokelma structure JSON after CIF changes:
+Regenerate the Lokelma atoms or the rowleyite void mesh after CIF changes:
 
 ```bash
 npm run parse-cif

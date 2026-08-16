@@ -3,6 +3,7 @@ import type { SceneLayer, Slide } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
 import { CrystalViewer } from '../motifs/CrystalViewer'
+import { VoidViewer } from '../motifs/VoidViewer'
 import { DepthField } from './DepthField'
 import styles from './Layouts.module.css'
 
@@ -24,6 +25,14 @@ function LayerView({ layer, active }: { layer: SceneLayer; active: boolean }) {
     return (
       <div className={styles.sceneMotif}>
         <CrystalViewer active={active} />
+      </div>
+    )
+  }
+
+  if (layer.kind === 'motif' && layer.motif === 'void-viewer') {
+    return (
+      <div className={styles.sceneMotif}>
+        <VoidViewer active={active} />
       </div>
     )
   }

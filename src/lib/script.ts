@@ -30,6 +30,9 @@ function motifLine(slide: Slide): string | undefined {
   if (slide.motif === 'crystal-viewer') {
     return 'Motif: ZS-9 crystal structure — K⁺ in the channels (drag to orbit)'
   }
+  if (slide.motif === 'void-viewer') {
+    return 'Motif: Rowleyite void space — cages and channels, no atoms (drag to orbit)'
+  }
   if (slide.motif === 'criteria-overlap') {
     return 'Motif: aesthetic judgment overlapping scientific standing'
   }
@@ -58,7 +61,18 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
       const layer = slide.layers.find((item) => item.id === id)
       if (layer?.alt) lines.push(`Image: ${layer.alt}`)
       if (layer?.kind === 'motif' && layer.motif === 'crystal-viewer') {
-        lines.push('Motif: ZS-9 crystal structure — K⁺ in the channels (drag to orbit)')
+        if (beat?.id === 'protons') {
+          lines.push('Motif: ZS-9 — K removed, H pointing at the vacant site (H to step)')
+        } else if (beat?.id === 'lock') {
+          lines.push('Motif: ZS-9 — H bends and exchanges out; K locks in')
+        } else if (beat?.id === 'patients') {
+          lines.push('Motif: ZS-9 — K locked in the 7-ring (drag to orbit)')
+        } else {
+          lines.push('Motif: ZS-9 crystal structure — K⁺ in the channels (drag to orbit)')
+        }
+      }
+      if (layer?.kind === 'motif' && layer.motif === 'void-viewer') {
+        lines.push('Motif: Rowleyite void space — cages and channels, no atoms (drag to orbit)')
       }
     }
   } else if (slide.image) {
