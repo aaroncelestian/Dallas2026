@@ -810,7 +810,7 @@ export const slides: Slide[] = [
         label: 'The cap',
         title: 'The cap is the data.',
         layers: ['bluecap'],
-        callouts: ['cap', 'body'],
+        callouts: ['termination', 'cap', 'body'],
         notes:
           'Talk the Mn → Fe shift off the formulae. The indigo rind is why it is famous and a chemical change written into the crystal. Same looking.',
       },
@@ -819,7 +819,7 @@ export const slides: Slide[] = [
         label: 'Same looking',
         title: 'Same looking.',
         layers: ['bluecap'],
-        callouts: ['cap', 'pocket'],
+        callouts: ['termination', 'cap', 'body', 'pocket'],
         notes:
           'Carnegie kept it for the first reason. Aesthetic standing and scientific standing are one act. Then Blue Wave for the color case.',
       },

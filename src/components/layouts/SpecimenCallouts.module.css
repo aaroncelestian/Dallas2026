@@ -31,7 +31,6 @@
 .label {
   position: absolute;
   max-width: min(28ch, 28vw);
-  transform: translateY(-50%);
 }
 
 .label[data-side='right'] {

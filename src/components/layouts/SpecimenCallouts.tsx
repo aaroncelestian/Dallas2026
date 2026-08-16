@@ -14,9 +14,25 @@ type Pair = {
   textY: number
 }
 
+const GAP = 16
+
 function curve(p: Pair) {
   const mx = (p.orbX + p.textX) / 2
   return `M ${p.orbX} ${p.orbY} C ${mx} ${p.orbY}, ${mx} ${p.textY}, ${p.textX} ${p.textY}`
+}
+
+function stackTops(
+  items: Array<{ id: string; preferred: number; height: number }>,
+): Record<string, number> {
+  const tops: Record<string, number> = {}
+  const ordered = [...items].sort((a, b) => a.preferred - b.preferred)
+  let bottom = -Infinity
+  for (const item of ordered) {
+    const top = Math.max(item.preferred - item.height / 2, bottom + GAP)
+    tops[item.id] = top
+    bottom = top + item.height
+  }
+  return tops
 }
 
 export function SpecimenCallouts({
@@ -34,6 +50,7 @@ export function SpecimenCallouts({
   const marksRef = useRef(marks)
   marksRef.current = marks
   const [plate, setPlate] = useState<Box | null>(null)
+  const [tops, setTops] = useState<Record<string, number>>({})
   const [pairs, setPairs] = useState<Pair[]>([])
   const shown = marks.filter((mark) => visible.includes(mark.id))
   const shownKey = shown.map((mark) => mark.id).join('|')
@@ -43,6 +60,7 @@ export function SpecimenCallouts({
     if (!root || !active || !shownKey) {
       setPlate(null)
       setPairs([])
+      setTops({})
       return
     }
 
@@ -58,10 +76,27 @@ export function SpecimenCallouts({
         height: pr.height,
       }
       setPlate(next)
+
       const current = shownKey
         .split('|')
         .map((id) => marksRef.current.find((m) => m.id === id))
         .filter((mark): mark is SpecimenCallout => Boolean(mark))
+
+      const bySide: Record<'left' | 'right', Array<{ id: string; preferred: number; height: number }>> = {
+        left: [],
+        right: [],
+      }
+      current.forEach((mark, i) => {
+        const side = mark.side ?? 'right'
+        const height = labelRefs.current[i]?.getBoundingClientRect().height ?? 64
+        bySide[side].push({
+          id: mark.id,
+          preferred: next.top + mark.y * next.height,
+          height,
+        })
+      })
+      const nextTops = { ...stackTops(bySide.left), ...stackTops(bySide.right) }
+      setTops(nextTops)
 
       const nextPairs = current.map((mark, i) => {
         const label = labelRefs.current[i]
@@ -105,11 +140,13 @@ export function SpecimenCallouts({
           className={styles.label}
           data-side={mark.side ?? 'right'}
           style={{
-            top: plate ? `${plate.top + mark.y * plate.height}px` : `${mark.y * 100}%`,
+            top:
+              tops[mark.id] ??
+              (plate ? plate.top + mark.y * plate.height : `${mark.y * 100}%`),
           }}
           initial={false}
           animate={{ opacity: active ? 1 : 0 }}
-          transition={{ duration: reduced ? 0 : 0.45, delay: reduced ? 0 : 0.12 + i * 0.08 }}
+          transition={{ duration: reduced ? 0 : 0.45, delay: reduced ? 0 : 0.08 }}
         >
           <div className={styles.title}>{mark.title}</div>
           {mark.formula && <div className={styles.formula}>{mark.formula}</div>}
@@ -118,7 +155,7 @@ export function SpecimenCallouts({
       ))}
 
       <svg className={styles.svg} aria-hidden>
-        {pairs.map((p, i) => (
+        {pairs.map((p) => (
           <g key={p.id}>
             <motion.circle
               cx={p.orbX}
@@ -127,7 +164,7 @@ export function SpecimenCallouts({
               className={styles.tick}
               initial={false}
               animate={{ opacity: active ? 1 : 0 }}
-              transition={{ duration: reduced ? 0 : 0.35, delay: reduced ? 0 : i * 0.08 }}
+              transition={{ duration: reduced ? 0 : 0.35 }}
             />
             <motion.path
               d={curve(p)}
@@ -135,11 +172,7 @@ export function SpecimenCallouts({
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: active ? 0.9 : 0 }}
               transition={{
-                pathLength: {
-                  duration: reduced ? 0 : 0.75,
-                  delay: reduced ? 0 : 0.06 + i * 0.08,
-                  ease: [0.4, 0, 0.2, 1],
-                },
+                pathLength: { duration: reduced ? 0 : 0.75, ease: [0.4, 0, 0.2, 1] },
                 opacity: { duration: reduced ? 0 : 0.35 },
               }}
             />
