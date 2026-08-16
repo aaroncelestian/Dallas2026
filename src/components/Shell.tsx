@@ -16,6 +16,26 @@ function holdsCopy(slide?: Slide) {
 
 const RESOURCES = [
   {
+    href: 'https://aaroncelestian.github.io/PRISM/',
+    title: 'PRISM',
+    detail: 'Mineral specimen rater',
+  },
+  {
+    href: 'https://aaroncelestian.github.io/SpecimenPro-Webpage/',
+    title: 'SpecimenPro',
+    detail: 'Document and organize a collection',
+  },
+  {
+    href: 'https://aaroncelestian.github.io/MineralSciences/',
+    title: 'Mineral Sciences',
+    detail: 'aaroncelestian.github.io',
+  },
+  {
+    href: 'https://aaroncelestian.substack.com',
+    title: 'Pocketful of χtals',
+    detail: 'Blog and podcast',
+  },
+  {
     href: 'https://lacnhm.maps.arcgis.com/apps/mapviewer/index.html?webmap=6f3eb85811d645059fe7afe5441a1480',
     embed:
       'https://lacnhm.maps.arcgis.com/apps/Embed/index.html?webmap=6f3eb85811d645059fe7afe5441a1480',
@@ -25,7 +45,7 @@ const RESOURCES = [
   {
     href: 'https://aaroncelestian.substack.com/p/everything-has-an-address',
     title: 'Everything Has an Address',
-    detail: 'pocketful of χtals',
+    detail: 'Cabinet essay',
   },
 ] as const
 
@@ -554,7 +574,7 @@ export function Shell() {
             aria-haspopup="menu"
             aria-expanded={resourcesOpen}
             aria-label="Open resources"
-            title="Trade routes map and cabinet essay"
+            title="PRISM, SpecimenPro, site, and related work"
             onClick={() => {
               setPickerOpen(false)
               setResourcesOpen((open) => !open)
