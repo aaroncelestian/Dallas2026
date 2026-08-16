@@ -1,10 +1,9 @@
-import { Suspense, useLayoutEffect, useMemo, useRef } from 'react'
+import { Suspense, useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Line, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import mesh from '../../data/rowleyiteVoid.json'
 import guests from '../../data/rowleyiteGuests.json'
-import framework from '../../data/rowleyiteFramework.json'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import styles from './Motifs.module.css'
 
@@ -15,12 +14,6 @@ const SCALE = 0.155
 const LEGEND_WALLS = [
   { color: VOID_OUT, label: 'outside' },
   { color: VOID_IN, label: 'inside' },
-] as const
-
-const LEGEND_FRAME = [
-  { color: '#9a8ab0', label: 'V' },
-  { color: '#d4b45a', label: 'As' },
-  { color: '#d0c8bc', label: 'O' },
 ] as const
 
 const LEGEND_GUESTS = [
@@ -97,110 +90,6 @@ function Bond({ a, b }: { a: [number, number, number]; b: [number, number, numbe
         depthWrite={false}
       />
     </mesh>
-  )
-}
-
-function InstancedSpheres({
-  atoms,
-  color,
-  radius,
-}: {
-  atoms: { x: number; y: number; z: number }[]
-  color: string
-  radius: number
-}) {
-  const ref = useRef<THREE.InstancedMesh>(null)
-  useLayoutEffect(() => {
-    const mesh = ref.current
-    if (!mesh) return
-    const dummy = new THREE.Object3D()
-    atoms.forEach((atom, i) => {
-      dummy.position.set(atom.x, atom.y, atom.z)
-      dummy.updateMatrix()
-      mesh.setMatrixAt(i, dummy.matrix)
-    })
-    mesh.instanceMatrix.needsUpdate = true
-  }, [atoms])
-  if (!atoms.length) return null
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, atoms.length]} renderOrder={2}>
-      <sphereGeometry args={[radius, 12, 12]} />
-      <meshStandardMaterial
-        color={color}
-        roughness={0.38}
-        metalness={0.2}
-        emissive={color}
-        emissiveIntensity={0.18}
-        transparent
-        opacity={0.7}
-        depthTest={false}
-        depthWrite={false}
-      />
-    </instancedMesh>
-  )
-}
-
-function FrameworkBonds() {
-  const ref = useRef<THREE.InstancedMesh>(null)
-  useLayoutEffect(() => {
-    const mesh = ref.current
-    if (!mesh) return
-    const dummy = new THREE.Object3D()
-    const y = new THREE.Vector3(0, 1, 0)
-    framework.bonds.forEach((bond, i) => {
-      const A = new THREE.Vector3(...(bond.a as [number, number, number]))
-      const B = new THREE.Vector3(...(bond.b as [number, number, number]))
-      const dir = B.clone().sub(A)
-      const len = dir.length()
-      dummy.position.copy(A.add(B).multiplyScalar(0.5))
-      dummy.quaternion.setFromUnitVectors(y, dir.normalize())
-      dummy.scale.set(1, len, 1)
-      dummy.updateMatrix()
-      mesh.setMatrixAt(i, dummy.matrix)
-    })
-    mesh.instanceMatrix.needsUpdate = true
-  }, [])
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, framework.bonds.length]} renderOrder={2}>
-      <cylinderGeometry args={[0.05, 0.05, 1, 6]} />
-      <meshStandardMaterial
-        color="#7a7064"
-        roughness={0.65}
-        metalness={0.08}
-        transparent
-        opacity={0.62}
-        depthTest={false}
-        depthWrite={false}
-      />
-    </instancedMesh>
-  )
-}
-
-function Framework() {
-  const groups = useMemo(() => {
-    const by: Record<string, { x: number; y: number; z: number; color: string; radius: number }[]> = {
-      V: [],
-      As: [],
-      O: [],
-    }
-    for (const atom of framework.atoms) {
-      const list = by[atom.element]
-      if (list) list.push(atom)
-    }
-    return by
-  }, [])
-  return (
-    <group>
-      <FrameworkBonds />
-      {(['V', 'As', 'O'] as const).map((el) => (
-        <InstancedSpheres
-          key={el}
-          atoms={groups[el]}
-          color={groups[el][0]?.color ?? '#ccc'}
-          radius={groups[el][0]?.radius ?? 0.2}
-        />
-      ))}
-    </group>
   )
 }
 
@@ -288,7 +177,6 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
             depthWrite={false}
           />
         </mesh>
-        <Framework />
         {showGuests && <GuestMolecules />}
       </group>
       <OrbitControls enablePan={false} enableZoom={false} makeDefault />
@@ -308,12 +196,6 @@ export function VoidViewer({ active, guests: showGuests = false }: { active: boo
     >
       <div className={styles.legend}>
         {LEGEND_WALLS.map((row) => (
-          <div key={row.label} className={styles.legendRow}>
-            <span className={styles.swatch} style={{ background: row.color }} />
-            {row.label}
-          </div>
-        ))}
-        {LEGEND_FRAME.map((row) => (
           <div key={row.label} className={styles.legendRow}>
             <span className={styles.swatch} style={{ background: row.color }} />
             {row.label}
