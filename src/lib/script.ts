@@ -92,7 +92,7 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
             : beat?.id === 'absorb'
               ? 'Motif: lithium ride — flying to H₂MnO₄'
               : beat?.id === 'air'
-                ? 'Motif: lithium ride — holding at the spinel; CO₂ falls in ahead'
+                ? 'Motif: lithium ride — arriving at CO₂; the wash falls in'
                 : beat?.id === 'product'
                   ? 'Motif: lithium ride — flying to Li₂CO₃'
                   : beat?.id === 'award'

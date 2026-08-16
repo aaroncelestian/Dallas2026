@@ -22,23 +22,56 @@ const ORDER: CycleBeat[] = ['brine', 'absorb', 'air', 'product', 'award', 'recyc
 const ANGLE: Record<CycleBeat, number> = {
   brine: 180,
   absorb: 270,
-  air: 270,
+  air: 360,
   product: 450,
   award: 450,
   recycle: 450,
 }
 
+type Glyph = { t: string; sub?: boolean }
+
 const STATIONS = [
-  { id: 'brine', label: 'brine', angle: 180, from: 0 },
-  { id: 'spinel', label: 'H₂MnO₄', angle: 270, from: 1 },
-  { id: 'air', label: 'CO₂', angle: 0, from: 2 },
-  { id: 'product', label: 'Li₂CO₃', angle: 90, from: 3 },
+  { id: 'brine', glyphs: [{ t: 'brine' }] as Glyph[], angle: 180, from: 0 },
+  {
+    id: 'spinel',
+    glyphs: [
+      { t: 'H' },
+      { t: '2', sub: true },
+      { t: 'MnO' },
+      { t: '4', sub: true },
+    ] as Glyph[],
+    angle: 270,
+    from: 1,
+  },
+  { id: 'air', glyphs: [{ t: 'CO' }, { t: '2', sub: true }] as Glyph[], angle: 0, from: 2 },
+  {
+    id: 'product',
+    glyphs: [
+      { t: 'Li' },
+      { t: '2', sub: true },
+      { t: 'CO' },
+      { t: '3', sub: true },
+    ] as Glyph[],
+    angle: 90,
+    from: 3,
+  },
 ] as const
 
 const WIDE_POS = new THREE.Vector3(6.4, 5.6, 6.9)
 const WIDE_LOOK = new THREE.Vector3(0, 0, 0)
-const RIDE_FOG: [number, number] = [1.6, 6.4]
+const RIDE_FOG: [number, number] = [0.85, 3.35]
 const WIDE_FOG: [number, number] = [9, 24]
+const ARC_BEHIND = 14
+const ARC_AHEAD = 52
+const ARC_RAD = ((ARC_BEHIND + ARC_AHEAD) * Math.PI) / 180
+
+function focusStation(beat: CycleBeat): StationId | 'all' {
+  if (beat === 'recycle') return 'all'
+  if (beat === 'brine') return 'brine'
+  if (beat === 'absorb') return 'spinel'
+  if (beat === 'air') return 'air'
+  return 'product'
+}
 
 function asBeat(id?: string): CycleBeat {
   if (id && ORDER.includes(id as CycleBeat)) return id as CycleBeat
@@ -61,6 +94,43 @@ function onRing(deg: number, radius = RING): THREE.Vector3 {
 function tangent(deg: number): THREE.Vector3 {
   const rad = (deg * Math.PI) / 180
   return new THREE.Vector3(-Math.sin(rad), 0, Math.cos(rad)).normalize()
+}
+
+function Formula({
+  glyphs,
+  fontSize,
+  color,
+}: {
+  glyphs: readonly Glyph[]
+  fontSize: number
+  color: string
+}) {
+  const widths = glyphs.map((g) => g.t.length * fontSize * (g.sub ? 0.4 : 0.58))
+  const total = widths.reduce((sum, w) => sum + w, 0)
+  let cursor = -total / 2
+  return (
+    <group>
+      {glyphs.map((g, i) => {
+        const width = widths[i]
+        const x = cursor + width / 2
+        cursor += width
+        return (
+          <Text
+            key={`${g.t}-${i}`}
+            position={[x, g.sub ? -fontSize * 0.22 : 0, 0]}
+            fontSize={g.sub ? fontSize * 0.62 : fontSize}
+            color={color}
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.012}
+            outlineColor="#070605"
+          >
+            {g.t}
+          </Text>
+        )
+      })}
+    </group>
+  )
 }
 
 function nearestStation(deg: number): StationId {
@@ -124,13 +194,16 @@ function CycleRig({
   const li = useRef<THREE.Mesh>(null)
   const co2 = useRef<THREE.Mesh>(null)
   const returnLine = useRef<THREE.Group>(null)
+  const arc = useRef<THREE.Group>(null)
+  const fullRing = useRef<THREE.Mesh>(null)
 
   useEffect(() => {
     const next = ANGLE[beat]
+    const same = Math.abs(next - anim.current.angle) < 0.5
     anim.current.from = anim.current.angle
     anim.current.to = next
-    anim.current.flight = reduced ? 1 : 0
-    if (reduced) anim.current.angle = next
+    anim.current.flight = reduced || same ? 1 : 0
+    if (reduced || same) anim.current.angle = next
     looping.current = false
     if (!recycled) {
       glowRef.current = null
@@ -181,20 +254,24 @@ function CycleRig({
 
     const t = a.angle
     const tan = tangent(t)
-    const side = new THREE.Vector3().crossVectors(tan, new THREE.Vector3(0, 1, 0)).normalize()
-    const holding = a.flight >= 1 && !recycled && !reduced
-    const sway = holding ? Math.sin(a.time * 0.55) * 0.22 : 0
-    const bob = holding ? Math.sin(a.time * 0.4) * 0.05 : 0
+    const moving = a.flight < 1 && Math.abs(a.to - a.from) > 0.5 && !reduced
+    const turn = moving ? Math.sin(a.flight * Math.PI) : 0
 
     liPos.copy(onRing(t))
     if (li.current) li.current.position.copy(liPos)
+    const radial = liPos.clone().setY(0).normalize()
 
+    // Outside the rail, low. A left-hand bend — never a view across the ring.
     ridePos
       .copy(liPos)
-      .addScaledVector(tan, -1.55)
-      .addScaledVector(side, sway)
-      .setY(0.52 + bob)
-    rideLook.copy(liPos).addScaledVector(tan, 2.8).setY(0.18)
+      .addScaledVector(tan, -1.35)
+      .addScaledVector(radial, 0.22 + turn * 0.12)
+      .setY(0.34)
+    rideLook
+      .copy(liPos)
+      .addScaledVector(tan, 1.7)
+      .addScaledVector(radial, -turn * 0.95)
+      .setY(0.12)
 
     camPos.lerpVectors(ridePos, WIDE_POS, easeOut(a.pull))
     camLook.lerpVectors(rideLook, WIDE_LOOK, easeOut(a.pull))
@@ -202,6 +279,23 @@ function CycleRig({
     if (!wide) {
       camera.position.copy(camPos)
       camera.lookAt(camLook)
+      if (turn > 0.001) camera.rotateZ(turn * 0.2)
+    }
+
+    if (arc.current) {
+      arc.current.rotation.y = -THREE.MathUtils.degToRad(t - ARC_BEHIND)
+      arc.current.visible = a.pull < 0.92
+      arc.current.traverse((child) => {
+        const mesh = child as THREE.Mesh
+        const mat = mesh.material as THREE.MeshStandardMaterial | undefined
+        if (mat && 'opacity' in mat) mat.opacity = 1 - easeOut(a.pull)
+      })
+    }
+    if (fullRing.current) {
+      const mat = fullRing.current.material as THREE.MeshStandardMaterial
+      mat.opacity = easeOut(a.pull)
+      mat.transparent = true
+      fullRing.current.visible = a.pull > 0.08
     }
     const persp = camera as THREE.PerspectiveCamera
     persp.fov = THREE.MathUtils.lerp(60, 40, easeOut(a.pull))
@@ -241,7 +335,23 @@ function CycleRig({
       <directionalLight position={[3, 7, 2]} intensity={0.7} color={CREAM} />
       <pointLight position={[0, 2.2, 0]} intensity={0.35} color={GOLD} />
 
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
+      <group ref={arc}>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[RING, 0.042, 14, 48, ARC_RAD]} />
+          <meshStandardMaterial
+            color={GOLD}
+            roughness={0.38}
+            metalness={0.55}
+            emissive={GOLD}
+            emissiveIntensity={0.22}
+            transparent
+            opacity={1}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      <mesh ref={fullRing} rotation={[Math.PI / 2, 0, 0]} visible={false}>
         <torusGeometry args={[RING, 0.042, 14, 128]} />
         <meshStandardMaterial
           color={GOLD}
@@ -249,6 +359,8 @@ function CycleRig({
           metalness={0.55}
           emissive={GOLD}
           emissiveIntensity={0.18}
+          transparent
+          opacity={0}
         />
       </mesh>
 
@@ -269,34 +381,29 @@ function CycleRig({
       </group>
 
       {STATIONS.map((station) => {
-        const live = recycled || reached >= station.from
+        const focus = focusStation(beat)
+        const here = focus === 'all' || station.id === focus
+        const live = here && (recycled || reached >= station.from)
         const lit = glow === station.id
         const p = onRing(station.angle)
         const label = onRing(station.angle, RING + 0.62)
         return (
           <group key={station.id}>
-            <mesh position={[p.x, 0.02, p.z]}>
+            <mesh position={[p.x, 0.02, p.z]} visible={live}>
               <sphereGeometry args={[0.09, 16, 16]} />
               <meshStandardMaterial
                 color={GOLD}
                 emissive={GOLD_HOT}
-                emissiveIntensity={lit ? 1.1 : live ? 0.55 : 0.08}
-                transparent
-                opacity={live ? 1 : 0.2}
+                emissiveIntensity={lit ? 1.1 : 0.55}
               />
             </mesh>
             {live && (
               <Billboard follow position={[label.x, 0.42, label.z]}>
-                <Text
+                <Formula
+                  glyphs={station.glyphs}
                   fontSize={0.3}
                   color={lit ? GOLD_HOT : CREAM}
-                  anchorX="center"
-                  anchorY="middle"
-                  outlineWidth={0.012}
-                  outlineColor="#070605"
-                >
-                  {station.label}
-                </Text>
+                />
               </Billboard>
             )}
           </group>
@@ -351,7 +458,7 @@ export function LithiumCycle({ active }: { active: boolean }) {
     >
       <Canvas
         dpr={[1, 1.75]}
-        camera={{ position: [-4.25, 0.52, 1.55], fov: 60, near: 0.12, far: 40 }}
+        camera={{ position: [-4.47, 0.34, 1.35], fov: 60, near: 0.12, far: 40 }}
         gl={{ antialias: true, alpha: false }}
         style={{ width: '100%', height: '100%' }}
       >
