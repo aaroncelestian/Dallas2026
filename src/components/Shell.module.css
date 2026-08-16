@@ -201,6 +201,10 @@
   color: var(--color-accent);
 }
 
+.pickerBeat {
+  padding-left: 28px;
+}
+
 .counter {
   font-family: var(--font-body);
   font-size: 12px;

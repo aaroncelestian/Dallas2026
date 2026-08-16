@@ -471,32 +471,10 @@ export function Shell() {
       <div className={styles.chrome} data-open={chromeOpen || undefined}>
         <div className={styles.pickerWrap} ref={pickerRef}>
           {pickerOpen && (
-            <div className={styles.picker} role="listbox" aria-label="Slides">
-              {scene.hasScene && slide.scene && (
-                <>
-                  <div className={styles.pickerChapter}>{slide.label}</div>
-                  {slide.scene.map((beat, i) => (
-                    <button
-                      key={beat.id}
-                      type="button"
-                      role="option"
-                      className={styles.pickerItem}
-                      data-active={i === scene.index}
-                      aria-selected={i === scene.index}
-                      onClick={() => {
-                        scene.go(i)
-                        setPickerOpen(false)
-                      }}
-                    >
-                      <span className={styles.pickerNum}>{i + 1}</span>
-                      {beat.label}
-                    </button>
-                  ))}
-                  <div className={styles.pickerChapter}>Slides</div>
-                </>
-              )}
+            <div className={styles.picker} role="listbox" aria-label="Scenes">
               {slides.map((s, i) => {
                 const showChapter = i === 0 || s.chapter !== slides[i - 1].chapter
+                const beats = i === activeIndex ? s.scene : undefined
                 return (
                   <div key={s.id}>
                     {showChapter && (
@@ -505,7 +483,7 @@ export function Shell() {
                     <button
                       type="button"
                       role="option"
-                      ref={i === activeIndex ? activePickRef : undefined}
+                      ref={i === activeIndex && !beats ? activePickRef : undefined}
                       className={styles.pickerItem}
                       data-active={i === activeIndex}
                       aria-selected={i === activeIndex}
@@ -517,6 +495,24 @@ export function Shell() {
                       <span className={styles.pickerNum}>{i + 1}</span>
                       {s.label}
                     </button>
+                    {beats?.map((beat, bi) => (
+                      <button
+                        key={beat.id}
+                        type="button"
+                        role="option"
+                        ref={bi === scene.index ? activePickRef : undefined}
+                        className={`${styles.pickerItem} ${styles.pickerBeat}`}
+                        data-active={bi === scene.index}
+                        aria-selected={bi === scene.index}
+                        onClick={() => {
+                          scene.go(bi)
+                          setPickerOpen(false)
+                        }}
+                      >
+                        <span className={styles.pickerNum}>{bi + 1}</span>
+                        {beat.label}
+                      </button>
+                    ))}
                   </div>
                 )
               })}
@@ -529,10 +525,10 @@ export function Shell() {
             aria-expanded={pickerOpen}
             aria-label={
               scene.hasScene
-                ? `Slide ${activeIndex + 1}, beat ${scene.index + 1} of ${scene.total}. Open list`
-                : `Slide ${activeIndex + 1} of ${slides.length}. Open slide list`
+                ? `Scene ${activeIndex + 1}, beat ${scene.index + 1} of ${scene.total}. Open list`
+                : `Scene ${activeIndex + 1} of ${slides.length}. Open scene list`
             }
-            title="Jump to a slide or scene beat"
+            title="Jump to a scene"
             onClick={() => {
               setResourcesOpen(false)
               setPickerOpen((open) => !open)

@@ -1,11 +1,7 @@
-import { useEffect, useState } from 'react'
-import {
-  animate,
-  motion,
-  useMotionValue,
-  useMotionValueEvent,
-  useTransform,
-} from 'framer-motion'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Billboard, Line, OrbitControls, Text } from '@react-three/drei'
+import * as THREE from 'three'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
 import styles from './Motifs.module.css'
@@ -13,9 +9,15 @@ import styles from './Motifs.module.css'
 type CycleBeat = 'brine' | 'absorb' | 'air' | 'product' | 'award' | 'recycle'
 type StationId = (typeof STATIONS)[number]['id']
 
-const RING = 118
+const RING = 4.25
+const GOLD = '#d4a04a'
+const GOLD_HOT = '#f0c878'
+const CREAM = '#f3eee4'
+const FLIGHT_S = 1.85
+const PULL_S = 2.3
 const REPLAY_DELAY_MS = 3000
 const REPLAY_LOOP_S = 4
+
 const ORDER: CycleBeat[] = ['brine', 'absorb', 'air', 'product', 'award', 'recycle']
 const ANGLE: Record<CycleBeat, number> = {
   brine: 180,
@@ -25,14 +27,6 @@ const ANGLE: Record<CycleBeat, number> = {
   award: 450,
   recycle: 450,
 }
-const PROGRESS: Record<CycleBeat, number> = {
-  brine: 0.08,
-  absorb: 0.28,
-  air: 0.52,
-  product: 0.78,
-  award: 1,
-  recycle: 1,
-}
 
 const STATIONS = [
   { id: 'brine', label: 'brine', angle: 180, from: 0 },
@@ -41,26 +35,32 @@ const STATIONS = [
   { id: 'product', label: 'Li₂CO₃', angle: 90, from: 3 },
 ] as const
 
+const WIDE_POS = new THREE.Vector3(6.4, 5.6, 6.9)
+const WIDE_LOOK = new THREE.Vector3(0, 0, 0)
+const RIDE_FOG: [number, number] = [1.6, 6.4]
+const WIDE_FOG: [number, number] = [9, 24]
+
 function asBeat(id?: string): CycleBeat {
   if (id && ORDER.includes(id as CycleBeat)) return id as CycleBeat
   return 'brine'
 }
 
-function polar(deg: number, radius: number) {
-  const rad = (deg * Math.PI) / 180
-  return { x: Math.cos(rad) * radius, y: Math.sin(rad) * radius }
-}
-
-function labelPos(deg: number) {
-  const p = polar(deg, RING + 36)
-  if (deg === 180) return { x: p.x - 8, y: p.y, anchor: 'end' as const }
-  if (deg === 270) return { x: p.x, y: p.y - 4, anchor: 'middle' as const }
-  if (deg === 0) return { x: p.x + 8, y: p.y, anchor: 'start' as const }
-  return { x: p.x, y: p.y + 10, anchor: 'middle' as const }
+function easeOut(t: number) {
+  return 1 - (1 - t) ** 3
 }
 
 function wrapAngle(deg: number) {
   return ((deg % 360) + 360) % 360
+}
+
+function onRing(deg: number, radius = RING): THREE.Vector3 {
+  const rad = (deg * Math.PI) / 180
+  return new THREE.Vector3(Math.cos(rad) * radius, 0, Math.sin(rad) * radius)
+}
+
+function tangent(deg: number): THREE.Vector3 {
+  const rad = (deg * Math.PI) / 180
+  return new THREE.Vector3(-Math.sin(rad), 0, Math.cos(rad)).normalize()
 }
 
 function nearestStation(deg: number): StationId {
@@ -78,134 +78,298 @@ function nearestStation(deg: number): StationId {
   return best
 }
 
-const CO2 = polar(0, RING)
-const BRINE = polar(180, RING)
+type Anim = {
+  angle: number
+  from: number
+  to: number
+  flight: number
+  pull: number
+  loop: boolean
+  time: number
+}
+
+function CycleRig({
+  beat,
+  active,
+  reduced,
+  glow,
+  onGlow,
+}: {
+  beat: CycleBeat
+  active: boolean
+  reduced: boolean
+  glow: StationId | null
+  onGlow: (id: StationId | null) => void
+}) {
+  const { camera, scene } = useThree()
+  const recycled = beat === 'recycle'
+  const reached = ORDER.indexOf(beat)
+  const glowRef = useRef<StationId | null>(null)
+  const looping = useRef(false)
+  const [wide, setWide] = useState(false)
+  const anim = useRef<Anim>({
+    angle: ANGLE[beat],
+    from: ANGLE[beat],
+    to: ANGLE[beat],
+    flight: 1,
+    pull: recycled ? 1 : 0,
+    loop: false,
+    time: 0,
+  })
+  const ridePos = useMemo(() => new THREE.Vector3(), [])
+  const rideLook = useMemo(() => new THREE.Vector3(), [])
+  const camPos = useMemo(() => new THREE.Vector3(), [])
+  const camLook = useMemo(() => new THREE.Vector3(), [])
+  const liPos = useMemo(() => new THREE.Vector3(), [])
+  const li = useRef<THREE.Mesh>(null)
+  const co2 = useRef<THREE.Mesh>(null)
+  const returnLine = useRef<THREE.Group>(null)
+
+  useEffect(() => {
+    const next = ANGLE[beat]
+    anim.current.from = anim.current.angle
+    anim.current.to = next
+    anim.current.flight = reduced ? 1 : 0
+    if (reduced) anim.current.angle = next
+    looping.current = false
+    if (!recycled) {
+      glowRef.current = null
+      onGlow(null)
+    }
+  }, [beat, onGlow, recycled, reduced])
+
+  useEffect(() => {
+    if (!recycled) {
+      setWide(false)
+      looping.current = false
+      return
+    }
+    const ready = window.setTimeout(() => setWide(true), reduced ? 0 : PULL_S * 1000)
+    if (!active || reduced) return () => window.clearTimeout(ready)
+    const start = window.setTimeout(() => {
+      looping.current = true
+    }, REPLAY_DELAY_MS)
+    return () => {
+      window.clearTimeout(ready)
+      window.clearTimeout(start)
+    }
+  }, [active, recycled, reduced])
+
+  useFrame((_, dt) => {
+    const a = anim.current
+    a.time += dt
+    const cap = reduced ? 1 : dt
+
+    if (recycled && looping.current && active && !reduced) {
+      a.angle += (360 / REPLAY_LOOP_S) * dt
+      const nextGlow = nearestStation(a.angle)
+      if (nextGlow !== glowRef.current) {
+        glowRef.current = nextGlow
+        onGlow(nextGlow)
+      }
+    } else if (a.flight < 1) {
+      a.flight = Math.min(1, a.flight + cap / FLIGHT_S)
+      a.angle = a.from + (a.to - a.from) * easeOut(a.flight)
+    } else {
+      a.angle = a.to
+    }
+
+    const wantPull = recycled ? 1 : 0
+    a.pull = reduced
+      ? wantPull
+      : THREE.MathUtils.damp(a.pull, wantPull, recycled ? 1.15 : 3.2, dt)
+
+    const t = a.angle
+    const tan = tangent(t)
+    const side = new THREE.Vector3().crossVectors(tan, new THREE.Vector3(0, 1, 0)).normalize()
+    const holding = a.flight >= 1 && !recycled && !reduced
+    const sway = holding ? Math.sin(a.time * 0.55) * 0.22 : 0
+    const bob = holding ? Math.sin(a.time * 0.4) * 0.05 : 0
+
+    liPos.copy(onRing(t))
+    if (li.current) li.current.position.copy(liPos)
+
+    ridePos
+      .copy(liPos)
+      .addScaledVector(tan, -1.55)
+      .addScaledVector(side, sway)
+      .setY(0.52 + bob)
+    rideLook.copy(liPos).addScaledVector(tan, 2.8).setY(0.18)
+
+    camPos.lerpVectors(ridePos, WIDE_POS, easeOut(a.pull))
+    camLook.lerpVectors(rideLook, WIDE_LOOK, easeOut(a.pull))
+
+    if (!wide) {
+      camera.position.copy(camPos)
+      camera.lookAt(camLook)
+    }
+    const persp = camera as THREE.PerspectiveCamera
+    persp.fov = THREE.MathUtils.lerp(60, 40, easeOut(a.pull))
+    persp.near = 0.12
+    persp.updateProjectionMatrix()
+
+    const fog = scene.fog as THREE.Fog | null
+    if (fog) {
+      fog.near = THREE.MathUtils.lerp(RIDE_FOG[0], WIDE_FOG[0], a.pull)
+      fog.far = THREE.MathUtils.lerp(RIDE_FOG[1], WIDE_FOG[1], a.pull)
+    }
+
+    if (co2.current) {
+      const shown = reached >= 2
+      const destY = shown ? 0.28 : 3.6
+      const destOp = shown ? 1 : 0
+      co2.current.position.y = reduced
+        ? destY
+        : THREE.MathUtils.damp(co2.current.position.y, destY, 1.4, dt)
+      const mat = co2.current.material as THREE.MeshStandardMaterial
+      mat.opacity = reduced ? destOp : THREE.MathUtils.damp(mat.opacity, destOp, 1.8, dt)
+    }
+
+    if (returnLine.current) {
+      returnLine.current.visible = a.pull > 0.12
+      returnLine.current.traverse((child) => {
+        const mesh = child as THREE.Line
+        const mat = mesh.material as THREE.LineBasicMaterial | undefined
+        if (mat && 'opacity' in mat) mat.opacity = Math.max(0, (a.pull - 0.12) / 0.88)
+      })
+    }
+  })
+
+  return (
+    <>
+      <ambientLight intensity={0.22} />
+      <directionalLight position={[3, 7, 2]} intensity={0.7} color={CREAM} />
+      <pointLight position={[0, 2.2, 0]} intensity={0.35} color={GOLD} />
+
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[RING, 0.042, 14, 128]} />
+        <meshStandardMaterial
+          color={GOLD}
+          roughness={0.38}
+          metalness={0.55}
+          emissive={GOLD}
+          emissiveIntensity={0.18}
+        />
+      </mesh>
+
+      <group ref={returnLine} visible={false}>
+        <Line
+          points={[
+            [RING, 0.03, 0],
+            [-RING, 0.03, 0],
+          ]}
+          color={GOLD}
+          dashed
+          dashSize={0.2}
+          gapSize={0.14}
+          lineWidth={1.6}
+          transparent
+          opacity={0}
+        />
+      </group>
+
+      {STATIONS.map((station) => {
+        const live = recycled || reached >= station.from
+        const lit = glow === station.id
+        const p = onRing(station.angle)
+        const label = onRing(station.angle, RING + 0.62)
+        return (
+          <group key={station.id}>
+            <mesh position={[p.x, 0.02, p.z]}>
+              <sphereGeometry args={[0.09, 16, 16]} />
+              <meshStandardMaterial
+                color={GOLD}
+                emissive={GOLD_HOT}
+                emissiveIntensity={lit ? 1.1 : live ? 0.55 : 0.08}
+                transparent
+                opacity={live ? 1 : 0.2}
+              />
+            </mesh>
+            {live && (
+              <Billboard follow position={[label.x, 0.42, label.z]}>
+                <Text
+                  fontSize={0.3}
+                  color={lit ? GOLD_HOT : CREAM}
+                  anchorX="center"
+                  anchorY="middle"
+                  outlineWidth={0.012}
+                  outlineColor="#070605"
+                >
+                  {station.label}
+                </Text>
+              </Billboard>
+            )}
+          </group>
+        )
+      })}
+
+      <mesh ref={li} position={onRing(ANGLE[beat]).toArray()}>
+        <sphereGeometry args={[0.15, 24, 24]} />
+        <meshStandardMaterial
+          color={GOLD_HOT}
+          emissive={GOLD_HOT}
+          emissiveIntensity={1.15}
+          roughness={0.22}
+          metalness={0.45}
+        />
+      </mesh>
+
+      <mesh ref={co2} position={[RING, 3.6, 0]}>
+        <sphereGeometry args={[0.11, 16, 16]} />
+        <meshStandardMaterial
+          color="#c8d8e0"
+          emissive="#9eb8c4"
+          emissiveIntensity={0.7}
+          transparent
+          opacity={0}
+          depthWrite={false}
+        />
+      </mesh>
+
+      <OrbitControls
+        enabled={wide && !reduced}
+        enablePan={false}
+        enableZoom={false}
+        makeDefault={wide}
+      />
+    </>
+  )
+}
 
 export function LithiumCycle({ active }: { active: boolean }) {
   const scene = useScene()
   const reduced = usePrefersReducedMotion()
   const beat = asBeat(scene.beat?.id)
-  const reached = ORDER.indexOf(beat)
   const recycled = beat === 'recycle'
   const [glow, setGlow] = useState<StationId | null>(null)
-  const angle = useMotionValue(ANGLE[beat])
-  const progress = useMotionValue(PROGRESS[beat])
-  const liX = useTransform(angle, (value) => Math.cos((value * Math.PI) / 180) * RING)
-  const liY = useTransform(angle, (value) => Math.sin((value * Math.PI) / 180) * RING)
-  const duration = reduced || !active ? 0 : 1.05
-
-  useMotionValueEvent(angle, 'change', (value) => {
-    if (!recycled) {
-      setGlow(null)
-      return
-    }
-    setGlow(nearestStation(value))
-  })
-
-  useEffect(() => {
-    if (recycled) return
-    const controls = [
-      animate(angle, ANGLE[beat], { duration, ease: [0.16, 1, 0.3, 1] }),
-      animate(progress, PROGRESS[beat], { duration, ease: [0.16, 1, 0.3, 1] }),
-    ]
-    return () => {
-      for (const control of controls) control.stop()
-    }
-  }, [angle, beat, duration, progress, recycled])
-
-  useEffect(() => {
-    if (!recycled || !active) {
-      setGlow(null)
-      return
-    }
-    angle.set(ANGLE.recycle)
-    progress.set(1)
-    if (reduced) {
-      setGlow('brine')
-      return
-    }
-
-    let replay: ReturnType<typeof animate> | undefined
-    const start = window.setTimeout(() => {
-      const from = angle.get()
-      replay = animate(angle, from + 360, {
-        duration: REPLAY_LOOP_S,
-        ease: 'linear',
-        repeat: Infinity,
-      })
-    }, REPLAY_DELAY_MS)
-
-    return () => {
-      window.clearTimeout(start)
-      replay?.stop()
-    }
-  }, [active, angle, progress, recycled, reduced])
 
   return (
-    <div className={styles.cycle} aria-label="Lithium extraction loop">
-      <svg className={styles.cycleSvg} viewBox="-220 -220 440 440" role="img">
-        <title>brine to H₂MnO₄ to CO₂ to Li₂CO₃, spinel returns</title>
-        <circle className={styles.cycleRing} r={RING} fill="none" />
-        <g transform="rotate(180)">
-          <motion.circle
-            className={styles.cycleArc}
-            r={RING}
-            fill="none"
-            style={{ pathLength: progress }}
+    <div
+      className={styles.cycle}
+      data-wide={recycled || undefined}
+      aria-label="Lithium extraction loop"
+    >
+      <Canvas
+        dpr={[1, 1.75]}
+        camera={{ position: [-4.25, 0.52, 1.55], fov: 60, near: 0.12, far: 40 }}
+        gl={{ antialias: true, alpha: false }}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <color attach="background" args={['#000000']} />
+        <fog attach="fog" args={['#000000', RIDE_FOG[0], RIDE_FOG[1]]} />
+        <Suspense fallback={null}>
+          <CycleRig
+            beat={beat}
+            active={active}
+            reduced={reduced}
+            glow={glow}
+            onGlow={setGlow}
           />
-        </g>
-        <motion.line
-          className={styles.cycleReturn}
-          x1={CO2.x}
-          y1={CO2.y}
-          x2={BRINE.x}
-          y2={BRINE.y}
-          initial={false}
-          animate={{ opacity: recycled ? 1 : 0 }}
-          transition={{ duration }}
-        />
-        {STATIONS.map((station) => {
-          const node = polar(station.angle, RING)
-          const label = labelPos(station.angle)
-          const live = reached >= station.from
-          const airFall = station.id === 'air'
-          const lit = glow === station.id
-          return (
-            <g key={station.id}>
-              <motion.circle
-                cx={node.x}
-                cy={node.y}
-                r={lit ? 6 : live ? 4.5 : 3}
-                className={styles.cycleNode}
-                animate={{ opacity: live ? 1 : 0.28 }}
-                transition={{ duration: 0.2 }}
-              />
-              <motion.text
-                x={label.x}
-                y={label.y}
-                textAnchor={label.anchor}
-                dominantBaseline="middle"
-                className={styles.cycleLabel}
-                data-glow={lit || undefined}
-                initial={false}
-                animate={{
-                  opacity: airFall ? (live ? 1 : 0) : live ? 1 : 0.22,
-                  y: airFall && !live ? label.y - 72 : label.y,
-                }}
-                transition={{ duration: airFall ? duration : 0.45, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {station.label}
-              </motion.text>
-            </g>
-          )
-        })}
-        <motion.g style={{ x: liX, y: liY }} className={styles.cycleLi}>
-          <circle r="11" />
-          <text textAnchor="middle" dominantBaseline="central">
-            Li
-          </text>
-        </motion.g>
-      </svg>
+        </Suspense>
+      </Canvas>
+      {recycled && (
+        <div className={styles.crystalCaption}>The circle they just rode · drag to orbit</div>
+      )}
     </div>
   )
 }

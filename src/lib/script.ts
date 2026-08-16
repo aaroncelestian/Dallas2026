@@ -34,7 +34,7 @@ function motifLine(slide: Slide): string | undefined {
     return 'Motif: Rowleyite void space — cages and channels, no atoms (drag to orbit)'
   }
   if (slide.motif === 'lithium-cycle') {
-    return 'Motif: lithium loop — brine → H₂MnO₄ → CO₂ → Li₂CO₃'
+    return 'Motif: lithium ride — first-person on the loop, then pullback'
   }
   if (slide.motif === 'criteria-overlap') {
     return 'Motif: aesthetic judgment overlapping scientific standing'
@@ -88,16 +88,18 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
       if (layer?.kind === 'motif' && layer.motif === 'lithium-cycle') {
         const cycle =
           beat?.id === 'brine'
-            ? 'Motif: lithium loop — desalination brine live'
+            ? 'Motif: lithium ride — first-person at the brine, only a short arc ahead'
             : beat?.id === 'absorb'
-              ? 'Motif: lithium loop — Li moves into H₂MnO₄'
+              ? 'Motif: lithium ride — flying to H₂MnO₄'
               : beat?.id === 'air'
-                ? 'Motif: lithium loop — CO₂ falls in from the air'
+                ? 'Motif: lithium ride — holding at the spinel; CO₂ falls in ahead'
                 : beat?.id === 'product'
-                  ? 'Motif: lithium loop — Li₂CO₃, ready for a battery'
-                  : beat?.id === 'recycle'
-                    ? 'Motif: lithium loop — dashed CO₂ → brine return; after 3s the cycle loops at 4s/rev until the next slide'
-                    : 'Motif: lithium loop — brine → H₂MnO₄ → CO₂ → Li₂CO₃'
+                  ? 'Motif: lithium ride — flying to Li₂CO₃'
+                  : beat?.id === 'award'
+                    ? 'Motif: lithium ride — holding at Li₂CO₃'
+                    : beat?.id === 'recycle'
+                      ? 'Motif: lithium pullback — full loop revealed; dashed CO₂ → brine return; then 4s/rev until the next slide'
+                      : 'Motif: lithium ride — first-person on the loop'
         lines.push(cycle)
       }
     }
