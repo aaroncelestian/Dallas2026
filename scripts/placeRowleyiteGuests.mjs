@@ -13,9 +13,9 @@ const cifPath = join(root, 'original_images', 'supporting', 'rowleyite.cif')
 const outPath = join(root, 'src', 'data', 'rowleyiteGuests.json')
 
 const GRID = 52
-const PROBE = 1.35
-const RADII = { O: 1.32, V: 1.58, P: 1.48, As: 1.52 }
-const GUEST_CLEAR = 0.55
+const PROBE = 0.88
+const RADII = { O: 0.92, V: 1.15, P: 1.08, As: 1.10 }
+const GUEST_CLEAR = 0.45
 const DISPLAY = {
   C: { color: '#e8d4c0', radius: 0.2 },
   N: { color: '#5b7ec7', radius: 0.19 },
@@ -25,6 +25,20 @@ const DISPLAY = {
 }
 
 const GUESTS = [
+  {
+    id: 'doxorubicin',
+    file: 'doxorubicin_3D.pdb',
+    carbon: '#f0c4a8',
+    minClear: -0.15,
+    thorough: true,
+  },
+  {
+    id: 'vincristine',
+    file: 'vincristine_3D.pdb',
+    carbon: '#c5d8e6',
+    minClear: -0.2,
+    thorough: true,
+  },
   {
     id: 'cisplatin',
     file: 'cisplatin_3D.pdb',
@@ -36,18 +50,6 @@ const GUESTS = [
     file: 'temozolomide_3D.pdb',
     carbon: '#e6d08a',
     minClear: -0.25,
-  },
-  {
-    id: 'doxorubicin',
-    file: 'doxorubicin_3D.pdb',
-    carbon: '#f0c4a8',
-    minClear: -0.35,
-  },
-  {
-    id: 'vincristine',
-    file: 'vincristine_3D.pdb',
-    carbon: '#c5d8e6',
-    minClear: -0.45,
   },
 ]
 
@@ -355,7 +357,7 @@ for (let i = 1; i < n; i++) {
 
 sites.sort((p, q) => q.score - p.score)
 
-const MIN_CAGE_R = 5.5
+const MIN_CAGE_R = 6.0
 const CAGE_SEP = 9
 const allLarge = []
 for (const site of sites) {
@@ -379,14 +381,15 @@ function guestClearance(placed) {
   return min
 }
 
-function faceOn(placed) {
+function principalAxes(pts) {
+  const n = pts.length || 1
   let xx = 0
   let yy = 0
   let zz = 0
   let xy = 0
   let xz = 0
   let yz = 0
-  for (const p of placed) {
+  for (const p of pts) {
     xx += p.x * p.x
     yy += p.y * p.y
     zz += p.z * p.z
@@ -394,37 +397,196 @@ function faceOn(placed) {
     xz += p.x * p.z
     yz += p.y * p.z
   }
-  return zz / (xx + yy + zz + 1e-6)
+  xx /= n
+  yy /= n
+  zz /= n
+  xy /= n
+  xz /= n
+  yz /= n
+  const mul = (v) => [
+    xx * v[0] + xy * v[1] + xz * v[2],
+    xy * v[0] + yy * v[1] + yz * v[2],
+    xz * v[0] + yz * v[1] + zz * v[2],
+  ]
+  const power = (exclude) => {
+    let v = [0.57, 0.31, 0.76]
+    for (let i = 0; i < 48; i++) {
+      if (exclude) {
+        const d = v[0] * exclude[0] + v[1] * exclude[1] + v[2] * exclude[2]
+        v = [v[0] - d * exclude[0], v[1] - d * exclude[1], v[2] - d * exclude[2]]
+      }
+      v = mul(v)
+      const len = Math.hypot(v[0], v[1], v[2]) || 1
+      v = [v[0] / len, v[1] / len, v[2] / len]
+    }
+    return v
+  }
+  const a0 = power(null)
+  const a1 = power(a0)
+  const a2 = [
+    a0[1] * a1[2] - a0[2] * a1[1],
+    a0[2] * a1[0] - a0[0] * a1[2],
+    a0[0] * a1[1] - a0[1] * a1[0],
+  ]
+  return [a0, a1, a2]
 }
 
-function dock(mol, site, occupied) {
-  const deg = Math.PI / 180
-  let best = null
-  for (let rx = 0; rx < 180; rx += 30) {
-    for (let ry = 0; ry < 360; ry += 30) {
-      for (let rz = 0; rz < 180; rz += 45) {
-        const m = rotMat(rx * deg, ry * deg, rz * deg)
-        for (const dz of [-1.2, 0, 1.2]) {
-          const placed = mol.atoms.map((p) => {
-            const q = applyRot(p, m)
-            return {
-              element: q.element,
-              x: q.x + site.x,
-              y: q.y + site.y,
-              z: q.z + site.z + dz,
-            }
-          })
-          if (occupied.some((o) => Math.hypot(site.x - o.x, site.y - o.y, site.z + dz - o.z) < o.span)) {
-            continue
-          }
-          const clear = guestClearance(placed)
-          const view = faceOn(placed.map((p) => ({ x: p.x - site.x, y: p.y - site.y, z: p.z - site.z - dz })))
-          const score = clear * 4 - view * 0.35
-          if (!best || score > best.score) {
-            best = { placed, clear, view, score, dz }
-          }
+function mulMat(A, B) {
+  return [
+    A[0] * B[0] + A[1] * B[3] + A[2] * B[6],
+    A[0] * B[1] + A[1] * B[4] + A[2] * B[7],
+    A[0] * B[2] + A[1] * B[5] + A[2] * B[8],
+    A[3] * B[0] + A[4] * B[3] + A[5] * B[6],
+    A[3] * B[1] + A[4] * B[4] + A[5] * B[7],
+    A[3] * B[2] + A[4] * B[5] + A[5] * B[8],
+    A[6] * B[0] + A[7] * B[3] + A[8] * B[6],
+    A[6] * B[1] + A[7] * B[4] + A[8] * B[7],
+    A[6] * B[2] + A[7] * B[5] + A[8] * B[8],
+  ]
+}
+
+function axesToMat(axes) {
+  return [
+    axes[0][0],
+    axes[1][0],
+    axes[2][0],
+    axes[0][1],
+    axes[1][1],
+    axes[2][1],
+    axes[0][2],
+    axes[1][2],
+    axes[2][2],
+  ]
+}
+
+function transpose(m) {
+  return [m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]]
+}
+
+function cageCloud(site, radius = 7, step = 0.75) {
+  const pts = []
+  for (let x = -radius; x <= radius; x += step) {
+    for (let y = -radius; y <= radius; y += step) {
+      for (let z = -radius; z <= radius; z += step) {
+        if (sdfInterp(site.x + x, site.y + y, site.z + z) > PROBE) {
+          pts.push({ x, y, z })
         }
       }
+    }
+  }
+  return pts
+}
+
+function placeWith(mol, site, m, t) {
+  return mol.atoms.map((p) => {
+    const q = applyRot(p, m)
+    return {
+      element: q.element,
+      x: q.x + site.x + t[0],
+      y: q.y + site.y + t[1],
+      z: q.z + site.z + t[2],
+    }
+  })
+}
+
+function dock(mol, site, occupied, thorough = false) {
+  const cloud = thorough ? cageCloud(site, 10.5, 0.7) : cageCloud(site)
+  const cageAxes = cloud.length > 12 ? principalAxes(cloud) : [
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1],
+  ]
+  const molAxes = principalAxes(mol.atoms)
+  const signs = [
+    [1, 1, 1],
+    [1, 1, -1],
+    [1, -1, 1],
+    [1, -1, -1],
+    [-1, 1, 1],
+    [-1, 1, -1],
+    [-1, -1, 1],
+    [-1, -1, -1],
+  ]
+  const shifts = thorough ? [-2.4, -1.2, 0, 1.2, 2.4] : [-1.4, 0, 1.4]
+  let best = null
+  const consider = (m, t) => {
+    const placed = placeWith(mol, site, m, t)
+    if (
+      occupied.some(
+        (o) => Math.hypot(site.x + t[0] - o.x, site.y + t[1] - o.y, site.z + t[2] - o.z) < o.span,
+      )
+    ) {
+      return
+    }
+    const clear = guestClearance(placed)
+    if (!best || clear > best.clear) best = { placed, clear, score: clear, dz: t[2], m, t }
+  }
+
+  for (const s of signs) {
+    const aligned = [
+      [s[0] * cageAxes[0][0], s[0] * cageAxes[0][1], s[0] * cageAxes[0][2]],
+      [s[1] * cageAxes[1][0], s[1] * cageAxes[1][1], s[1] * cageAxes[1][2]],
+      [s[2] * cageAxes[2][0], s[2] * cageAxes[2][1], s[2] * cageAxes[2][2]],
+    ]
+    const m = mulMat(axesToMat(aligned), transpose(axesToMat(molAxes)))
+    for (const tx of shifts) {
+      for (const ty of shifts) {
+        for (const tz of shifts) consider(m, [tx, ty, tz])
+      }
+    }
+  }
+
+  if (best?.m && thorough) {
+    const deg = Math.PI / 180
+    for (let twist = 0; twist < 360; twist += 20) {
+      const m = mulMat(rotMat(twist * deg, 0, 0), best.m)
+      consider(m, best.t)
+      const m2 = mulMat(rotMat(0, twist * deg, 0), best.m)
+      consider(m2, best.t)
+    }
+  }
+
+  if (best?.m) {
+    const deg = Math.PI / 180
+    const span = thorough ? 20 : 15
+    const step = thorough ? 10 : 15
+    for (let rx = -span; rx <= span; rx += step) {
+      for (let ry = -span; ry <= span; ry += step) {
+        for (let rz = -span; rz <= span; rz += step) {
+          if (rx === 0 && ry === 0 && rz === 0) continue
+          const m = mulMat(rotMat(rx * deg, ry * deg, rz * deg), best.m)
+          consider(m, best.t)
+        }
+      }
+    }
+  }
+
+  if (best?.m && thorough) {
+    const deg = Math.PI / 180
+    for (let iter = 0; iter < 6; iter++) {
+      const dR = (10 / (iter + 1)) * deg
+      const dT = 0.55 / (iter + 1)
+      let improved = false
+      const dirs = [
+        [dR, 0, 0, 0, 0, 0],
+        [-dR, 0, 0, 0, 0, 0],
+        [0, dR, 0, 0, 0, 0],
+        [0, -dR, 0, 0, 0, 0],
+        [0, 0, dR, 0, 0, 0],
+        [0, 0, -dR, 0, 0, 0],
+        [0, 0, 0, dT, 0, 0],
+        [0, 0, 0, -dT, 0, 0],
+        [0, 0, 0, 0, dT, 0],
+        [0, 0, 0, 0, -dT, 0],
+        [0, 0, 0, 0, 0, dT],
+        [0, 0, 0, 0, 0, -dT],
+      ]
+      for (const [rx, ry, rz, tx, ty, tz] of dirs) {
+        const prev = best.clear
+        consider(mulMat(rotMat(rx, ry, rz), best.m), [best.t[0] + tx, best.t[1] + ty, best.t[2] + tz])
+        if (best.clear > prev + 1e-4) improved = true
+      }
+      if (!improved) break
     }
   }
   return best
@@ -440,10 +602,10 @@ for (const spec of GUESTS) {
   let chosen = null
   for (const site of large) {
     if (occupied.some((o) => Math.hypot(site.x - o.x, site.y - o.y, site.z - o.z) < CAGE_SEP)) continue
-    const trial = dock(mol, site, occupied)
+    const trial = dock(mol, site, occupied, spec.thorough)
     if (!trial || trial.clear < spec.minClear) continue
-    chosen = { ...trial, site }
-    break
+    if (!chosen || trial.clear > chosen.clear) chosen = { ...trial, site }
+    if (!spec.thorough) break
   }
   if (!chosen) {
     console.log(`  skipped — no large open cage accepted it`)
@@ -452,7 +614,7 @@ for (const spec of GUESTS) {
   console.log(
     `  docked in large cage r=${chosen.site.r.toFixed(2)} Å  zFace=${chosen.site.zFace.toFixed(1)} Å  clearance=${chosen.clear.toFixed(2)} Å`,
   )
-  const pull = 0.4
+  const pull = spec.thorough ? 0 : 0.4
   occupied.push({
     x: chosen.site.x,
     y: chosen.site.y,

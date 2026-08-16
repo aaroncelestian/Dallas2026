@@ -270,6 +270,16 @@
   object-fit: cover;
 }
 
+.sceneShow,
+.sceneShowPlate {
+  position: absolute;
+  inset: 0;
+}
+
+.sceneShow {
+  cursor: pointer;
+}
+
 .voidSlide {
   flex: 1;
   display: flex;

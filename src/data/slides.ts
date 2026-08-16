@@ -37,7 +37,12 @@ export type CameraKind =
   | 'pan-bounce'
   | 'hold'
 
-export type SceneLayerKind = 'image' | 'motif' | 'video'
+export type SceneLayerKind = 'image' | 'motif' | 'video' | 'slideshow'
+
+export interface SceneSlide {
+  src: string
+  alt: string
+}
 
 export interface SceneLayer {
   id: string
@@ -48,6 +53,9 @@ export interface SceneLayer {
   fit?: 'cover' | 'contain'
   camera?: CameraKind
   motif?: MotifKind
+  slides?: SceneSlide[]
+  /** First plate hold, then each later plate. */
+  dwellMs?: [number, number]
 }
 
 export interface SceneBeat {
@@ -290,13 +298,22 @@ export const slides: Slide[] = [
     ],
     scene: [
       {
-        id: 'low-water',
-        label: 'Low-water lithium',
+        id: 'property',
+        label: 'The property',
         kicker: 'Resource security',
-        title: 'Low-water lithium.',
+        title: 'Not the mineral.\nThe property.',
         layers: ['spinel'],
         notes:
-          'Spinel-structured analogs guiding extraction against Chile/Argentina evaporative brine. Museum mineralogy in a live supply-chain conversation. The specimen is the structure, not the mine.',
+          'First research case. Hold the spinel. This is not lithium ore. Nobody accessioned it as a battery plant. Natural structures already know how to host a small cation, how to be selective, how to let something in and hold it. Sometimes we never put the specimen in the reactor. We take the property and build with it. That inspiration is the point of this story.',
+      },
+      {
+        id: 'waste',
+        label: 'Waste liquids',
+        kicker: 'Resource security',
+        title: 'The lithium is already\nin the waste.',
+        layers: ['spinel'],
+        notes:
+          'Mine leachate. Oil-field brine. Spent batteries. Oak Ridge, Element3, and this museum — a method for taking lithium out of liquids we already produce. Not a new evaporative pond. Not a new pit in the Atacama.',
       },
       {
         id: 'water',
@@ -305,7 +322,25 @@ export const slides: Slide[] = [
         title: 'The Atacama cannot\nspare the water.',
         layers: ['spinel'],
         notes:
-          'Water cost, ecosystem impact. Let the sentence carry the politics. Then leave it.',
+          'The incumbent method is evaporation. Water cost, ecosystem impact. Let the sentence carry the politics. Then leave it.',
+      },
+      {
+        id: 'vacancy',
+        label: 'Vacancy',
+        kicker: 'Resource security',
+        title: 'A hole the size\nof lithium.',
+        layers: ['spinel'],
+        notes:
+          'The working chemistry is aluminum hydroxide — common, cheap, already in the crust. Amorphous, not the crystalline gibbsite people had been using. It takes lithium up and holds it: at least five times the load of the old sorbents. The reason is a vacancy so small that only lithium fits. Sodium and potassium are too big. Works from pH 5 to 11. Runs at 140 °C. No acid roast. Traditional routes cook mined rock with acid at 250, or cook it at 800 to 1000 without acid. This one doesn’t.',
+      },
+      {
+        id: 'award',
+        label: 'R&D 100',
+        kicker: 'Resource security',
+        title: 'An R&D 100.',
+        layers: ['spinel'],
+        notes:
+          'R&D World. Global competition. The stamp that a mineral-inspired process left the cabinet and entered a live supply-chain conversation — U.S. battery metal from waste, a third the material and energy of the standard route, a sorbent you rinse with hot water and use again. The prize is not the point for this room. The point is that a museum was on the team because someone had spent years watching how natural structures already solve the problem. Then rowleyite — that same structural selectivity doesn’t stop at extraction.',
       },
     ],
   },
@@ -489,10 +524,21 @@ export const slides: Slide[] = [
       },
       {
         id: 'biofilm',
-        kind: 'image',
+        kind: 'slideshow',
         src: asset('images/stone-biofilm.jpg'),
         alt: 'SEM of intercalated bacterial biofilm inside a calcium stone',
         fit: 'contain',
+        dwellMs: [14000, 9000],
+        slides: [
+          {
+            src: asset('images/stone-biofilm.jpg'),
+            alt: 'SEM of a bacterial colony and biofilm inside a calcium stone',
+          },
+          {
+            src: asset('images/stone-voids.jpg'),
+            alt: 'SEM of bacteria sitting in the mineral voids of a calcium stone',
+          },
+        ],
       },
     ],
     scene: [
@@ -527,7 +573,7 @@ export const slides: Slide[] = [
         title: 'It doesn’t build alone.',
         layers: ['biofilm'],
         notes:
-          'High-resolution electron imaging and synchrotron XRD: bacterial biofilms structurally intercalated through the internal architecture, in layers, in patients with no diagnosed infection at all. Schmidt et al., PNAS 2026. Kidney stone disease, partly microbial in origin.',
+          'Hold the colony. That’s the life, at 2500× — a biofilm, not a smear. Then the same life sitting in the mineral, in the voids. High-resolution electron imaging and synchrotron XRD: bacterial biofilms structurally intercalated through the internal architecture, in layers, in patients with no diagnosed infection at all. Schmidt et al., PNAS 2026. Kidney stone disease, partly microbial in origin. Click the plate if you want the cut now; it will come back to the colony.',
       },
     ],
   },
@@ -603,7 +649,7 @@ export const slides: Slide[] = [
         title: 'Rare. Beautiful. Functional.',
         subtitle: 'A treasure holds all three.',
         notes:
-          'Step back. Rare alone is just scarcity. Beautiful alone is decoration. Functional alone is utility. A treasure is what happens when one specimen holds all three at once — and every specimen in the last twenty minutes earned that word without me saying it. The zeolite. The rowleyite. The biofilm inside a kidney stone. Same pattern, every time.',
+          'Step back. Rare alone is just scarcity. Beautiful alone is decoration. Functional alone is utility. A treasure is what happens when one specimen holds all three at once — and every specimen in the last twenty minutes earned that word without me saying it. The spinel that taught a sorbent. The zeolite. The rowleyite. The biofilm inside a kidney stone. Same pattern, every time.',
       },
     ],
   },

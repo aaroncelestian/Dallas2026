@@ -77,7 +77,8 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `ks78-cut.jpg` | Kidney stone CT poster |
 | `ks78-thickness.mp4` | Kidney stone CT orbit |
 | `stromatolite.jpg` | Stromatolite thin section |
-| `stone-biofilm.jpg` | Stone biofilm SEM |
+| `stone-biofilm.jpg` | Stone biofilm SEM · colony |
+| `stone-voids.jpg` | Stone biofilm SEM · voids |
 | `halite-trona.jpg` | Salt as shelter |
 | `mars-analog.jpg` | Salt and Mars |
 | `emerald.jpg` | Unearthed |

@@ -59,7 +59,9 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
   if (beat?.layers && slide.layers) {
     for (const id of beat.layers) {
       const layer = slide.layers.find((item) => item.id === id)
-      if (layer?.alt) {
+      if (layer?.kind === 'slideshow' && layer.slides?.length) {
+        for (const plate of layer.slides) lines.push(`Image: ${plate.alt}`)
+      } else if (layer?.alt) {
         lines.push(layer.kind === 'video' ? `Video: ${layer.alt}` : `Image: ${layer.alt}`)
       }
       if (layer?.kind === 'motif' && layer.motif === 'crystal-viewer') {

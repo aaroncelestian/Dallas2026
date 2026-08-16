@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useRef } from 'react'
-import type { SceneLayer, Slide } from '../../data/slides'
+import { useEffect, useRef, useState } from 'react'
+import type { SceneLayer, SceneSlide, Slide } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
 import { CrystalViewer } from '../motifs/CrystalViewer'
@@ -64,6 +64,67 @@ function SceneVideo({
   )
 }
 
+function SceneSlideshow({
+  slides,
+  active,
+  fit = 'contain',
+  dwellMs = [14000, 9000],
+}: {
+  slides: SceneSlide[]
+  active: boolean
+  fit?: 'cover' | 'contain'
+  dwellMs?: [number, number]
+}) {
+  const [index, setIndex] = useState(0)
+  const reduced = usePrefersReducedMotion()
+  const plate = slides[index] ?? slides[0]
+
+  useEffect(() => {
+    if (!active) setIndex(0)
+  }, [active])
+
+  useEffect(() => {
+    if (!active || reduced || slides.length < 2) return
+    const wait = index === 0 ? dwellMs[0] : dwellMs[1]
+    const id = window.setTimeout(() => {
+      setIndex((current) => (current + 1) % slides.length)
+    }, wait)
+    return () => window.clearTimeout(id)
+  }, [active, dwellMs, index, reduced, slides.length])
+
+  if (!plate) return null
+
+  return (
+    <div
+      className={styles.sceneShow}
+      onClick={() => {
+        if (slides.length < 2) return
+        setIndex((current) => (current + 1) % slides.length)
+      }}
+    >
+      <AnimatePresence>
+        <motion.div
+          key={plate.src}
+          className={styles.sceneShowPlate}
+          initial={reduced ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={reduced ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: reduced ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <DepthField
+            src={plate.src}
+            alt={plate.alt}
+            active={active}
+            fit={fit}
+            yaw={1}
+            camera="hold"
+          />
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  )
+}
+
 function LayerView({
   layer,
   active,
@@ -86,6 +147,17 @@ function LayerView({
       <div className={styles.sceneMotif}>
         <VoidViewer active={active} guests={showGuests} />
       </div>
+    )
+  }
+
+  if (layer.kind === 'slideshow' && layer.slides?.length) {
+    return (
+      <SceneSlideshow
+        slides={layer.slides}
+        active={active}
+        fit={layer.fit}
+        dwellMs={layer.dwellMs}
+      />
     )
   }
 
