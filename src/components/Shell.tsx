@@ -140,7 +140,9 @@ export function Shell() {
 
   useEffect(() => {
     const image = slides.find((s) => s.id === 'cabinet-hit')?.image
-    const hrefs = [image?.src, image?.detail].filter((href): href is string => Boolean(href))
+    const hrefs = [image?.src, image?.detail, ...(image?.marks?.map((m) => m.src) ?? [])].filter(
+      (href): href is string => Boolean(href),
+    )
     const links = hrefs.map((href) => {
       const link = document.createElement('link')
       link.rel = 'preload'

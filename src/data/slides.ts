@@ -61,7 +61,8 @@ export interface StoneMark {
   y: number
   w: number
   h: number
-  shape?: 'oval' | 'rect'
+  src?: string
+  tint?: string
 }
 
 export interface Slide {
@@ -207,10 +208,42 @@ export const slides: Slide[] = [
       focus: { x: 0.347876, y: 0.427042, w: 0.342135, h: 0.176953 },
       detail: asset('images/cabinet-doorway.webp'),
       marks: [
-        { label: 'Quartz', x: 0.492, y: 0.192, w: 0.046, h: 0.028, shape: 'oval' },
-        { label: 'Agate', x: 0.462, y: 0.244, w: 0.105, h: 0.048, shape: 'oval' },
-        { label: 'Travertine', x: 0.382, y: 0.388, w: 0.252, h: 0.040, shape: 'rect' },
-        { label: 'Lapis', x: 0.492, y: 0.614, w: 0.044, h: 0.020, shape: 'oval' },
+        {
+          label: 'Quartz',
+          x: 0.492,
+          y: 0.192,
+          w: 0.046,
+          h: 0.028,
+          src: asset('images/cabinet-quartz.webp'),
+          tint: '#f0e6d0',
+        },
+        {
+          label: 'Agate',
+          x: 0.462,
+          y: 0.244,
+          w: 0.105,
+          h: 0.048,
+          src: asset('images/cabinet-agate.webp'),
+          tint: '#d47848',
+        },
+        {
+          label: 'Travertine',
+          x: 0.355,
+          y: 0.616,
+          w: 0.11,
+          h: 0.018,
+          src: asset('images/cabinet-travertine.webp'),
+          tint: '#d4b896',
+        },
+        {
+          label: 'Lapis',
+          x: 0.492,
+          y: 0.614,
+          w: 0.044,
+          h: 0.020,
+          src: asset('images/cabinet-lapis.webp'),
+          tint: '#4a7ec8',
+        },
       ],
     },
     bullets: [
@@ -220,7 +253,7 @@ export const slides: Slide[] = [
       'Two populations. Two source rocks.',
     ],
     notes:
-      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Five seconds. Then it pulls back and it is a cabinet. Speak the facts as they appear: papal commission, the materials, then the science the object did not know it would be asked — moganite dating the agate, two populations from two source rocks. As the cabinet settles, the stones take their names: quartz, agate, travertine, lapis. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
+      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Five seconds. Then it pulls back and it is a cabinet. As it settles, the stones light: quartz, agate, travertine, lapis. Talk the minerals off the close-ups. Then advance. The plates go to blur and the facts come in: papal commission, the materials, moganite dating the agate, two populations from two source rocks. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
   },
 
   // ── Act I ─────────────────────────────────────────────

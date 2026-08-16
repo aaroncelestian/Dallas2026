@@ -4,13 +4,15 @@ import type { StoneMark } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import styles from './ImpactHit.module.css'
 
-type Phase = 'hold' | 'pull' | 'settled'
+type Phase = 'hold' | 'pull' | 'stones' | 'argument'
 
 const HOLD_MS = 5000
 const PULL_MS = 8000
 const DETAIL_FADE_S = 2
-const MARK_START_MS = 5000
-const MARK_STAGGER_MS = 550
+const ORB_START_MS = 4500
+const STONE_STAGGER_MS = 480
+const LINE_DELAY_MS = 220
+const PLATE_DELAY_MS = 780
 const NONE: string[] = []
 const NO_MARKS: StoneMark[] = []
 const HOLD_PUSH = 1.06
@@ -30,7 +32,13 @@ type Pose = {
   imgH: number
 }
 
-type Anchor = { label: string; cx: number; cy: number; left: number }
+type Pair = {
+  label: string
+  orbX: number
+  orbY: number
+  plateX: number
+  plateY: number
+}
 
 function measure(frame: DOMRect, imgW: number, imgH: number, focus?: Focus): Pose {
   const region = focus ?? { x: 0.35, y: 0.35, w: 0.3, h: 0.22 }
@@ -54,62 +62,30 @@ function measure(frame: DOMRect, imgW: number, imgH: number, focus?: Focus): Pos
   }
 }
 
-function readAnchors(
+function readPairs(
   plane: HTMLElement,
   slot: HTMLElement,
+  plates: Array<HTMLElement | null>,
   marks: StoneMark[],
-): Anchor[] {
+): Pair[] {
   const pr = plane.getBoundingClientRect()
   const sr = slot.getBoundingClientRect()
-  return marks.map((m) => ({
-    label: m.label,
-    cx: pr.left - sr.left + (m.x + m.w / 2) * pr.width,
-    cy: pr.top - sr.top + (m.y + m.h / 2) * pr.height,
-    left: pr.left - sr.left + m.x * pr.width,
-  }))
+  return marks.map((m, i) => {
+    const plate = plates[i]
+    const pb = plate?.getBoundingClientRect()
+    return {
+      label: m.label,
+      orbX: pr.left - sr.left + (m.x + m.w / 2) * pr.width,
+      orbY: pr.top - sr.top + (m.y + m.h / 2) * pr.height,
+      plateX: pb ? pb.right - sr.left : 0,
+      plateY: pb ? pb.top - sr.top + pb.height / 2 : 0,
+    }
+  })
 }
 
-function useMarkAnchors(
-  planeRef: React.RefObject<HTMLDivElement | null>,
-  slotRef: React.RefObject<HTMLDivElement | null>,
-  marks: StoneMark[],
-  visible: boolean,
-  live: boolean,
-) {
-  const [anchors, setAnchors] = useState<Anchor[]>([])
-
-  useEffect(() => {
-    if (!visible || marks.length === 0) {
-      setAnchors([])
-      return
-    }
-
-    const write = () => {
-      const plane = planeRef.current
-      const slot = slotRef.current
-      if (!plane || !slot) return
-      setAnchors(readAnchors(plane, slot, marks))
-    }
-
-    write()
-    if (!live) {
-      const slot = slotRef.current
-      if (!slot) return
-      const ro = new ResizeObserver(write)
-      ro.observe(slot)
-      return () => ro.disconnect()
-    }
-
-    let id = 0
-    const tick = () => {
-      write()
-      id = requestAnimationFrame(tick)
-    }
-    id = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(id)
-  }, [visible, live, marks, planeRef, slotRef])
-
-  return anchors
+function curve(p: Pair) {
+  const mx = (p.orbX + p.plateX) / 2
+  return `M ${p.orbX} ${p.orbY} C ${mx} ${p.orbY}, ${mx} ${p.plateY}, ${p.plateX} ${p.plateY}`
 }
 
 export function ImpactHit({
@@ -135,35 +111,32 @@ export function ImpactHit({
   const rootRef = useRef<HTMLDivElement>(null)
   const slotRef = useRef<HTMLDivElement>(null)
   const planeRef = useRef<HTMLDivElement>(null)
+  const plateRefs = useRef<Array<HTMLDivElement | null>>([])
+  const seqRef = useRef(0)
   const [phase, setPhase] = useState<Phase>('hold')
   const [shown, setShown] = useState(0)
-  const [marked, setMarked] = useState(0)
+  const [orbs, setOrbs] = useState(0)
+  const [drawn, setDrawn] = useState(0)
+  const [plated, setPlated] = useState(0)
   const [pose, setPose] = useState<Pose | null>(null)
-  const pulling = reduced || phase === 'pull' || phase === 'settled'
-  const anchors = useMarkAnchors(
-    planeRef,
-    slotRef,
-    stones,
-    active && pulling,
-    phase === 'pull' && !reduced,
-  )
+  const [pairs, setPairs] = useState<Pair[]>([])
+
+  const pulling = reduced || phase !== 'hold'
+  const arguing = phase === 'argument'
+  const overlay = Boolean(focus && detailSrc)
 
   useEffect(() => {
     const root = rootRef.current
     if (!root) return
-
     const img = new Image()
     img.src = src
-
     const update = () => {
       const frame = root.getBoundingClientRect()
       if (!img.naturalWidth || !frame.width) return
       setPose(measure(frame, img.naturalWidth, img.naturalHeight, focus))
     }
-
     img.onload = update
     if (img.complete) update()
-
     const ro = new ResizeObserver(update)
     ro.observe(root)
     return () => ro.disconnect()
@@ -173,38 +146,127 @@ export function ImpactHit({
     if (!active) {
       setPhase('hold')
       setShown(0)
-      setMarked(0)
+      setOrbs(0)
+      setDrawn(0)
+      setPlated(0)
       return
     }
     if (reduced) {
-      setPhase('settled')
-      setShown(lines.length)
-      setMarked(stones.length)
+      setPhase('stones')
+      setOrbs(stones.length)
+      setDrawn(stones.length)
+      setPlated(stones.length)
       return
     }
     setPhase('hold')
     setShown(0)
-    setMarked(0)
-    const gap = lines.length ? PULL_MS / lines.length : PULL_MS
-    const pull = window.setTimeout(() => setPhase('pull'), HOLD_MS)
-    const factTimers = lines.map((_, i) =>
-      window.setTimeout(() => setShown(i + 1), HOLD_MS + i * gap),
+    setOrbs(0)
+    setDrawn(0)
+    setPlated(0)
+    const seq = ++seqRef.current
+    const later = (fn: () => void, ms: number) =>
+      window.setTimeout(() => {
+        if (seqRef.current === seq) fn()
+      }, ms)
+    const pull = later(() => setPhase('pull'), HOLD_MS)
+    const orbTimers = stones.map((_, i) =>
+      later(() => setOrbs(i + 1), HOLD_MS + ORB_START_MS + i * STONE_STAGGER_MS),
     )
-    const markTimers = stones.map((_, i) =>
-      window.setTimeout(() => setMarked(i + 1), HOLD_MS + MARK_START_MS + i * MARK_STAGGER_MS),
+    const lineTimers = stones.map((_, i) =>
+      later(() => setDrawn(i + 1), HOLD_MS + ORB_START_MS + LINE_DELAY_MS + i * STONE_STAGGER_MS),
     )
-    const settled = window.setTimeout(() => setPhase('settled'), HOLD_MS + PULL_MS)
+    const plateTimers = stones.map((_, i) =>
+      later(() => setPlated(i + 1), HOLD_MS + ORB_START_MS + PLATE_DELAY_MS + i * STONE_STAGGER_MS),
+    )
+    const stonesReady = later(() => setPhase('stones'), HOLD_MS + PULL_MS)
     return () => {
+      seqRef.current += 1
       window.clearTimeout(pull)
-      window.clearTimeout(settled)
-      factTimers.forEach((id) => window.clearTimeout(id))
-      markTimers.forEach((id) => window.clearTimeout(id))
+      window.clearTimeout(stonesReady)
+      orbTimers.forEach((id) => window.clearTimeout(id))
+      lineTimers.forEach((id) => window.clearTimeout(id))
+      plateTimers.forEach((id) => window.clearTimeout(id))
     }
-  }, [active, reduced, lines, stones])
+  }, [active, reduced, stones])
 
-  const overlay = focus && detailSrc
-  const columnX =
-    anchors.length > 0 ? Math.min(...anchors.map((a) => a.left)) - 28 : 0
+  useEffect(() => {
+    if (!active || phase === 'hold') {
+      setPairs([])
+      return
+    }
+    const write = () => {
+      const plane = planeRef.current
+      const slot = slotRef.current
+      if (!plane || !slot) return
+      setPairs(readPairs(plane, slot, plateRefs.current, stones))
+    }
+    write()
+    if (phase !== 'pull') {
+      const slot = slotRef.current
+      if (!slot) return
+      const ro = new ResizeObserver(write)
+      ro.observe(slot)
+      return () => ro.disconnect()
+    }
+    let id = 0
+    const tick = () => {
+      write()
+      id = requestAnimationFrame(tick)
+    }
+    id = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(id)
+  }, [active, phase, stones])
+
+  useEffect(() => {
+    if (!active || !arguing) {
+      setShown(0)
+      return
+    }
+    if (reduced) {
+      setShown(lines.length)
+      return
+    }
+    const timers = lines.map((_, i) => window.setTimeout(() => setShown(i + 1), 180 + i * 480))
+    return () => timers.forEach((id) => window.clearTimeout(id))
+  }, [active, arguing, lines, reduced])
+
+  useEffect(() => {
+    if (!active) return
+    const skip = () => {
+      seqRef.current += 1
+      setPhase('stones')
+      setOrbs(stones.length)
+      setDrawn(stones.length)
+      setPlated(stones.length)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'BUTTON') return
+      if (document.documentElement.hasAttribute('data-resource')) return
+      const next = ['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)
+      const prev = ['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)
+      if (next && (phase === 'hold' || phase === 'pull')) {
+        e.preventDefault()
+        e.stopPropagation()
+        skip()
+        return
+      }
+      if (next && phase === 'stones') {
+        e.preventDefault()
+        e.stopPropagation()
+        setPhase('argument')
+        return
+      }
+      if (prev && phase === 'argument') {
+        e.preventDefault()
+        e.stopPropagation()
+        setPhase('stones')
+        setShown(0)
+      }
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [active, phase, stones.length])
 
   return (
     <div ref={rootRef} className={styles.root} data-phase={phase}>
@@ -235,11 +297,11 @@ export function ImpactHit({
                   ? { duration: PULL_MS / 1000, ease: [0.4, 0, 0.6, 1] }
                   : phase === 'hold'
                     ? { duration: HOLD_MS / 1000, ease: 'linear' }
-                    : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }
+                    : { duration: 0.55, ease: [0.16, 1, 0.3, 1] }
             }
           >
             <img src={src} alt={alt} className={styles.photo} draggable={false} />
-            {overlay && (
+            {overlay && focus && (
               <motion.img
                 src={detailSrc}
                 alt=""
@@ -259,87 +321,86 @@ export function ImpactHit({
                 draggable={false}
               />
             )}
-            {stones.length > 0 && (
-              <svg
-                className={styles.markSvg}
-                viewBox={`0 0 ${pose.imgW} ${pose.imgH}`}
-                aria-hidden
+            {stones.map((m, i) => (
+              <div
+                key={m.label}
+                className={styles.orbAnchor}
+                style={{
+                  left: `${(m.x + m.w / 2) * 100}%`,
+                  top: `${(m.y + m.h / 2) * 100}%`,
+                }}
               >
-                {stones.map((m, i) => {
-                  const x = m.x * pose.imgW
-                  const y = m.y * pose.imgH
-                  const w = m.w * pose.imgW
-                  const h = m.h * pose.imgH
-                  const visible = i < marked
-                  return m.shape === 'rect' ? (
-                    <motion.rect
-                      key={m.label}
-                      x={x}
-                      y={y}
-                      width={w}
-                      height={h}
-                      rx={3}
-                      className={styles.markShape}
-                      initial={false}
-                      animate={{ opacity: visible ? 1 : 0 }}
-                      transition={{ duration: reduced ? 0 : 0.45, ease: [0.16, 1, 0.3, 1] }}
-                    />
-                  ) : (
-                    <motion.ellipse
-                      key={m.label}
-                      cx={x + w / 2}
-                      cy={y + h / 2}
-                      rx={w / 2}
-                      ry={h / 2}
-                      className={styles.markShape}
-                      initial={false}
-                      animate={{ opacity: visible ? 1 : 0 }}
-                      transition={{ duration: reduced ? 0 : 0.45, ease: [0.16, 1, 0.3, 1] }}
-                    />
-                  )
-                })}
-              </svg>
-            )}
+                <motion.div
+                  className={styles.orb}
+                  style={{
+                    background: `radial-gradient(circle, ${m.tint ?? '#e0b15c'}cc 0%, ${m.tint ?? '#e0b15c'}55 32%, transparent 72%)`,
+                  }}
+                  initial={false}
+                  animate={{
+                    opacity: i < orbs ? (arguing ? 0.35 : 1) : 0,
+                    scale: i < orbs ? 1 : 0.35,
+                  }}
+                  transition={{ duration: reduced ? 0 : 0.7, ease: [0.16, 1, 0.3, 1] }}
+                />
+              </div>
+            ))}
           </motion.div>
         )}
+
+        <svg className={styles.calloutSvg} aria-hidden>
+          {pairs.map((p, i) =>
+            i < drawn ? (
+              <motion.path
+                key={p.label}
+                d={curve(p)}
+                className={styles.calloutLine}
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: arguing ? 0.2 : 0.85 }}
+                transition={{
+                  pathLength: { duration: reduced ? 0 : 0.8, ease: [0.4, 0, 0.2, 1] },
+                  opacity: { duration: reduced ? 0 : 0.45 },
+                }}
+              />
+            ) : null,
+          )}
+        </svg>
+
         {stones.length > 0 && (
-          <svg className={styles.calloutSvg} aria-hidden>
-            {stones.map((m, i) => {
-              const a = anchors.find((n) => n.label === m.label)
-              if (!a || i >= marked) return null
-              return (
-                <motion.line
-                  key={m.label}
-                  x1={columnX}
-                  y1={a.cy}
-                  x2={a.left}
-                  y2={a.cy}
-                  className={styles.calloutLine}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: reduced ? 0 : 0.45, ease: [0.16, 1, 0.3, 1] }}
-                />
-              )
-            })}
-          </svg>
+          <div className={styles.plates} data-blur={arguing || undefined}>
+            {stones.map((m, i) => (
+              <div key={m.label} className={styles.plateWrap}>
+                <motion.div
+                  ref={(el) => {
+                    plateRefs.current[i] = el
+                  }}
+                  className={styles.plate}
+                  initial={false}
+                  animate={{ opacity: i < plated ? 1 : 0 }}
+                  transition={{ duration: reduced ? 0 : 0.5, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {m.src ? (
+                    <img src={m.src} alt="" className={styles.plateMedia} draggable={false} />
+                  ) : (
+                    <div
+                      className={styles.plateMedia}
+                      style={{ background: m.tint ?? 'var(--color-accent)' }}
+                    />
+                  )}
+                </motion.div>
+                <motion.span
+                  className={styles.plateLabel}
+                  initial={false}
+                  animate={{ opacity: i < plated && !arguing ? 1 : 0 }}
+                  transition={{ duration: reduced ? 0 : 0.4 }}
+                >
+                  {m.label}
+                </motion.span>
+              </div>
+            ))}
+          </div>
         )}
-        {stones.map((m, i) => {
-          const a = anchors.find((n) => n.label === m.label)
-          if (!a) return null
-          return (
-            <motion.div
-              key={m.label}
-              className={styles.markLabel}
-              style={{ left: columnX, top: a.cy }}
-              initial={false}
-              animate={{ opacity: i < marked ? 1 : 0 }}
-              transition={{ duration: reduced ? 0 : 0.45, ease: [0.16, 1, 0.3, 1] }}
-            >
-              {m.label}
-            </motion.div>
-          )
-        })}
       </div>
+
       {lines.length > 0 && (
         <ul className={styles.facts} aria-label="Cabinet facts">
           {lines.map((line, i) => (
@@ -348,7 +409,7 @@ export function ImpactHit({
               className={styles.fact}
               initial={false}
               animate={{ opacity: i < shown ? 1 : 0 }}
-              transition={{ duration: reduced ? 0 : 0.45, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: reduced ? 0 : 0.55, ease: [0.16, 1, 0.3, 1] }}
             >
               {line}
             </motion.li>
