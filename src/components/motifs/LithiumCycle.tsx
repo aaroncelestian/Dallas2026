@@ -416,7 +416,7 @@ function CycleRig({
               />
             </mesh>
             {labeled && (
-              <Html>
+              <Html
                 position={[label.x, 0.48, label.z]}
                 center
                 transform={false}
