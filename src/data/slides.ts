@@ -53,6 +53,7 @@ export interface SceneBeat {
   title?: string
   subtitle?: string
   layers?: string[]
+  guests?: boolean
   notes?: string
 }
 
@@ -229,12 +230,12 @@ export const slides: Slide[] = [
         },
         {
           label: 'Travertine',
-          x: 0.355,
-          y: 0.616,
-          w: 0.11,
-          h: 0.018,
+          x: 0.24,
+          y: 0.422,
+          w: 0.12,
+          h: 0.014,
           src: asset('images/cabinet-travertine.webp'),
-          tint: '#d4b896',
+          tint: '#d8c4a4',
         },
         {
           label: 'Lapis',
@@ -344,12 +345,23 @@ export const slides: Slide[] = [
           'Don’t draw the atoms. The framework is vanadium and phosphate; what the structure actually offers is the hole — cages and a connected channel network. Drag if you want the room to look into a cage. That empty space is what made it more than a new species.',
       },
       {
+        id: 'cargo',
+        label: 'Cargo',
+        kicker: 'Host–guest',
+        title: 'Doxorubicin.\nVincristine.',
+        layers: ['voids'],
+        guests: true,
+        notes:
+          'Two chemotherapeutics sitting in openings on the near face of the cell. The cages are large enough. Don’t overclaim a calculated pose — this is the picture of the idea: the hole is the useful part. Drag to look in from the side.',
+      },
+      {
         id: 'lead',
         label: 'Therapeutic lead',
         title: 'Then a\ntherapeutic lead.',
         layers: ['voids'],
+        guests: true,
         notes:
-          'Vanadium-bearing framework, cytotoxic selectivity, controlled-release potential. The channel architecture is still on the wall. That is what informed targeted oncology. The delay between “new species” and “drug-design lead” is the point.',
+          'Vanadium-bearing framework, cytotoxic selectivity, controlled-release potential. The cargo is still on the wall. That channel architecture is what informed targeted oncology. The delay between “new species” and “drug-design lead” is the point.',
       },
     ],
   },
@@ -381,7 +393,16 @@ export const slides: Slide[] = [
         title: 'Nobody bought this\nas medicine.',
         layers: ['zeolite'],
         notes:
-          'Acquired for channel structure and aesthetic rarity. State it plainly: nobody acquired this as medical research.',
+          'Acquired for channel structure and aesthetic rarity. State it plainly: nobody acquired this as medical research. The specimen is the class, not the drug. The names that matter are next.',
+      },
+      {
+        id: 'precedents',
+        label: 'Precedents',
+        kicker: 'Zeolite → Lokelma',
+        title: 'Georgechaoite.\nUmbite.\nSitinakite.',
+        layers: ['zeolite'],
+        notes:
+          'Name the minerals that taught the pore. Georgechaoite and umbite are the natural zirconosilicates — Na/K sitting in a Zr–Si channel. Sitinakite is the titanosilicate cousin. Lokelma is the synthetic that left the cabinet. Don’t lecture the structures. The names are the lineage.',
       },
       {
         id: 'gut',

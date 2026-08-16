@@ -20,7 +20,15 @@ function TitleLines({ text }: { text: string }) {
   )
 }
 
-function LayerView({ layer, active }: { layer: SceneLayer; active: boolean }) {
+function LayerView({
+  layer,
+  active,
+  showGuests,
+}: {
+  layer: SceneLayer
+  active: boolean
+  showGuests?: boolean
+}) {
   if (layer.kind === 'motif' && layer.motif === 'crystal-viewer') {
     return (
       <div className={styles.sceneMotif}>
@@ -32,7 +40,7 @@ function LayerView({ layer, active }: { layer: SceneLayer; active: boolean }) {
   if (layer.kind === 'motif' && layer.motif === 'void-viewer') {
     return (
       <div className={styles.sceneMotif}>
-        <VoidViewer active={active} />
+        <VoidViewer active={active} guests={showGuests} />
       </div>
     )
   }
@@ -89,7 +97,7 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
               exit={reduced ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration, ease: [0.16, 1, 0.3, 1] }}
             >
-              <LayerView layer={layer} active={active} />
+              <LayerView layer={layer} active={active} showGuests={beat?.guests} />
             </motion.div>
           ))}
         </AnimatePresence>

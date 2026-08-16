@@ -3,10 +3,23 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Line, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import mesh from '../../data/rowleyiteVoid.json'
+import guests from '../../data/rowleyiteGuests.json'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import styles from './Motifs.module.css'
 
-const VOID = '#e0b15c'
+const VOID_OUT = '#e0b15c'
+const VOID_IN = '#5aa8b8'
+const SCALE = 0.155
+
+const LEGEND_WALLS = [
+  { color: VOID_OUT, label: 'outside' },
+  { color: VOID_IN, label: 'inside' },
+] as const
+
+const LEGEND_GUESTS = [
+  { color: '#f0c4a8', label: 'doxorubicin' },
+  { color: '#c5d8e6', label: 'vincristine' },
+] as const
 
 function CellWire({ size }: { size: number }) {
   const edges = useMemo(() => {
@@ -54,10 +67,56 @@ function CellWire({ size }: { size: number }) {
   )
 }
 
-function Scene({ active }: { active: boolean }) {
+function Bond({ a, b }: { a: [number, number, number]; b: [number, number, number] }) {
+  const mid = useMemo(() => {
+    const A = new THREE.Vector3(...a)
+    const B = new THREE.Vector3(...b)
+    const dir = new THREE.Vector3().subVectors(B, A)
+    const len = dir.length()
+    const quat = new THREE.Quaternion()
+    quat.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize())
+    return { len, quat, pos: A.clone().add(B).multiplyScalar(0.5) }
+  }, [a, b])
+  return (
+    <mesh position={mid.pos.toArray()} quaternion={mid.quat}>
+      <cylinderGeometry args={[0.11, 0.11, mid.len, 6]} />
+      <meshStandardMaterial color="#6a5a4a" roughness={0.65} metalness={0.08} />
+    </mesh>
+  )
+}
+
+function GuestMolecules() {
+  return (
+    <>
+      {guests.molecules.map((mol) => (
+        <group key={mol.name}>
+          {mol.bonds.map(([i, j]) => {
+            const A = mol.atoms[i]
+            const B = mol.atoms[j]
+            if (!A || !B) return null
+            return <Bond key={`${mol.name}-${i}-${j}`} a={[A.x, A.y, A.z]} b={[B.x, B.y, B.z]} />
+          })}
+          {mol.atoms.map((atom) => (
+            <mesh key={`${mol.name}-${atom.id}`} position={[atom.x, atom.y, atom.z]}>
+              <sphereGeometry args={[atom.radius, 16, 16]} />
+              <meshStandardMaterial
+                color={atom.color}
+                roughness={0.3}
+                metalness={0.12}
+                emissive={atom.color}
+                emissiveIntensity={0.28}
+              />
+            </mesh>
+          ))}
+        </group>
+      ))}
+    </>
+  )
+}
+
+function Scene({ active, showGuests }: { active: boolean; showGuests: boolean }) {
   const group = useRef<THREE.Group>(null)
   const reduced = usePrefersReducedMotion()
-  const scale = 0.155
 
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry()
@@ -67,51 +126,108 @@ function Scene({ active }: { active: boolean }) {
     return geo
   }, [])
 
+  const target = useMemo(
+    () => new THREE.Vector3(guests.focus.x * SCALE, guests.focus.y * SCALE, guests.focus.z * SCALE),
+    [],
+  )
+
   useFrame((_, dt) => {
     if (!group.current || reduced || !active) return
-    group.current.rotation.y += dt * 0.1
+    group.current.rotation.y += dt * 0.08
   })
 
   return (
     <>
-      <ambientLight intensity={0.42} />
+      <ambientLight intensity={0.4} />
       <directionalLight position={[6, 8, 4]} intensity={1.05} color="#fff4e0" />
-      <directionalLight position={[-5, -2, -6]} intensity={0.38} color="#9ec4d4" />
-      <pointLight position={[0, 0.2, 1.6]} intensity={1.05} color={VOID} distance={16} />
-      <group ref={group} scale={scale}>
+      <directionalLight position={[-5, -2, -6]} intensity={0.34} color="#9ec4d4" />
+      <pointLight
+        position={[guests.focus.x * SCALE, guests.focus.y * SCALE, guests.focus.z * SCALE + 1.2]}
+        intensity={1.35}
+        color={showGuests ? '#f0c4a8' : VOID_IN}
+        distance={14}
+      />
+      <group ref={group} scale={SCALE}>
         <CellWire size={mesh.cell.a} />
         <mesh geometry={geometry}>
           <meshStandardMaterial
-            color={VOID}
-            roughness={0.34}
+            color={VOID_OUT}
+            roughness={0.36}
             metalness={0.18}
-            emissive={VOID}
-            emissiveIntensity={0.2}
+            emissive={VOID_OUT}
+            emissiveIntensity={0.14}
             transparent
-            opacity={0.88}
-            side={THREE.DoubleSide}
+            opacity={showGuests ? 0.5 : 0.78}
+            side={THREE.FrontSide}
+            depthWrite={!showGuests}
           />
         </mesh>
+        <mesh geometry={geometry}>
+          <meshStandardMaterial
+            color={VOID_IN}
+            roughness={0.42}
+            metalness={0.08}
+            emissive={VOID_IN}
+            emissiveIntensity={0.22}
+            transparent
+            opacity={showGuests ? 0.58 : 0.86}
+            side={THREE.BackSide}
+            depthWrite={!showGuests}
+          />
+        </mesh>
+        {showGuests && <GuestMolecules />}
       </group>
-      <OrbitControls enablePan={false} enableZoom={false} makeDefault />
+      <OrbitControls enablePan={false} enableZoom={false} makeDefault target={target} />
     </>
   )
 }
 
-export function VoidViewer({ active }: { active: boolean }) {
+export function VoidViewer({ active, guests: showGuests = false }: { active: boolean; guests?: boolean }) {
+  const cam = [
+    guests.focus.x * SCALE + 1.15,
+    guests.focus.y * SCALE + 0.85,
+    guests.focus.z * SCALE + 5.6,
+  ] as [number, number, number]
+
   return (
-    <div className={styles.crystal} aria-label="Rowleyite void space — the cages and channels, not the atoms">
+    <div
+      className={styles.crystal}
+      aria-label={
+        showGuests
+          ? 'Rowleyite void space with doxorubicin and vincristine in near-face cages'
+          : 'Rowleyite void space — the cages and channels, not the atoms'
+      }
+    >
+      <div className={styles.legend}>
+        {LEGEND_WALLS.map((row) => (
+          <div key={row.label} className={styles.legendRow}>
+            <span className={styles.swatch} style={{ background: row.color }} />
+            {row.label}
+          </div>
+        ))}
+        {showGuests &&
+          LEGEND_GUESTS.map((row) => (
+            <div key={row.label} className={styles.legendRow}>
+              <span className={styles.swatch} style={{ background: row.color }} />
+              {row.label}
+            </div>
+          ))}
+      </div>
       <Canvas
         dpr={[1, 1.75]}
-        camera={{ position: [3.6, 2.0, 9.4], fov: 36 }}
+        camera={{ position: cam, fov: 34 }}
         gl={{ antialias: true, alpha: true }}
         style={{ width: '100%', height: '100%' }}
       >
         <Suspense fallback={null}>
-          <Scene active={active} />
+          <Scene active={active} showGuests={showGuests} />
         </Suspense>
       </Canvas>
-      <div className={styles.crystalCaption}>Rowleyite · void space · drag to orbit</div>
+      <div className={styles.crystalCaption}>
+        {showGuests
+          ? 'Rowleyite · doxorubicin + vincristine in the near cages · drag to orbit'
+          : 'Rowleyite · void space · drag to orbit'}
+      </div>
     </div>
   )
 }
