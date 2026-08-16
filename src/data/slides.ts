@@ -777,7 +777,7 @@ export const slides: Slide[] = [
     title: 'Where does geology end\nand intention begin?',
     motif: 'prep-modes',
     notes:
-      'Unearthed holds the open question with four deliberate modes. Use [ ] or , . to pull focus: citrine teapot (total transformation), chrysanthemum stone (subtraction), Hubei turquoise (architecture exposed), ammolite with Pepper’s Ghost (interpretive reconstruction). Don’t resolve the question.',
+      'Unearthed holds the open question with four deliberate modes. Use [ ] or , . to pull focus: citrine teapot (total transformation), chrysanthemum stone (subtraction), Hubei turquoise and the malachite feet in azurite (architecture exposed — cut and polished), ammolite with Pepper’s Ghost (interpretive reconstruction). Don’t resolve the question.',
   },
   {
     id: 'provenance',

@@ -89,7 +89,8 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `unearthed-gallery.jpg` | Loans |
 | `prep-teapot.jpg` | Prep mode 1 |
 | `prep-chrysanthemum.jpg` | Prep mode 2 |
-| `prep-turquoise.jpg` | Prep mode 3 |
+| `prep-turquoise.jpg` | Prep mode 3 · Hubei turquoise |
+| `prep-malachite.jpg` | Prep mode 3 · malachite feet |
 | `prep-ammolite.jpg` | Prep mode 4 |
 
 1620 is typographic on purpose.

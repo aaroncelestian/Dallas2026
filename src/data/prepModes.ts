@@ -21,6 +21,11 @@ export const PREP_MODES = [
     body: 'Hubei turquoise — matrix removed, veins left standing.',
     src: asset('images/prep-turquoise.jpg'),
     alt: 'Hubei turquoise vessel',
+    extra: {
+      src: asset('images/prep-malachite.jpg'),
+      alt: 'Malachite feet in azurite, cut and polished',
+      body: 'Malachite ‘feet’ in azurite — cut and polished.',
+    },
   },
   {
     id: 'ammolite',

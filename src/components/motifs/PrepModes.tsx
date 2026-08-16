@@ -9,6 +9,11 @@ export type PrepMode = {
   body: string
   src: string
   alt: string
+  extra?: {
+    src: string
+    alt: string
+    body: string
+  }
 }
 
 export function PrepModes({
@@ -54,18 +59,33 @@ export function PrepModes({
             onClick={() => setFocus(i)}
             aria-pressed={i === focus}
           >
-            <motion.img
-              src={m.src}
-              alt={m.alt}
-              animate={{
-                filter:
-                  i === focus || !active
-                    ? 'blur(0px) brightness(1)'
-                    : 'blur(3px) brightness(0.92)',
-                scale: i === focus && active ? 1.02 : 1,
-              }}
-              transition={{ duration: reduced ? 0 : 0.45 }}
-            />
+            <div className={m.extra ? styles.prepCellPair : undefined}>
+              <motion.img
+                src={m.src}
+                alt={m.alt}
+                animate={{
+                  filter:
+                    i === focus || !active
+                      ? 'blur(0px) brightness(1)'
+                      : 'blur(3px) brightness(0.92)',
+                  scale: i === focus && active && !m.extra ? 1.02 : 1,
+                }}
+                transition={{ duration: reduced ? 0 : 0.45 }}
+              />
+              {m.extra && (
+                <motion.img
+                  src={m.extra.src}
+                  alt={m.extra.alt}
+                  animate={{
+                    filter:
+                      i === focus || !active
+                        ? 'blur(0px) brightness(1)'
+                        : 'blur(3px) brightness(0.92)',
+                  }}
+                  transition={{ duration: reduced ? 0 : 0.45 }}
+                />
+              )}
+            </div>
             <span>{m.title}</span>
           </button>
         ))}
@@ -81,6 +101,7 @@ export function PrepModes({
         >
           <h3>{modes[focus]?.title}</h3>
           <p>{modes[focus]?.body}</p>
+          {modes[focus]?.extra && <p>{modes[focus].extra.body}</p>}
           <span className={styles.prepHint}>[ ] or , . to pull focus</span>
         </motion.div>
       </AnimatePresence>

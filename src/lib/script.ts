@@ -109,7 +109,10 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
     lines.push(`Image: ${slide.image.alt}`)
   }
   if (slide.motif === 'prep-modes') {
-    for (const mode of PREP_MODES) lines.push(`• ${mode.title} — ${mode.body}`)
+    for (const mode of PREP_MODES) {
+      lines.push(`• ${mode.title} — ${mode.body}`)
+      if (mode.extra) lines.push(`• ${mode.title} — ${mode.extra.body}`)
+    }
   } else {
     const motif = motifLine(slide)
     if (motif && !beat) lines.push(motif)
