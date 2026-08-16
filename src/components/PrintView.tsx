@@ -64,22 +64,41 @@ export function PrintView() {
         {beats.map((beat, i) => {
           const showChapter = i === 0 || beat.chapter !== beats[i - 1].chapter
           return (
-            <section key={beat.slide.id} className={styles.beat}>
+            <section
+              key={`${beat.slide.id}-${beat.sceneLabel ?? 'slide'}-${beat.index}`}
+              className={styles.beat}
+            >
               {showChapter && (
                 <h2 className={styles.chapter}>{chapterTitle(beat.chapter)}</h2>
               )}
               <h3>
                 <span className={styles.num}>{beat.index + 1}</span>
-                {beat.slide.label}
+                {beat.sceneLabel
+                  ? `${beat.slide.label} · ${beat.sceneLabel}`
+                  : beat.slide.label}
               </h3>
               <div className={styles.grid}>
                 <div>
                   <h4>On screen</h4>
-                  {beat.slide.image && (
-                    <figure className={styles.figure}>
-                      <img src={beat.slide.image.src} alt={beat.slide.image.alt} />
-                    </figure>
-                  )}
+                  {(() => {
+                    const layer = beat.slide.layers?.find(
+                      (item) =>
+                        item.kind === 'image' &&
+                        item.src &&
+                        (!beat.sceneLabel ||
+                          beat.slide.scene
+                            ?.find((s) => s.label === beat.sceneLabel)
+                            ?.layers?.includes(item.id)),
+                    )
+                    const src = layer?.src ?? beat.slide.image?.src
+                    const alt = layer?.alt ?? beat.slide.image?.alt
+                    if (!src) return null
+                    return (
+                      <figure className={styles.figure}>
+                        <img src={src} alt={alt} />
+                      </figure>
+                    )
+                  })()}
                   <ul>
                     {beat.onScreen.map((line) => (
                       <li key={line}>{line}</li>

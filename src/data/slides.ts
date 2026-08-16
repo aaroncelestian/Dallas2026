@@ -34,6 +34,27 @@ export type CameraKind =
   | 'drift'
   | 'hold'
 
+export type SceneLayerKind = 'image' | 'motif' | 'video'
+
+export interface SceneLayer {
+  id: string
+  kind: SceneLayerKind
+  src?: string
+  alt?: string
+  fit?: 'cover' | 'contain'
+  motif?: MotifKind
+}
+
+export interface SceneBeat {
+  id: string
+  label: string
+  kicker?: string
+  title?: string
+  subtitle?: string
+  layers?: string[]
+  notes?: string
+}
+
 export interface Slide {
   id: string
   label: string
@@ -74,6 +95,8 @@ export interface Slide {
   copySnap?: boolean
   splitFlip?: boolean
   notes?: string
+  layers?: SceneLayer[]
+  scene?: SceneBeat[]
 }
 
 export const CHAPTERS: { id: ChapterId; num: string; title: string }[] = [
@@ -189,24 +212,78 @@ export const slides: Slide[] = [
     ghostNum: '01',
     title: 'Research as\nunplanned infrastructure',
     notes:
-      'Four specimens. Four centuries of waiting. Each acquired for a reason that had nothing to do with its eventual payoff.',
+      'A handful of specimens. Centuries, in aggregate, of waiting. Each acquired for a reason that had nothing to do with its eventual payoff — and one recurring signature that shows up in more of them than you’d expect.',
   },
   {
-    id: 'zeolite-setup',
-    label: 'Zeolite',
+    id: 'lithium',
+    label: 'Lithium',
     chapter: 'research',
-    layout: 'bleed',
-    camera: 'rack',
-    kicker: 'Channel structure',
-    title: 'Nobody bought this\nas medicine.',
-    image: {
-      src: asset('images/zeolite.jpg'),
-      alt: 'Zeolite specimen, stellarite',
-      fit: 'contain',
-    },
-    yaw: -1,
-    notes:
-      'Acquired for channel structure and aesthetic rarity. Show the specimen. State it plainly: nobody acquired this as medical research.',
+    layout: 'stage',
+    clearPlate: true,
+    layers: [
+      {
+        id: 'spinel',
+        kind: 'image',
+        src: asset('images/spinel.jpg'),
+        alt: 'Spinel octahedron',
+        fit: 'contain',
+      },
+    ],
+    scene: [
+      {
+        id: 'low-water',
+        label: 'Low-water lithium',
+        kicker: 'Resource security',
+        title: 'Low-water lithium.',
+        layers: ['spinel'],
+        notes:
+          'Spinel-structured analogs guiding extraction against Chile/Argentina evaporative brine. Museum mineralogy in a live supply-chain conversation. The specimen is the structure, not the mine.',
+      },
+      {
+        id: 'water',
+        label: 'Water cost',
+        kicker: 'Resource security',
+        title: 'The Atacama cannot\nspare the water.',
+        layers: ['spinel'],
+        notes:
+          'Water cost, ecosystem impact. Let the sentence carry the politics. Then leave it.',
+      },
+    ],
+  },
+  {
+    id: 'rowleyite',
+    label: 'Rowleyite',
+    chapter: 'research',
+    layout: 'stage',
+    clearPlate: true,
+    layers: [
+      {
+        id: 'specimen',
+        kind: 'image',
+        src: asset('images/rowleyite.jpg'),
+        alt: 'Rowleyite crystals on matrix',
+        fit: 'contain',
+      },
+    ],
+    scene: [
+      {
+        id: 'novelty',
+        label: 'Novelty',
+        kicker: 'A new species',
+        title: 'Prized for novelty.',
+        layers: ['specimen'],
+        notes:
+          'That same structural selectivity doesn’t stop at extraction. It goes into medicine too. Collector logic here was pure taxonomic curiosity — not medicine. Dallas may already know the species-description story. Don’t retell it.',
+      },
+      {
+        id: 'lead',
+        label: 'Therapeutic lead',
+        title: 'Then a\ntherapeutic lead.',
+        layers: ['specimen'],
+        notes:
+          'Vanadium-bearing framework, cytotoxic selectivity, controlled-release potential. Channel architecture informing targeted oncology. The delay between “new species” and “drug-design lead” is the point.',
+      },
+    ],
   },
   {
     id: 'lokelma',
@@ -214,76 +291,189 @@ export const slides: Slide[] = [
     chapter: 'research',
     layout: 'stage',
     clearPlate: true,
-    kicker: 'Zeolite → Lokelma',
-    title: 'Size-selective exchange\nbecomes a drug.',
-    subtitle: '3 million patients.',
-    motif: 'crystal-viewer',
-    notes:
-      'The structure is the argument. Cubic zirconosilicate, ~3 Å pores, K⁺ sitting in the 7-rings — extremely selective over Na⁺, Ca²⁺, Mg²⁺. Drag if you want the room to look into a channel. Speak the scale: one in nine people with chronic kidney disease are hyperkalemic. The three million is already on the wall. Then leave it.',
+    layers: [
+      {
+        id: 'zeolite',
+        kind: 'image',
+        src: asset('images/zeolite.jpg'),
+        alt: 'Zeolite specimen, stellarite',
+        fit: 'contain',
+      },
+      {
+        id: 'structure',
+        kind: 'motif',
+        motif: 'crystal-viewer',
+      },
+    ],
+    scene: [
+      {
+        id: 'specimen',
+        label: 'Zeolite',
+        kicker: 'Channel structure',
+        title: 'Nobody bought this\nas medicine.',
+        layers: ['zeolite'],
+        notes:
+          'Acquired for channel structure and aesthetic rarity. State it plainly: nobody acquired this as medical research.',
+      },
+      {
+        id: 'gut',
+        label: 'Gut',
+        kicker: 'Zeolite → Lokelma',
+        title: 'Not blood.\nNot kidney.\nGut.',
+        layers: ['structure'],
+        notes:
+          'One channel-selective mineral is still years from a patient. Another already is one. Correct a likely assumption: Lokelma doesn’t circulate in the blood, and it doesn’t act on the kidney. It’s non-absorbed — it never leaves the gut. Drag if you want the room to look into a channel.',
+      },
+      {
+        id: 'pore',
+        label: 'Pore',
+        kicker: 'Zeolite → Lokelma',
+        title: 'A ~3 Å pore, built to\nmimic a K⁺ channel.',
+        layers: ['structure'],
+        notes:
+          'The crystal lattice opens a pore about three angstroms wide, engineered to mimic the selectivity of the body’s own potassium channels. Extremely selective over Na⁺, Ca²⁺, Mg²⁺. It captures potassium as food moves through the intestine, before the kidney would ever have to clear it. Deployed exactly where the kidney isn’t, because the kidney is the organ that’s failing.',
+      },
+      {
+        id: 'patients',
+        label: '3 million',
+        kicker: 'Zeolite → Lokelma',
+        title: 'Size-selective exchange\nbecomes a drug.',
+        subtitle: '3 million patients.',
+        layers: ['structure'],
+        notes:
+          'The three million is already on the wall. Then leave it.',
+      },
+    ],
   },
   {
-    id: 'rowleyite-setup',
-    label: 'Rowleyite',
+    id: 'stones',
+    label: 'Kidney stones',
     chapter: 'research',
-    layout: 'bleed',
-    camera: 'pan-right',
-    kicker: 'A new species',
-    title: 'Prized for novelty.',
-    image: {
-      src: asset('images/rowleyite.jpg'),
-      alt: 'Rowleyite crystals on matrix',
-      fit: 'cover',
-    },
-    yaw: 1,
-    notes:
-      'Collector logic: taxonomic curiosity — not medicine. Dallas may already know the species-description story. Don’t retell it. The therapeutic angle is downstream of pure taxonomy.',
-  },
-  {
-    id: 'rowleyite-oncology',
-    label: 'Oncology',
-    chapter: 'research',
-    layout: 'void',
-    camera: 'drift',
-    title: 'Then a\ntherapeutic lead.',
-    notes:
-      'Vanadium-bearing framework, cytotoxic selectivity, controlled-release potential. Channel architecture informing targeted oncology. The delay between “new species” and “drug-design lead” is the point.',
-  },
-  {
-    id: 'spinel',
-    label: 'Lithium',
-    chapter: 'research',
-    layout: 'void',
+    layout: 'stage',
     clearPlate: true,
-    title: 'Low-water lithium.',
-    kicker: 'Resource security',
-    notes:
-      'Spinel-structured analogs guiding extraction against Chile/Argentina evaporative brine — water cost, ecosystem impact. Museum mineralogy in a live supply-chain conversation. No specimen on screen: let the sentence carry it.',
+    layers: [
+      {
+        id: 'polish',
+        kind: 'image',
+        src: asset('images/stone-polish.jpg'),
+        alt: 'Polished cross-section of a calcium oxalate kidney stone',
+        fit: 'contain',
+      },
+      {
+        id: 'ct',
+        kind: 'image',
+        src: asset('images/ks78-cut.jpg'),
+        alt: 'CT volume of a kidney stone, voids opened',
+        fit: 'contain',
+      },
+      {
+        id: 'stromatolite',
+        kind: 'image',
+        src: asset('images/stromatolite.jpg'),
+        alt: 'Stromatolite thin section, blue epoxy in the pores',
+        fit: 'contain',
+      },
+      {
+        id: 'biofilm',
+        kind: 'image',
+        src: asset('images/stone-biofilm.jpg'),
+        alt: 'SEM of intercalated bacterial biofilm inside a calcium stone',
+        fit: 'contain',
+      },
+    ],
+    scene: [
+      {
+        id: 'uninvited',
+        label: 'Uninvited',
+        title: 'One mineral you swallow\non purpose.',
+        subtitle: 'One mineral builds itself, uninvited.',
+        layers: ['polish'],
+        notes:
+          'The kidney’s own mineral chemistry is a different story. Not compensation from outside — a mineral forming inside the kidney’s own machinery. The oldest assumption about the most common kidney stone, calcium oxalate, is that it’s purely abiotic.',
+      },
+      {
+        id: 'inside',
+        label: 'CT volume',
+        title: 'It has an inside.',
+        layers: ['ct'],
+        notes:
+          'High-resolution imaging of the volume — layers, voids, thickness. Not a pebble. An architecture.',
+      },
+      {
+        id: 'layers',
+        label: 'Layers',
+        title: 'Layers, again.',
+        layers: ['stromatolite'],
+        notes:
+          'That layered architecture should look familiar to anyone who’s cut open a stromatolite. The blue is epoxy in the pores, not the mineral. Different mineral — calcium carbonate instead of calcium oxalate — but the same open question: is the layering evidence of a microbial mat building upward, one generation at a time? We don’t yet know that a kidney stone and a stromatolite form by the identical mechanism. What we do know is that both are laminated structures where biology appears to be templating mineral growth in sequence, not just contaminating it once.',
+      },
+      {
+        id: 'biofilm',
+        label: 'Biofilm',
+        title: 'It doesn’t build alone.',
+        layers: ['biofilm'],
+        notes:
+          'High-resolution electron imaging and synchrotron XRD: bacterial biofilms structurally intercalated through the internal architecture, in layers, in patients with no diagnosed infection at all. Schmidt et al., PNAS 2026. Kidney stone disease, partly microbial in origin.',
+      },
+    ],
   },
   {
-    id: 'mars',
-    label: 'Mars analogs',
+    id: 'salt-mars',
+    label: 'Salt and Mars',
     chapter: 'research',
-    layout: 'bleed',
-    camera: 'rise',
-    kicker: 'Astrobiology',
-    title: 'It looked like\nnothing else.',
-    image: {
-      src: asset('images/mars-analog.jpg'),
-      alt: 'Mars-analog evaporite with microbial texture',
-      fit: 'cover',
-    },
-    yaw: -1,
-    notes:
-      'Collected because it looked like nothing else. Mars-analog evaporites. Halophile carotenoid biosignatures. Novelty that became a template for reading life’s residue.',
+    layout: 'stage',
+    clearPlate: true,
+    layers: [
+      {
+        id: 'halite',
+        kind: 'image',
+        src: asset('images/halite-trona.jpg'),
+        alt: 'Halite crystals on trona',
+        fit: 'contain',
+      },
+      {
+        id: 'mars',
+        kind: 'image',
+        src: asset('images/mars-analog.jpg'),
+        alt: 'Mars-analog evaporite with microbial texture',
+        fit: 'contain',
+      },
+    ],
+    scene: [
+      {
+        id: 'entomb',
+        label: 'Shelter',
+        title: 'Why entomb yourself\nin mineral at all?',
+        layers: ['halite'],
+        notes:
+          'There’s a reason biology keeps doing this, at every scale we’ve just walked through. Halophilic organisms don’t just tolerate salt — they use it. Mineral encasement, salt-crystal fluid inclusions, layered carbonate mats: all of it functions as protection, a way to survive conditions that would otherwise be lethal. A stromatolite, looked at this way, isn’t just a record. It’s a shelter its builders kept constructing.',
+      },
+      {
+        id: 'elsewhere',
+        label: 'Mars',
+        kicker: 'Astrobiology',
+        title: 'If salt is a shelter here,\nask where else.',
+        layers: ['mars'],
+        notes:
+          'If mineral encasement is a survival strategy on this planet, it doesn’t stay confined to this planet. Mars-analog evaporites. Halophile carotenoid biosignatures. The same shelter-building strategy, looked for somewhere no one’s confirmed biology ever existed at all.',
+      },
+    ],
   },
   {
     id: 'pattern',
     label: 'The pattern',
     chapter: 'research',
-    layout: 'void',
-    title: 'They had to\nwait together.',
-    notes:
-      'Hinge of the talk. Microbial activity leaves a structural signature that persists across scales — kidney stones to Martian regolith. No single acquisition could show this. It only became visible because the specimens existed together, decades apart, waiting to be read against each other. Close Act I here.',
+    layout: 'stage',
+    clearPlate: true,
+    scene: [
+      {
+        id: 'signature',
+        label: 'Signature',
+        title: 'The same signature.\nThree scales apart.',
+        notes:
+          'Hinge of the talk. A kidney stone’s biofilm layers, a stromatolite’s laminae, a halophile’s salt-crystal shelter, a Mars-analog evaporite’s texture — not four unrelated curiosities, but one recurring strategy, read at scales from a human body to a planet nobody’s stood on. No single specimen could show that pattern. It only became visible because the specimens existed together, waiting to be read against each other. Close Act I here.',
+      },
+    ],
   },
 
   // ── Act II ────────────────────────────────────────────

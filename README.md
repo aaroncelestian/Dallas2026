@@ -40,7 +40,11 @@ That launches Chrome/Edge as an app window (`--app`), which is the cleanest shar
 | `Shift+F` | Native fullscreen (breaks Zoom window-share) |
 | `Enter` or `R` | Blue Wave color reveal (on that beat) |
 | `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
+| Space / → | Next scene beat, then next slide |
+| ← | Previous scene beat, then previous slide |
+| `1`–`9` | Jump to scene beat N |
 | Drag | Orbit the Lokelma structure (on that beat) |
+| Hover counter | Jump to a slide or a scene beat |
 
 Chrome (counter, TOC, Resources) stays invisible until you hover. Cursor hides after a beat of stillness. The counter opens a slide list. Resources open over the talk — **Back to talk** or Esc returns.
 
@@ -65,9 +69,15 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | File | Beat |
 |------|------|
 | `gold.jpg` | Cold open, title, close |
-| `zeolite.jpg` | Zeolite |
+| `zeolite.jpg` | Lokelma · zeolite |
+| `spinel.jpg` | Lithium |
 | `rowleyite.jpg` | Rowleyite |
-| `mars-analog.jpg` | Mars analogs |
+| `stone-polish.jpg` | Kidney stone cut |
+| `ks78-cut.jpg` | Kidney stone CT |
+| `stromatolite.jpg` | Stromatolite thin section |
+| `stone-biofilm.jpg` | Stone biofilm SEM |
+| `halite-trona.jpg` | Salt as shelter |
+| `mars-analog.jpg` | Salt and Mars |
 | `emerald.jpg` | Unearthed |
 | `blue-wave.jpg` | Color reveal |
 | `stibnite.jpg` | Preservation |
@@ -79,7 +89,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `prep-turquoise.jpg` | Prep mode 3 |
 | `prep-ammolite.jpg` | Prep mode 4 |
 
-1620 and the lithium beat are typographic on purpose — no stand-in specimen.
+1620 is typographic on purpose.
 
 ## Timing guide (~40 min)
 

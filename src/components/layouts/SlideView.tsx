@@ -9,6 +9,7 @@ import { CriteriaOverlap } from '../motifs/CriteriaOverlap'
 import { PrepModes } from '../motifs/PrepModes'
 import { ColorReveal } from '../motifs/ColorReveal'
 import { PREP_MODES } from '../../data/prepModes'
+import { SceneView } from './SceneView'
 import styles from './Layouts.module.css'
 
 const rise = {
@@ -102,6 +103,10 @@ export function SlideView({
 }) {
   const yaw = (slide.yaw ?? 1) as 1 | -1
   const ownImage = !plated
+
+  if (slide.scene) {
+    return <SceneView slide={slide} active={active} />
+  }
 
   if (slide.layout === 'impact') {
     return (

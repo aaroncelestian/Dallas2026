@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { slides, CHAPTERS, type CameraKind, type ChapterId, type Slide } from '../data/slides'
 import { useActiveSlide, usePrefersReducedMotion } from '../hooks/useActiveSlide'
+import { SceneProvider, useSceneController } from '../hooks/useSceneBeats'
 import { useViewportHeight } from '../hooks/useViewportHeight'
 import { NavContext } from '../hooks/useSlideNav'
 import { exitPresent, fillAvailableScreen, isPresentMode, openPresentWindow, openPrintView } from '../lib/asset'
@@ -41,6 +42,7 @@ function plateState(slide: Slide, last: Slide['image']) {
     slide.motif === 'color-reveal' ||
     slide.motif === 'prep-modes' ||
     slide.motif === 'crystal-viewer' ||
+    Boolean(slide.scene) ||
     slide.clearPlate ||
     slide.layout === 'impact' ||
     slide.layout === 'void' ||
@@ -79,6 +81,9 @@ export function Shell() {
   const interceptRef = useRef<((from: number, to: number) => boolean) | null>(null)
   const { containerRef, activeIndex, goTo } = useActiveSlide(slides.length, interceptRef)
   const slide = slides[activeIndex]
+  const scene = useSceneController(slide)
+  const sceneRef = useRef(scene)
+  sceneRef.current = scene
   const activeChapter = slide?.chapter
   const [fullscreen, setFullscreen] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -97,7 +102,8 @@ export function Shell() {
     slide.layout !== 'impact' &&
     slide.motif !== 'color-reveal' &&
     slide.motif !== 'prep-modes' &&
-    slide.motif !== 'crystal-viewer'
+    slide.motif !== 'crystal-viewer' &&
+    !slide.scene
   ) {
     if (lastImage.current?.src !== slide.image.src) {
       heldCamera.current = slide.camera
@@ -189,6 +195,15 @@ export function Shell() {
   useEffect(() => {
     interceptRef.current = (from, to) => {
       if (leavingRef.current) return true
+      const currentScene = sceneRef.current
+      if (to > from && currentScene.hasScene && !currentScene.atEnd) {
+        currentScene.next()
+        return true
+      }
+      if (to < from && currentScene.hasScene && !currentScene.atStart) {
+        currentScene.prev()
+        return true
+      }
       if (to <= from) return false
       const current = slides[from]
       if (!current?.exitHold || reduced) return false
@@ -314,6 +329,12 @@ export function Shell() {
         return
       }
 
+      if (sceneRef.current.hasScene && /^[1-9]$/.test(e.key)) {
+        e.preventDefault()
+        sceneRef.current.go(Number(e.key) - 1)
+        return
+      }
+
       if (e.key !== 'f' && e.key !== 'F') return
       e.preventDefault()
       // Native fullscreen breaks Zoom window-share. Shift+F only, if you
@@ -375,6 +396,7 @@ export function Shell() {
 
   return (
     <NavContext.Provider value={goTo}>
+    <SceneProvider value={scene}>
       <div ref={containerRef} className={styles.shell} id="deck">
         {plate.image && plate.mode !== 'hidden' && (
           <DepthField
@@ -443,6 +465,29 @@ export function Shell() {
         <div className={styles.pickerWrap} ref={pickerRef}>
           {pickerOpen && (
             <div className={styles.picker} role="listbox" aria-label="Slides">
+              {scene.hasScene && slide.scene && (
+                <>
+                  <div className={styles.pickerChapter}>{slide.label}</div>
+                  {slide.scene.map((beat, i) => (
+                    <button
+                      key={beat.id}
+                      type="button"
+                      role="option"
+                      className={styles.pickerItem}
+                      data-active={i === scene.index}
+                      aria-selected={i === scene.index}
+                      onClick={() => {
+                        scene.go(i)
+                        setPickerOpen(false)
+                      }}
+                    >
+                      <span className={styles.pickerNum}>{i + 1}</span>
+                      {beat.label}
+                    </button>
+                  ))}
+                  <div className={styles.pickerChapter}>Slides</div>
+                </>
+              )}
               {slides.map((s, i) => {
                 const showChapter = i === 0 || s.chapter !== slides[i - 1].chapter
                 return (
@@ -475,14 +520,20 @@ export function Shell() {
             className={styles.counter}
             aria-haspopup="listbox"
             aria-expanded={pickerOpen}
-            aria-label={`Slide ${activeIndex + 1} of ${slides.length}. Open slide list`}
-            title="Jump to a slide"
+            aria-label={
+              scene.hasScene
+                ? `Slide ${activeIndex + 1}, beat ${scene.index + 1} of ${scene.total}. Open list`
+                : `Slide ${activeIndex + 1} of ${slides.length}. Open slide list`
+            }
+            title="Jump to a slide or scene beat"
             onClick={() => {
               setResourcesOpen(false)
               setPickerOpen((open) => !open)
             }}
           >
-            {activeIndex + 1} / {slides.length}
+            {scene.hasScene
+              ? `${activeIndex + 1} · ${scene.index + 1}/${scene.total}`
+              : `${activeIndex + 1} / ${slides.length}`}
           </button>
         </div>
         {!presenting && (
@@ -585,6 +636,7 @@ export function Shell() {
           />
         </div>
       )}
+    </SceneProvider>
     </NavContext.Provider>
   )
 }
