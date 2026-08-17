@@ -218,11 +218,11 @@ export function Shell() {
     interceptRef.current = (from, to) => {
       if (leavingRef.current) return true
       const currentScene = sceneRef.current
-      if (to > from && currentScene.hasScene && !currentScene.atEnd) {
+      if (to === from + 1 && currentScene.hasScene && !currentScene.atEnd) {
         currentScene.next()
         return true
       }
-      if (to < from && currentScene.hasScene && !currentScene.atStart) {
+      if (to === from - 1 && currentScene.hasScene && !currentScene.atStart) {
         currentScene.prev()
         return true
       }
@@ -492,7 +492,7 @@ export function Shell() {
                       data-active={i === activeIndex}
                       aria-selected={i === activeIndex}
                       onClick={() => {
-                        goTo(i)
+                        goTo(i, 'auto', true)
                         setPickerOpen(false)
                       }}
                     >

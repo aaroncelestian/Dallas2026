@@ -44,15 +44,77 @@ export function useActiveSlide(
         goTo(current - 1)
       } else if (e.key === 'Home') {
         e.preventDefault()
-        goTo(0)
+        goTo(0, 'auto', true)
       } else if (e.key === 'End') {
         e.preventDefault()
-        goTo(count - 1)
+        goTo(count - 1, 'auto', true)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [count, goTo])
+
+  useEffect(() => {
+    const EDGE = 56
+    const THRESH = 64
+    let tracking = false
+    let pointerId = 0
+    let startX = 0
+    let startY = 0
+
+    const chrome = (target: EventTarget | null) => {
+      if (!(target instanceof Element)) return false
+      return Boolean(
+        target.closest(
+          'button, a, input, textarea, select, [role="listbox"], [role="menu"], aside',
+        ),
+      )
+    }
+
+    const ignore = (target: EventTarget | null, x: number) => {
+      if (chrome(target)) return true
+      const fromEdge = x <= EDGE || x >= window.innerWidth - EDGE
+      if (fromEdge) return false
+      return target instanceof Element && Boolean(target.closest('canvas'))
+    }
+
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType === 'mouse') return
+      if (e.isPrimary === false) return
+      if (document.documentElement.hasAttribute('data-resource')) return
+      if (ignore(e.target, e.clientX)) return
+      tracking = true
+      pointerId = e.pointerId
+      startX = e.clientX
+      startY = e.clientY
+    }
+
+    const finish = (e: PointerEvent) => {
+      if (!tracking || e.pointerId !== pointerId) return
+      tracking = false
+      const dx = e.clientX - startX
+      const dy = e.clientY - startY
+      const ax = Math.abs(dx)
+      const ay = Math.abs(dy)
+      if (ax < THRESH || ax < ay * 1.35) return
+      const swallow = (ev: Event) => {
+        ev.preventDefault()
+        ev.stopPropagation()
+      }
+      window.addEventListener('click', swallow, true)
+      window.setTimeout(() => window.removeEventListener('click', swallow, true), 500)
+      goTo(activeIndexRef.current + (dx < 0 ? 1 : -1))
+    }
+
+    window.addEventListener('pointerdown', onDown)
+    window.addEventListener('pointerup', finish)
+    window.addEventListener('pointercancel', finish)
+    return () => {
+      window.removeEventListener('pointerdown', onDown)
+      window.removeEventListener('pointerup', finish)
+      window.removeEventListener('pointercancel', finish)
+    }
+  }, [goTo])
 
   return { containerRef, activeIndex, goTo }
 }

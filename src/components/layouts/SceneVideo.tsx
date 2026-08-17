@@ -402,6 +402,7 @@ export function SceneVideo({
           setStep(stops.length)
           return true
         }
+        if (!el) return false
         resumeGateRef.current = 0
         el.pause()
         el.currentTime = target.at
