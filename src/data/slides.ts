@@ -157,7 +157,7 @@ export interface Slide {
     /** High-res plate used for the zoomed-in hold, then faded as the full image pulls back. */
     detail?: string
     /** Where `detail` sits on the full image. Defaults to `focus`. */
-    detailFocus?: { x: number; y: number; w: number; h: number }}
+    detailFocus?: { x: number; y: number; w: number; h: number }
     /** Specimen callouts, normalized to the full image. */
     marks?: StoneMark[]
   }
