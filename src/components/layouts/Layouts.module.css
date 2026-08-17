@@ -199,6 +199,30 @@
   font-weight: 700;
 }
 
+.stageCopy[data-facts] {
+  max-width: min(42ch, 46vw);
+  margin-bottom: var(--pad-y);
+}
+
+.sceneFacts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.32rem;
+}
+
+.sceneFacts li {
+  font-family: var(--font-body);
+  font-size: clamp(0.78rem, 1.15vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.28;
+  color: color-mix(in srgb, var(--color-text) 78%, transparent);
+  text-shadow: 0 0 16px #070605;
+}
+
 .stageMotif {
   margin-top: 28px;
 }

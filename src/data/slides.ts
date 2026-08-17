@@ -68,6 +68,8 @@ export interface SpecimenCallout {
   title: string
   formula?: string
   body?: string
+  /** Smaller Spanish line under the English label. */
+  es?: string
 }
 
 export interface SceneBeat {
@@ -80,6 +82,7 @@ export interface SceneBeat {
   guests?: boolean
   /** Callout ids from the visible image layer. */
   callouts?: string[]
+  bullets?: string[]
   notes?: string
 }
 
@@ -598,20 +601,20 @@ export const slides: Slide[] = [
           'High-resolution imaging of the volume — layers, voids, thickness. Not a pebble. An architecture.',
       },
       {
-        id: 'layers',
-        label: 'Layers',
-        title: 'Layers, again.',
-        layers: ['stromatolite'],
-        notes:
-          'That layered architecture should look familiar to anyone who’s cut open a stromatolite. The blue is epoxy in the pores, not the mineral. Different mineral — calcium carbonate instead of calcium oxalate — but the same open question: is the layering evidence of a microbial mat building upward, one generation at a time? We don’t yet know that a kidney stone and a stromatolite form by the identical mechanism. What we do know is that both are laminated structures where biology appears to be templating mineral growth in sequence, not just contaminating it once.',
-      },
-      {
         id: 'biofilm',
         label: 'Biofilm',
         title: 'It doesn’t build alone.',
         layers: ['biofilm'],
         notes:
           'Hold the colony. That’s the life, at 2500× — a biofilm, not a smear. Then the same life sitting in the mineral, in the voids. High-resolution electron imaging and synchrotron XRD: bacterial biofilms structurally intercalated through the internal architecture, in layers, in patients with no diagnosed infection at all. Schmidt et al., PNAS 2026. Kidney stone disease, partly microbial in origin. Click the plate if you want the cut now; it will come back to the colony.',
+      },
+      {
+        id: 'layers',
+        label: 'Layers',
+        title: 'Layers, again.',
+        layers: ['stromatolite'],
+        notes:
+          'You just saw the life in those layers. That architecture should look familiar to anyone who’s cut open a stromatolite. The blue is epoxy in the pores, not the mineral. Different mineral — calcium carbonate instead of calcium oxalate — but the same open question: is the layering evidence of a microbial mat building upward, one generation at a time? We don’t yet know that a kidney stone and a stromatolite form by the identical mechanism. What we do know is that both are laminated structures where biology appears to be templating mineral growth in sequence, not just contaminating it once.',
       },
     ],
   },
@@ -785,6 +788,41 @@ export const slides: Slide[] = [
             title: 'Tourmaline Queen, 1972.',
             body: 'One pocket. Never again.',
           },
+          {
+            id: 'cap-trim',
+            x: 0.36,
+            y: 0.218,
+            side: 'right',
+            title: 'Iron–titanium in the last pulse.',
+            body: 'The blue variety is indicolite.',
+            es: 'Hierro–titanio en el último pulso. La variedad azul es indicolita.',
+          },
+          {
+            id: 'body-trim',
+            x: 0.344,
+            y: 0.38,
+            side: 'left',
+            title: 'Manganese makes the pink.',
+            body: 'The variety is rubellite.',
+            es: 'El manganeso da el rosa. La variedad es rubelita.',
+          },
+          {
+            id: 'pocket-trim',
+            x: 0.59,
+            y: 0.55,
+            side: 'right',
+            title: 'Tourmaline Queen mine, 1972.',
+            body: 'One pocket. Never again.',
+            es: 'Mina Tourmaline Queen, 1972. Una sola bolsa. Nunca más.',
+          },
+          {
+            id: 'carnegie',
+            x: 0.40,
+            y: 0.58,
+            side: 'left',
+            title: 'ex. Andrew Carnegie collection.',
+            es: 'ex. colección Andrew Carnegie.',
+          },
         ],
       },
     ],
@@ -799,7 +837,7 @@ export const slides: Slide[] = [
       {
         id: 'termination',
         label: 'Termination',
-        title: 'A complete face.',
+        title: 'A perfect termination.',
         layers: ['bluecap'],
         callouts: ['termination'],
         notes:
@@ -821,7 +859,33 @@ export const slides: Slide[] = [
         layers: ['bluecap'],
         callouts: ['termination', 'cap', 'body', 'pocket'],
         notes:
-          'Carnegie kept it for the first reason. Aesthetic standing and scientific standing are one act. Then the wave — water, crystallization, the real color.',
+          'Carnegie kept it for the first reason. Aesthetic standing and scientific standing are one act. Hold — the wall is about to do too much.',
+      },
+      {
+        id: 'less',
+        label: 'Less is more',
+        layers: ['bluecap'],
+        callouts: ['termination', 'cap', 'body', 'pocket'],
+        bullets: [
+          'Elbaite, var. rubellite — schorl at the base',
+          'Andrew Carnegie collection',
+          'Uninterrupted growth history',
+          'Na(Li,Al,Fe²⁺)₃Al₆(BO₃)₃Si₆O₁₈(OH)₄',
+          'Schorl → elbaite: early Fe-rich growth gives way to Li-Mn enrichment',
+          'Mn³⁺ chromophore — the pink',
+          'Fe²⁺–Ti⁴⁺ charge transfer — the blue cap',
+          'Tourmaline sculpting its own feedstock of elements as it grows',
+        ],
+        notes:
+          'Look at that. A display specimen does not get better because we laid the science on top of it. Less is more. The crystal is already pleasing. Keeping that simple is more inviting. Now strip it back to what a visitor can actually take.',
+      },
+      {
+        id: 'enough',
+        label: 'Enough',
+        layers: ['bluecap'],
+        callouts: ['cap-trim', 'body-trim', 'pocket-trim', 'carnegie'],
+        notes:
+          'This is enough. Indicolite, rubellite, one pocket, Carnegie. A visitor can take that and still look. Then the wave.',
       },
     ],
   },

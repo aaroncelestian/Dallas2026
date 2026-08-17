@@ -86,6 +86,7 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
   if (slide.quote) lines.push(`“${slide.quote}”`)
   if (slide.meta) lines.push(slide.meta)
   for (const bullet of slide.bullets ?? []) lines.push(`• ${bullet}`)
+  for (const bullet of beat?.bullets ?? []) lines.push(`• ${bullet}`)
   if (beat?.layers && slide.layers) {
     for (const id of beat.layers) {
       const layer = slide.layers.find((item) => item.id === id)
@@ -97,7 +98,7 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
       if (layer?.marks && beat?.callouts?.length) {
         for (const mark of layer.marks) {
           if (!beat.callouts.includes(mark.id)) continue
-          const bits = [mark.title, mark.formula, mark.body].filter(Boolean)
+          const bits = [mark.title, mark.formula, mark.body, mark.es].filter(Boolean)
           if (bits.length) lines.push(bits.join(' '))
         }
       }

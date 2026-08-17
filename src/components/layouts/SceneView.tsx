@@ -274,10 +274,11 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
       {!hasPlate && say && <p className="sr-only">{say}</p>}
       <SpecimenCallouts marks={marks} visible={callouts} active={active} />
       <AnimatePresence mode="wait">
-        {(beat?.kicker || beat?.title || beat?.subtitle) && (
+        {(beat?.kicker || beat?.title || beat?.subtitle || beat?.bullets?.length) && (
           <motion.div
             key={beat?.id ?? 'copy'}
             className={hasPlate ? styles.stageCopy : styles.voidInner}
+            data-facts={beat?.bullets?.length ? '' : undefined}
             initial={reduced ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={reduced ? { opacity: 1 } : { opacity: 0 }}
@@ -290,6 +291,13 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
               </h2>
             )}
             {beat?.subtitle && <p className={`${styles.body} text-muted`}>{beat.subtitle}</p>}
+            {beat?.bullets?.length ? (
+              <ul className={styles.sceneFacts}>
+                {beat.bullets.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>

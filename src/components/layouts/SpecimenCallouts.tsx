@@ -151,6 +151,7 @@ export function SpecimenCallouts({
           <div className={styles.title}>{mark.title}</div>
           {mark.formula && <div className={styles.formula}>{mark.formula}</div>}
           {mark.body && <div className={styles.body}>{mark.body}</div>}
+          {mark.es && <div className={styles.es}>{mark.es}</div>}
         </motion.div>
       ))}
 
