@@ -124,9 +124,9 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
       if (layer?.kind === 'motif' && layer.motif === 'lithium-cycle') {
         const cycle =
           beat?.id === 'brine'
-            ? 'Motif: lithium ride — first-person at the brine, only a short arc ahead'
+            ? 'Motif: lithium ride — first-person at the brine; DNA double helix on the rail (Materials Genome)'
             : beat?.id === 'absorb'
-              ? 'Motif: lithium ride — flying to H₂MnO₄'
+              ? 'Motif: lithium ride — flying to H₂MnO₄; cash the helix as Materials Genome'
               : beat?.id === 'air'
                 ? 'Motif: lithium ride — arriving at CO₂; the wash falls in'
                 : beat?.id === 'product'
@@ -134,7 +134,7 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
                   : beat?.id === 'award'
                     ? 'Motif: lithium ride — holding at Li₂CO₃'
                     : beat?.id === 'recycle'
-                      ? 'Motif: lithium pullback — full loop revealed; dashed CO₂ → brine return; then 4s/rev until the next slide'
+                      ? 'Motif: lithium pullback — full loop and DNA wreath revealed; dashed CO₂ → brine return; then 4s/rev until the next slide'
                       : 'Motif: lithium ride — first-person on the loop'
         lines.push(cycle)
       }

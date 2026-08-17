@@ -11,8 +11,11 @@ type StationId = 'brine' | 'spinel' | 'air' | 'product'
 
 const RING = 4.25
 const STATION_R = 0.175
-const SPIRAL_R = 0.26
-const SPIRAL_COILS = 38
+const DNA_R = 0.5
+const DNA_TURNS = 5
+const DNA_STRAND_R = 0.032
+const DNA_RUNG_R = 0.012
+const DNA_RUNGS_PER_TURN = 8
 const GOLD = '#d4a04a'
 const GOLD_HOT = '#f0c878'
 const CREAM = '#f3eee4'
@@ -94,46 +97,81 @@ class TorusHelixCurve extends THREE.Curve<THREE.Vector3> {
   }
 }
 
-function TrackSpiral() {
-  const geos = useMemo(() => {
-    const segs = 720
-    return [
-      new THREE.TubeGeometry(new TorusHelixCurve(SPIRAL_R, SPIRAL_COILS, 0), segs, 0.014, 6, true),
-      new THREE.TubeGeometry(new TorusHelixCurve(SPIRAL_R, SPIRAL_COILS, Math.PI), segs, 0.01, 6, true),
-    ]
+function helixPoint(t: number, phase: number) {
+  return new TorusHelixCurve(DNA_R, DNA_TURNS, phase).getPoint(t)
+}
+
+function TrackDna() {
+  const { strands, rungs } = useMemo(() => {
+    const segs = 360
+    const strandA = new THREE.TubeGeometry(
+      new TorusHelixCurve(DNA_R, DNA_TURNS, 0),
+      segs,
+      DNA_STRAND_R,
+      8,
+      true,
+    )
+    const strandB = new THREE.TubeGeometry(
+      new TorusHelixCurve(DNA_R, DNA_TURNS, Math.PI),
+      segs,
+      DNA_STRAND_R,
+      8,
+      true,
+    )
+    const count = DNA_TURNS * DNA_RUNGS_PER_TURN
+    const rungs = Array.from({ length: count }, (_, i) => {
+      const t = i / count
+      return new THREE.TubeGeometry(
+        new THREE.LineCurve3(helixPoint(t, 0), helixPoint(t, Math.PI)),
+        4,
+        DNA_RUNG_R,
+        5,
+        false,
+      )
+    })
+    return { strands: [strandA, strandB], rungs }
   }, [])
 
-  useEffect(() => () => {
-    for (const geo of geos) geo.dispose()
-  }, [geos])
+  useEffect(
+    () => () => {
+      for (const geo of strands) geo.dispose()
+      for (const geo of rungs) geo.dispose()
+    },
+    [rungs, strands],
+  )
 
   return (
-    <>
-      <mesh geometry={geos[0]}>
+    <group>
+      <mesh geometry={strands[0]}>
         <meshStandardMaterial
           color={GOLD}
           emissive={GOLD}
-          emissiveIntensity={0.24}
-          roughness={0.42}
-          metalness={0.5}
-          transparent
-          opacity={0.4}
-          depthWrite={false}
+          emissiveIntensity={0.22}
+          roughness={0.38}
+          metalness={0.52}
         />
       </mesh>
-      <mesh geometry={geos[1]}>
+      <mesh geometry={strands[1]}>
         <meshStandardMaterial
           color={CREAM}
           emissive={CREAM}
-          emissiveIntensity={0.08}
-          roughness={0.5}
-          metalness={0.28}
-          transparent
-          opacity={0.22}
-          depthWrite={false}
+          emissiveIntensity={0.12}
+          roughness={0.4}
+          metalness={0.4}
         />
       </mesh>
-    </>
+      {rungs.map((geo, i) => (
+        <mesh key={i} geometry={geo}>
+          <meshStandardMaterial
+            color={GOLD_HOT}
+            emissive={GOLD}
+            emissiveIntensity={0.1}
+            roughness={0.48}
+            metalness={0.35}
+          />
+        </mesh>
+      ))}
+    </group>
   )
 }
 
@@ -444,7 +482,7 @@ function CycleRig({
         />
       </mesh>
 
-      <TrackSpiral />
+      <TrackDna />
 
       <group ref={returnLine} visible={false}>
         <Line

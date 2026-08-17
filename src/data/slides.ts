@@ -332,7 +332,7 @@ export const slides: Slide[] = [
         title: 'Desalination already\nconcentrated the brine.',
         layers: ['cycle'],
         notes:
-          'The plant already did the hard work. Reject brine, sitting there. This is not a new evaporative pond. Not a new pit in the Atacama. The lithium is in a liquid we already make.',
+          'The plant already did the hard work. Reject brine, sitting there. This is not a new evaporative pond. Not a new pit in the Atacama. The lithium is in a liquid we already make. The double helix on the rail is DNA. Materials Genome. Hold it — it pays at the spinel.',
       },
       {
         id: 'absorb',
@@ -341,7 +341,7 @@ export const slides: Slide[] = [
         title: 'The spinel takes\nthe lithium.',
         layers: ['cycle'],
         notes:
-          'H₂MnO₄ — the protonated manganese spinel. Size-selective uptake. Lithium fits. The bigger cations in seawater do not. Watch it move in. We used the property, not the specimen.',
+          'H₂MnO₄ — the protonated manganese spinel. Size-selective uptake. Lithium fits. The bigger cations in seawater do not. Watch it move in. We used the property, not the specimen. That helix is the Materials Genome Project. That is how we made this spinel, and made it better than anything else out there.',
       },
       {
         id: 'air',
