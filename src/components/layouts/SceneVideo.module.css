@@ -204,12 +204,13 @@
 }
 
 .chrome {
-  position: absolute;
+  /* Fixed so title copy (z-index 2 over the stage) can't steal hover */
+  position: fixed;
   left: 12px;
   right: 12px;
   /* Clear Shell STAGE / RESOURCES / NOTES / PRINT row */
   bottom: 72px;
-  z-index: 6;
+  z-index: 40;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -220,14 +221,15 @@
   backdrop-filter: blur(10px);
   opacity: 0;
   transition: opacity 160ms ease;
-  pointer-events: none;
+  /* Keep hit-testing so hover works at this raised position */
+  pointer-events: auto;
 }
 
+.chrome:hover,
 .stage:hover .chrome,
 .stage:focus-within .chrome,
 .stage[data-annotate] .chrome {
   opacity: 1;
-  pointer-events: auto;
 }
 
 .transportBtn {
@@ -247,6 +249,11 @@
 .transportBtn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.transportBtn:hover:not(:disabled),
+.transportBtn:focus-visible:not(:disabled) {
+  background: color-mix(in srgb, #fff 14%, transparent);
 }
 
 .transportBtn[data-on] {
@@ -353,10 +360,10 @@
 }
 
 .panel {
-  position: absolute;
+  position: fixed;
   top: 12px;
   left: 12px;
-  z-index: 7;
+  z-index: 41;
   width: min(320px, calc(100% - 24px));
   padding: 12px 14px;
   background: color-mix(in srgb, #f2efe9 94%, transparent);
