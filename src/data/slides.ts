@@ -980,18 +980,49 @@ export const slides: Slide[] = [
     id: 'regional',
     label: 'Peninsular Ranges',
     chapter: 'exhibition',
-    layout: 'bleed',
-    camera: 'push',
-    kicker: 'Southern California',
-    title: 'Himalaya. Pala.\nStewart Lithia.',
-    image: {
-      src: asset('images/tourmaline.jpg'),
-      alt: 'Tourmaline, Himalaya Mine',
-      fit: 'contain',
-    },
-    yaw: 1,
-    notes:
-      'Peninsular Ranges pegmatites — Himalaya, Tourmaline King/Queen, Pala Chief, Stewart Lithia. NHMLAC’s collection as the largest public gathering of that material assembled to date. Crevoshay as a contemporary extension of specimen-first logic into wearable art. Keep tight. Regional color, not new argument.',
+    layout: 'stage',
+    clearPlate: true,
+    layers: [
+      {
+        id: 'ranges',
+        kind: 'slideshow',
+        fit: 'contain',
+        dwellMs: [12000, 8000],
+        slides: [
+          {
+            src: asset('images/tourmaline.jpg'),
+            alt: 'Tourmaline, Himalaya Mine',
+          },
+          {
+            src: asset('images/morganite-queen.jpg'),
+            alt: 'Morganite, Queen mine, Pala',
+          },
+          {
+            src: asset('images/king-mine.jpg'),
+            alt: 'Tourmaline, King Mine, 2022, ex. Larson',
+          },
+          {
+            src: asset('images/little-three.jpg'),
+            alt: 'Spessartine and schorl, Little Three Mine, Ramona',
+          },
+          {
+            src: asset('images/crevoshay-pendant.jpg'),
+            alt: 'Paula Crevoshay pendant — San Diego tourmaline',
+          },
+        ],
+      },
+    ],
+    scene: [
+      {
+        id: 'mines',
+        label: 'The mines',
+        kicker: 'Southern California',
+        title: 'Himalaya, King, Stewart, more.',
+        layers: ['ranges'],
+        notes:
+          'Peninsular Ranges pegmatites — Himalaya, King, Stewart, then more. The plates walk: Himalaya tourmaline, Morganite Queen, King Mine ex. Larson, Little Three, Crevoshay pendant — wearable, not a ring. NHMLAC’s collection as the largest public gathering of that material assembled to date. Keep tight. Regional color, not new argument.',
+      },
+    ],
   },
   {
     id: 'loans',

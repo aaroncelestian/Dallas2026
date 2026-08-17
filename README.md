@@ -86,7 +86,11 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `blue-wave.jpg` | Blue Wave · water and crystallization |
 | `stibnite.jpg` | Preservation |
 | `fluorite.jpg` | Provenance |
-| `tourmaline.jpg` | Peninsular Ranges |
+| `tourmaline.jpg` | Peninsular Ranges · Himalaya |
+| `morganite-queen.jpg` | Peninsular Ranges · Morganite Queen |
+| `king-mine.jpg` | Peninsular Ranges · King Mine |
+| `little-three.jpg` | Peninsular Ranges · Little Three |
+| `crevoshay-pendant.jpg` | Peninsular Ranges · Crevoshay pendant |
 | `unearthed-gallery.jpg` | Loans |
 | `prep-teapot.jpg` | Prep mode 1 |
 | `prep-chrysanthemum.jpg` | Prep mode 2 |
