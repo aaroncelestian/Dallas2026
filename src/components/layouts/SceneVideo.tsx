@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { ScaleBar, VideoHold, VideoMark, VideoMarkKind } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
@@ -629,7 +630,6 @@ export function SceneVideo({
       ref={stageRef}
       className={styles.stage}
       data-annotate={annotate || undefined}
-      data-idle={active ? undefined : ''}
       onClick={(e) => {
         if (!active) return
         if ((e.target as HTMLElement).closest(`.${styles.chrome}`)) return
@@ -695,170 +695,181 @@ export function SceneVideo({
         </AnimatePresence>
       </div>
 
-      <div
-        className={styles.chrome}
-        onClick={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <button
-          type="button"
-          className={styles.transportBtn}
-          onClick={togglePlay}
-          aria-label={playing ? 'Pause' : 'Play'}
-          title="Play / pause (K)"
-        >
-          {playing ? 'Pause' : 'Play'}
-        </button>
-
-        <div className={styles.scrubWrap}>
-          <input
-            className={styles.scrub}
-            type="range"
-            min={0}
-            max={Math.max(dur, 0.01)}
-            step={0.01}
-            value={Math.min(t, dur || t)}
-            aria-label="Scrub timeline"
-            onChange={(e) => scrubTo(Number(e.target.value))}
-          />
-          <div className={styles.holdTicks} aria-hidden>
-            {stops.map((h, i) => (
-              <button
-                key={`${h.at}-${i}`}
-                type="button"
-                className={styles.holdTick}
-                data-active={(parked && step === i) || undefined}
-                style={{ left: `${dur ? (h.at / dur) * 100 : 0}%` }}
-                title={
-                  annotate
-                    ? `Hold ${i + 1} · ${fmt(h.at)} — click to jump, Shift+click to delete`
-                    : `Hold ${i + 1} · ${fmt(h.at)}`
-                }
-                onClick={(e) => {
-                  if (annotate && e.shiftKey) {
-                    e.preventDefault()
-                    removeHold(i)
-                    return
-                  }
-                  scrubTo(h.at)
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        <span className={styles.time}>
-          {fmt(t)} / {fmt(dur)}
-        </span>
-
-        <button
-          type="button"
-          className={styles.transportBtn}
-          data-on={annotate || undefined}
-          onClick={() => setAnnotate((v) => !v)}
-          title="Annotate callouts (A)"
-        >
-          Annotate
-        </button>
-
-        {annotate && (
+      {active &&
+        createPortal(
           <>
-            <label className={styles.kindPick}>
-              <span>Mark</span>
-              <select
-                value={kindDraft}
-                onChange={(e) => setKindDraft(e.target.value as VideoMarkKind)}
-              >
-                <option value="mineral">Mineral</option>
-                <option value="biomass">Biomass</option>
-                <option value="onion">Onion</option>
-              </select>
-            </label>
-            <button type="button" className={styles.transportBtn} onClick={addHoldHere}>
-              Hold here
-            </button>
-            <button
-              type="button"
-              className={styles.transportBtn}
-              disabled={!parked && stops.every((h) => Math.abs(h.at - t) > NEAR)}
-              onClick={() => removeHold()}
-              title="Delete current pause (Delete / Backspace, or Shift+click a tick)"
+            <div
+              className={styles.chrome}
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
             >
-              Remove hold
-            </button>
-            <button type="button" className={styles.transportBtn} onClick={() => void copyJson()}>
-              {copied ? 'Copied' : 'Copy JSON'}
-            </button>
-          </>
-        )}
-      </div>
-
-      {annotate && (
-        <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
-          <p className={styles.panelHint}>
-            Click the CT frame to place a circle. Scrub, then <strong>Hold here</strong> for a pause.
-            Delete a pause with <strong>Remove hold</strong>, <strong>Delete</strong>, or{' '}
-            <strong>Shift+click</strong> an orange tick. Then <strong>Copy JSON</strong> into the{' '}
-            <code>holds</code> array in <code>slides.ts</code> (stones → ct layer) to keep it.
-          </p>
-          {selected ? (
-            <div className={styles.form}>
-              <label>
-                Title
-                <input
-                  value={selected.title}
-                  onChange={(e) => patchMark(selected.id, { title: e.target.value })}
-                />
-              </label>
-              <label>
-                Body
-                <input
-                  value={selected.body ?? ''}
-                  onChange={(e) => patchMark(selected.id, { body: e.target.value })}
-                />
-              </label>
-              <div className={styles.formRow}>
-                <label>
-                  Kind
-                  <select
-                    value={selected.kind}
-                    onChange={(e) =>
-                      patchMark(selected.id, { kind: e.target.value as VideoMarkKind })
-                    }
-                  >
-                    <option value="mineral">Mineral</option>
-                    <option value="biomass">Biomass</option>
-                    <option value="onion">Onion</option>
-                  </select>
-                </label>
-                <label>
-                  Side
-                  <select
-                    value={selected.side ?? 'right'}
-                    onChange={(e) =>
-                      patchMark(selected.id, {
-                        side: e.target.value as 'left' | 'right',
-                      })
-                    }
-                  >
-                    <option value="left">Left</option>
-                    <option value="right">Right</option>
-                  </select>
-                </label>
-              </div>
               <button
                 type="button"
                 className={styles.transportBtn}
-                onClick={() => deleteMark(selected.id)}
+                onClick={togglePlay}
+                aria-label={playing ? 'Pause' : 'Play'}
+                title="Play / pause (K)"
               >
-                Delete mark
+                {playing ? 'Pause' : 'Play'}
               </button>
+
+              <div className={styles.scrubWrap}>
+                <input
+                  className={styles.scrub}
+                  type="range"
+                  min={0}
+                  max={Math.max(dur, 0.01)}
+                  step={0.01}
+                  value={Math.min(t, dur || t)}
+                  aria-label="Scrub timeline"
+                  onChange={(e) => scrubTo(Number(e.target.value))}
+                />
+                <div className={styles.holdTicks} aria-hidden>
+                  {stops.map((h, i) => (
+                    <button
+                      key={`${h.at}-${i}`}
+                      type="button"
+                      className={styles.holdTick}
+                      data-active={(parked && step === i) || undefined}
+                      style={{ left: `${dur ? (h.at / dur) * 100 : 0}%` }}
+                      title={
+                        annotate
+                          ? `Hold ${i + 1} · ${fmt(h.at)} — click to jump, Shift+click to delete`
+                          : `Hold ${i + 1} · ${fmt(h.at)}`
+                      }
+                      onClick={(e) => {
+                        if (annotate && e.shiftKey) {
+                          e.preventDefault()
+                          removeHold(i)
+                          return
+                        }
+                        scrubTo(h.at)
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <span className={styles.time}>
+                {fmt(t)} / {fmt(dur)}
+              </span>
+
+              <button
+                type="button"
+                className={styles.transportBtn}
+                data-on={annotate || undefined}
+                onClick={() => setAnnotate((v) => !v)}
+                title="Annotate callouts (A)"
+              >
+                Annotate
+              </button>
+
+              {annotate && (
+                <>
+                  <label className={styles.kindPick}>
+                    <span>Mark</span>
+                    <select
+                      value={kindDraft}
+                      onChange={(e) => setKindDraft(e.target.value as VideoMarkKind)}
+                    >
+                      <option value="mineral">Mineral</option>
+                      <option value="biomass">Biomass</option>
+                      <option value="onion">Onion</option>
+                    </select>
+                  </label>
+                  <button type="button" className={styles.transportBtn} onClick={addHoldHere}>
+                    Hold here
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.transportBtn}
+                    disabled={!parked && stops.every((h) => Math.abs(h.at - t) > NEAR)}
+                    onClick={() => removeHold()}
+                    title="Delete current pause (Delete / Backspace, or Shift+click a tick)"
+                  >
+                    Remove hold
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.transportBtn}
+                    onClick={() => void copyJson()}
+                  >
+                    {copied ? 'Copied' : 'Copy JSON'}
+                  </button>
+                </>
+              )}
             </div>
-          ) : (
-            <p className={styles.panelEmpty}>No mark selected.</p>
-          )}
-        </div>
-      )}
+
+            {annotate && (
+              <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
+                <p className={styles.panelHint}>
+                  Click the CT frame to place a circle. Scrub, then <strong>Hold here</strong> for a
+                  pause. Delete a pause with <strong>Remove hold</strong>, <strong>Delete</strong>,
+                  or <strong>Shift+click</strong> an orange tick. Then <strong>Copy JSON</strong>{' '}
+                  into the <code>holds</code> array in <code>slides.ts</code> (stones → ct layer) to
+                  keep it.
+                </p>
+                {selected ? (
+                  <div className={styles.form}>
+                    <label>
+                      Title
+                      <input
+                        value={selected.title}
+                        onChange={(e) => patchMark(selected.id, { title: e.target.value })}
+                      />
+                    </label>
+                    <label>
+                      Body
+                      <input
+                        value={selected.body ?? ''}
+                        onChange={(e) => patchMark(selected.id, { body: e.target.value })}
+                      />
+                    </label>
+                    <div className={styles.formRow}>
+                      <label>
+                        Kind
+                        <select
+                          value={selected.kind}
+                          onChange={(e) =>
+                            patchMark(selected.id, { kind: e.target.value as VideoMarkKind })
+                          }
+                        >
+                          <option value="mineral">Mineral</option>
+                          <option value="biomass">Biomass</option>
+                          <option value="onion">Onion</option>
+                        </select>
+                      </label>
+                      <label>
+                        Side
+                        <select
+                          value={selected.side ?? 'right'}
+                          onChange={(e) =>
+                            patchMark(selected.id, {
+                              side: e.target.value as 'left' | 'right',
+                            })
+                          }
+                        >
+                          <option value="left">Left</option>
+                          <option value="right">Right</option>
+                        </select>
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.transportBtn}
+                      onClick={() => deleteMark(selected.id)}
+                    >
+                      Delete mark
+                    </button>
+                  </div>
+                ) : (
+                  <p className={styles.panelEmpty}>No mark selected.</p>
+                )}
+              </div>
+            )}
+          </>,
+          document.body,
+        )}
     </div>
   )
 }

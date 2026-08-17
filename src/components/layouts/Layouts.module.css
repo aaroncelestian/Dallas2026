@@ -182,6 +182,11 @@
   margin-bottom: calc(var(--pad-y) + 16px);
 }
 
+/* Title sits above the CT stage; don't steal scrubber / play clicks */
+.scene[data-callouts] .stageCopy {
+  pointer-events: none;
+}
+
 .scene[data-callouts] .stageScrim,
 .scene[data-camera='pan-bounce'] .stageScrim {
   background:
