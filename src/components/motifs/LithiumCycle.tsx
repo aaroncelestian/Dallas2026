@@ -11,10 +11,10 @@ type StationId = 'brine' | 'spinel' | 'air' | 'product'
 
 const RING = 4.25
 const STATION_R = 0.175
-const DNA_R = 0.5
+const DNA_R = 0.25
 const DNA_TURNS = 10
 const DNA_STRAND_R = 0.012
-const DNA_PHASE = THREE.MathUtils.degToRad(20)
+const DNA_PHASE = THREE.MathUtils.degToRad(40)
 const GOLD = '#d4a04a'
 const GOLD_HOT = '#f0c878'
 const CREAM = '#f3eee4'
