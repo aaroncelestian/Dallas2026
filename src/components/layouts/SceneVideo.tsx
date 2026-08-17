@@ -32,10 +32,30 @@ function stackTops(items: Array<{ id: string; preferred: number; height: number 
   return tops
 }
 
+const KIND_META: Record<VideoMarkKind, { label: string; title: string; color: string }> = {
+  mineral: { label: 'Strong layering', title: 'Strong layering.', color: 'var(--video-mineral)' },
+  biomass: { label: 'Weak / no layering', title: 'Weak / no layering.', color: 'var(--video-biomass)' },
+  onion: { label: 'Onion', title: 'Onion structure.', color: 'var(--color-accent-600)' },
+}
+
+const GENERIC_TITLES = new Set<string>([
+  ...Object.values(KIND_META).map((k) => k.title),
+  'Mineral.',
+  'Biomass.',
+])
+
 function markColor(kind: VideoMark['kind']) {
-  if (kind === 'mineral') return 'var(--video-mineral)'
-  if (kind === 'biomass') return 'var(--video-biomass)'
-  return 'var(--color-accent-600)'
+  return KIND_META[kind].color
+}
+
+function patchForKind(kind: VideoMarkKind, current: VideoMark): Partial<VideoMark> {
+  return {
+    kind,
+    title: GENERIC_TITLES.has(current.title) ? KIND_META[kind].title : current.title,
+    rx: kind === 'onion' ? (current.rx ?? 0.12) : undefined,
+    ry: kind === 'onion' ? (current.ry ?? 0.135) : undefined,
+    rings: kind === 'onion' ? (current.rings ?? 4) : undefined,
+  }
 }
 
 function fmt(t: number) {
@@ -133,26 +153,29 @@ function SceneVideoOverlay({
                 )
               })}
               <motion.circle
+                key={`${mark.id}-orb-${mark.kind}`}
                 cx={cx}
                 cy={cy}
                 r={mark.kind === 'onion' ? 4 : selected ? 7 : 5.5}
-                fill={color}
                 className={styles.orb}
                 initial={{ opacity: 0, scale: 0.4 }}
-                animate={{ opacity: 1, scale: 1 }}
+                animate={{ opacity: 1, scale: 1, fill: color }}
                 transition={{ duration: reduced ? 0 : 0.4 }}
-                style={selected ? { stroke: '#fff', strokeWidth: 2 } : undefined}
+                style={{
+                  color,
+                  ...(selected ? { stroke: '#fff', strokeWidth: 2 } : undefined),
+                }}
                 onClick={(e) => {
                   e.stopPropagation()
                   onSelect?.(mark.id)
                 }}
               />
               <motion.path
+                key={`${mark.id}-line-${mark.kind}`}
                 d={`M ${cx} ${cy} C ${midX} ${cy}, ${midX} ${labelY}, ${textX} ${labelY}`}
                 className={styles.line}
-                style={{ stroke: color }}
                 initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.9 }}
+                animate={{ pathLength: 1, opacity: 0.9, stroke: color }}
                 transition={{
                   pathLength: { duration: reduced ? 0 : 0.7, ease: [0.4, 0, 0.2, 1] },
                   opacity: { duration: reduced ? 0 : 0.3 },
@@ -228,7 +251,6 @@ export function SceneVideo({
   const [copied, setCopied] = useState(false)
   const [box, setBox] = useState<Box>({ x: 0, y: 0, w: 0, h: 0 })
   const [videoSize, setVideoSize] = useState({ w: VIDEO_W, h: VIDEO_H })
-  const [kindDraft, setKindDraft] = useState<VideoMarkKind>('mineral')
   const resumeGateRef = useRef(0)
   const live = useRef({ step: 0, parked: false, annotate: false, last: 0 })
   live.current = { step, parked, annotate, last }
@@ -582,16 +604,10 @@ export function SceneVideo({
         id,
         x: Math.round(x * 1000) / 1000,
         y: Math.round(y * 1000) / 1000,
-        kind: kindDraft,
+        kind: 'mineral',
         side: x < 0.5 ? 'left' : 'right',
-        title:
-          kindDraft === 'onion'
-            ? 'Onion structure.'
-            : kindDraft === 'mineral'
-              ? 'Strong layering.'
-              : 'Weak / no layering.',
+        title: KIND_META.mineral.title,
         body: '',
-        ...(kindDraft === 'onion' ? { rx: 0.12, ry: 0.135, rings: 4 } : {}),
       }
       const marks = [...(next[hi].marks ?? []), mark]
       next[hi] = { ...next[hi], marks }
@@ -805,19 +821,13 @@ export function SceneVideo({
 
             {annotate && (
               <>
-                <label className={styles.kindPick}>
-                  <span>Mark</span>
-                  <select
-                    value={kindDraft}
-                    onChange={(e) => setKindDraft(e.target.value as VideoMarkKind)}
-                  >
-                    <option value="mineral">Strong layering</option>
-                    <option value="biomass">Weak / no layering</option>
-                    <option value="onion">Onion</option>
-                  </select>
-                </label>
-                <button type="button" className={styles.transportBtn} onClick={addHoldHere}>
-                  Hold here
+                <button
+                  type="button"
+                  className={styles.transportBtn}
+                  onClick={addHoldHere}
+                  title="Add a pause at the playhead"
+                >
+                  HOLD +
                 </button>
                 <button
                   type="button"
@@ -826,7 +836,7 @@ export function SceneVideo({
                   onClick={() => removeHold()}
                   title="Delete current pause (Delete / Backspace, or Shift+click a tick)"
                 >
-                  Remove hold
+                  HOLD -
                 </button>
                 <button
                   type="button"
@@ -846,9 +856,10 @@ export function SceneVideo({
         createPortal(
           <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
             <p className={styles.panelHint}>
-              Click the CT frame to place a circle. Scrub, then <strong>Hold here</strong> for a
-              pause. Delete a pause with <strong>Remove hold</strong>, <strong>Delete</strong>, or{' '}
-              <strong>Shift+click</strong> an orange tick. Then <strong>Copy JSON</strong> into the{' '}
+              Click the CT frame to place a circle. Scrub, then <strong>HOLD +</strong> for a
+              pause. Delete a pause with <strong>HOLD -</strong>, <strong>Delete</strong>, or{' '}
+              <strong>Shift+click</strong> an orange tick.               Change a mark's type in the form — the
+              color updates on the frame. Then <strong>Copy JSON</strong> into the{' '}
               <code>holds</code> array in <code>slides.ts</code> (stones → ct layer) to keep it.
             </p>
             {selected ? (
@@ -867,52 +878,40 @@ export function SceneVideo({
                     onChange={(e) => patchMark(selected.id, { body: e.target.value })}
                   />
                 </label>
-                <div className={styles.formRow}>
-                  <label>
-                    Kind
-                    <select
-                      value={selected.kind}
-                      onChange={(e) => {
-                        const kind = e.target.value as VideoMarkKind
-                        patchMark(selected.id, {
-                          kind,
-                          ...(kind === 'onion'
-                            ? {
-                                rx: selected.rx ?? 0.12,
-                                ry: selected.ry ?? 0.135,
-                                rings: selected.rings ?? 4,
-                                title:
-                                  selected.title === 'Strong layering.' ||
-                                  selected.title === 'Weak / no layering.' ||
-                                  selected.title === 'Mineral.' ||
-                                  selected.title === 'Biomass.'
-                                    ? 'Onion structure.'
-                                    : selected.title,
-                              }
-                            : {}),
-                        })
-                      }}
-                    >
-                      <option value="mineral">Strong layering</option>
-                      <option value="biomass">Weak / no layering</option>
-                      <option value="onion">Onion</option>
-                    </select>
-                  </label>
-                  <label>
-                    Side
-                    <select
-                      value={selected.side ?? 'right'}
-                      onChange={(e) =>
-                        patchMark(selected.id, {
-                          side: e.target.value as 'left' | 'right',
-                        })
-                      }
-                    >
-                      <option value="left">Left</option>
-                      <option value="right">Right</option>
-                    </select>
-                  </label>
+                <div className={styles.kindField}>
+                  <span>Kind</span>
+                  <div className={styles.kindBtns} role="radiogroup" aria-label="Mark type">
+                    {(Object.keys(KIND_META) as VideoMarkKind[]).map((kind) => (
+                      <button
+                        key={kind}
+                        type="button"
+                        role="radio"
+                        className={styles.kindBtn}
+                        data-kind={kind}
+                        aria-checked={selected.kind === kind}
+                        data-on={selected.kind === kind || undefined}
+                        onClick={() => patchMark(selected.id, patchForKind(kind, selected))}
+                      >
+                        <span className={styles.kindSwatch} aria-hidden />
+                        {KIND_META[kind].label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+                <label>
+                  Side
+                  <select
+                    value={selected.side ?? 'right'}
+                    onChange={(e) =>
+                      patchMark(selected.id, {
+                        side: e.target.value as 'left' | 'right',
+                      })
+                    }
+                  >
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                  </select>
+                </label>
                 {selected.kind === 'onion' && (
                   <div className={styles.onionSize}>
                     <p className={styles.onionSizeHead}>Onion size</p>

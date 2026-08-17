@@ -51,6 +51,7 @@
 }
 
 .orb {
+  fill: currentColor;
   stroke: color-mix(in srgb, #fff 35%, transparent);
   stroke-width: 1;
   filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 55%, transparent));
@@ -96,6 +97,10 @@
 
 .label[data-kind='biomass'] .title {
   color: color-mix(in srgb, var(--video-biomass) 72%, var(--color-text));
+}
+
+.label[data-kind='onion'] .title {
+  color: color-mix(in srgb, var(--color-accent-600) 78%, var(--color-text));
 }
 
 .body {
@@ -330,18 +335,66 @@
   min-width: 6.5ch;
 }
 
-.kindPick {
+.kindBtns {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kindField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: color-mix(in srgb, #fff 70%, transparent);
 }
 
-.kindPick select,
+.kindBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  text-align: left;
+  color: #1c1a17;
+  background: #f2efe9;
+  border: 1px solid color-mix(in srgb, #1c1a17 22%, transparent);
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.kindBtn[data-on] {
+  border-color: color-mix(in srgb, #1c1a17 55%, transparent);
+  background: color-mix(in srgb, #fff 70%, #f2efe9);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #1c1a17 12%, transparent);
+}
+
+.kindSwatch {
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px color-mix(in srgb, #1c1a17 16%, transparent);
+}
+
+.kindBtn[data-kind='mineral'] .kindSwatch {
+  background: var(--video-mineral);
+}
+
+.kindBtn[data-kind='biomass'] .kindSwatch {
+  background: var(--video-biomass);
+}
+
+.kindBtn[data-kind='onion'] .kindSwatch {
+  background: var(--color-accent-600);
+}
+
 .form select,
 .form input[type='text'],
 .form input:not([type]),
@@ -385,6 +438,8 @@
 }
 
 .panel {
+  --video-mineral: #4aa8d8;
+  --video-biomass: #e24b3a;
   position: fixed;
   top: 12px;
   left: 12px;
