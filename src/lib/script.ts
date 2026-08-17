@@ -126,7 +126,7 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
           beat?.id === 'brine'
             ? 'Motif: lithium ride — first-person at the brine; DNA double helix on the rail (Materials Genome)'
             : beat?.id === 'absorb'
-              ? 'Motif: lithium ride — flying to H₂MnO₄; cash the helix as Materials Genome'
+              ? 'Motif: lithium ride — flying to HMn₂O₄; cash the helix as Materials Genome'
               : beat?.id === 'air'
                 ? 'Motif: lithium ride — arriving at CO₂; the wash falls in'
                 : beat?.id === 'product'
