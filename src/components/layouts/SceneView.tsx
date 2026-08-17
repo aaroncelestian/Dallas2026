@@ -214,7 +214,13 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
       </div>
       {hasPlate && <div className={styles.stageScrim} aria-hidden />}
       {!hasPlate && say && <p className="sr-only">{say}</p>}
-      <SpecimenCallouts marks={marks} visible={callouts} active={active} />
+      <SpecimenCallouts
+        marks={marks}
+        visible={callouts}
+        active={active}
+        delay={beat?.calloutDelay ?? 0}
+        fade={beat?.calloutFade}
+      />
       <AnimatePresence mode="wait">
         {(beat?.kicker || beat?.title || beat?.subtitle || beat?.bullets?.length) && (
           <motion.div

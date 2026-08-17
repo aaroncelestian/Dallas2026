@@ -65,10 +65,14 @@ export function SpecimenCallouts({
   marks,
   visible,
   active,
+  delay: hold = 0,
+  fade = 0.4,
 }: {
   marks: SpecimenCallout[]
   visible: string[]
   active: boolean
+  delay?: number
+  fade?: number
 }) {
   const reduced = usePrefersReducedMotion()
   const rootRef = useRef<HTMLDivElement>(null)
@@ -187,7 +191,12 @@ export function SpecimenCallouts({
           const mark = shown.find((item) => item.id === p.id)
           const dumped = mark ? isDump(mark) : false
           const order = mark ? shown.filter(isDump).findIndex((item) => item.id === p.id) : 0
-          const delay = reduced ? 0 : dumped ? 0.06 + Math.max(0, order) * 0.11 : 0
+          const calm = shown.findIndex((item) => item.id === p.id)
+          const slow = !reduced && !dumped && fade > 0.5
+          const wait =
+            reduced ? 0 : hold + (dumped ? 0.06 + Math.max(0, order) * 0.11 : slow ? Math.max(0, calm) * 0.35 : 0)
+          const fadeIn = reduced ? 0 : dumped ? 0.35 : fade
+          const ease = [0.22, 1, 0.36, 1] as const
           return (
             <g key={p.id}>
               <motion.circle
@@ -195,9 +204,9 @@ export function SpecimenCallouts({
                 cy={p.orbY}
                 r={3.5}
                 className={styles.tick}
-                initial={false}
+                initial={hold ? { opacity: 0 } : false}
                 animate={{ opacity: active ? 1 : 0 }}
-                transition={{ duration: reduced ? 0 : 0.35, delay }}
+                transition={{ duration: fadeIn, delay: wait, ease }}
               />
               <motion.path
                 d={curve(p)}
@@ -205,8 +214,8 @@ export function SpecimenCallouts({
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: active ? 0.9 : 0 }}
                 transition={{
-                  pathLength: { duration: reduced ? 0 : 0.7, delay, ease: [0.4, 0, 0.2, 1] },
-                  opacity: { duration: reduced ? 0 : 0.3, delay },
+                  pathLength: { duration: reduced ? 0 : Math.max(0.7, fadeIn), delay: wait, ease },
+                  opacity: { duration: fadeIn, delay: wait, ease },
                 }}
               />
             </g>
@@ -216,7 +225,9 @@ export function SpecimenCallouts({
 
       {shown.map((mark, i) => {
         const dumped = isDump(mark)
-        const delay = reduced ? 0 : dumped ? 0.06 + dump++ * 0.11 : 0.08
+        const slow = !reduced && !dumped && fade > 0.5
+        const wait = reduced ? 0 : hold + (dumped ? 0.06 + dump++ * 0.11 : slow ? i * 0.35 : 0.08)
+        const fadeIn = reduced ? 0 : dumped ? 0.4 : fade
         return (
           <motion.div
             key={mark.id}
@@ -233,9 +244,9 @@ export function SpecimenCallouts({
               ['--tilt' as string]: `${mark.tilt ?? 0}deg`,
               ['--inset' as string]: `${mark.inset ?? 0}rem`,
             }}
-            initial={dumped ? { opacity: 0 } : false}
+            initial={dumped || hold ? { opacity: 0 } : false}
             animate={{ opacity: active ? 1 : 0 }}
-            transition={{ duration: reduced ? 0 : 0.4, delay }}
+            transition={{ duration: fadeIn, delay: wait, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className={styles.title}>{mark.title}</div>
             {mark.formula && <div className={styles.formula}>{mark.formula}</div>}
