@@ -46,7 +46,7 @@ const STATIONS: { id: StationId; html: ReactNode; angle: number; from: number }[
   { id: 'product', html: <>Li<sub>2</sub>CO<sub>3</sub></>, angle: 90, from: 3 },
 ]
 
-const WIDE_POS = new THREE.Vector3(6.4, 5.6, 6.9)
+const WIDE_POS = new THREE.Vector3(5.6, 3.35, 10.4)
 const WIDE_LOOK = new THREE.Vector3(0, 0, 0)
 const RIDE_FOG: [number, number] = [0.85, 3.35]
 const TURN_FOG: [number, number] = [1.05, 5.8]
@@ -395,7 +395,7 @@ function CycleRig({
       fullRing.current.visible = true
     }
     const persp = camera as THREE.PerspectiveCamera
-    persp.fov = THREE.MathUtils.lerp(60, 40, easeOut(a.pull))
+    persp.fov = THREE.MathUtils.lerp(60, 44, easeOut(a.pull))
     persp.near = 0.12
     persp.updateProjectionMatrix()
 
