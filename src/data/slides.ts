@@ -189,7 +189,7 @@ export const slides: Slide[] = [
     chapter: 'open',
     layout: 'void',
     camera: 'drift',
-    title: 'Why keep a mineral\nno one yet knows\nhow to use?',
+    title: 'Every acquisition is a bet\nyou can’t price yet.',
     exitHold: 1,
     enterBlack: true,
     copySnap: true,
@@ -291,7 +291,7 @@ export const slides: Slide[] = [
     chapter: 'research',
     layout: 'divider',
     ghostNum: '01',
-    title: 'Research as\nunplanned infrastructure',
+    title: 'Acquired for one reason.\nPaid off for another.',
     notes:
       'A handful of specimens. Centuries, in aggregate, of waiting. Each acquired for a reason that had nothing to do with its eventual payoff — and one recurring signature that shows up in more of them than you’d expect.',
   },
@@ -432,8 +432,9 @@ export const slides: Slide[] = [
       },
       {
         id: 'lead',
-        label: 'Therapeutic lead',
-        title: 'Then a\ntherapeutic lead.',
+        label: 'Design template',
+        title: 'Rowleyite · Design template',
+        subtitle: 'The channel became the blueprint, not the drug.',
         layers: ['voids'],
         guests: true,
         notes:
@@ -700,10 +701,10 @@ export const slides: Slide[] = [
       {
         id: 'what-a-mineral-holds',
         label: 'What a mineral holds',
-        title: 'A Picasso is a story.',
-        subtitle: 'So is a mineral.',
+        title: 'Every specimen is a record.',
+        subtitle: 'Beauty is one way to read it.',
         notes:
-          'Any real work of art is never just an object to look at — it’s a story, about a place and time, or about what was happening inside the person who made it. A mineral holds a story too. Not a metaphor. Literal information: how it formed, when, what changed around it while it grew. Beauty is one way to read that story. It was never the only one.',
+          'Any real work of art is never just an object to look at — it’s a story, about a place and time, or about what was happening inside the person who made it. A specimen holds a story too. Not a metaphor. Literal information: how it formed, when, what changed around it while it grew. Beauty is one way to read that story. It was never the only one.',
       },
     ],
   },
