@@ -629,6 +629,7 @@ export function SceneVideo({
       ref={stageRef}
       className={styles.stage}
       data-annotate={annotate || undefined}
+      data-idle={active ? undefined : ''}
       onClick={(e) => {
         if (!active) return
         if ((e.target as HTMLElement).closest(`.${styles.chrome}`)) return
