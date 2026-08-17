@@ -43,12 +43,20 @@
   text-align: right;
 }
 
-.label[data-free] {
-  right: auto;
+.label[data-dump] {
   max-width: min(24ch, 22vw);
-  text-align: left;
-  transform: translate(-50%, -50%) rotate(var(--tilt, 0deg));
-  transform-origin: center;
+}
+
+.label[data-dump][data-side='right'] {
+  right: calc(var(--pad-x) + var(--inset, 0px));
+  transform: rotate(var(--tilt, 0deg));
+  transform-origin: left center;
+}
+
+.label[data-dump][data-side='left'] {
+  left: calc(var(--pad-x) + var(--inset, 0px));
+  transform: rotate(var(--tilt, 0deg));
+  transform-origin: right center;
 }
 
 .title {

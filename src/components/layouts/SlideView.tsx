@@ -122,6 +122,7 @@ export function SlideView({
         facts={slide.bullets}
         focus={slide.image?.focus}
         detailSrc={slide.image?.detail}
+        detailFocus={slide.image?.detailFocus}
         marks={slide.image?.marks}
       />
     )

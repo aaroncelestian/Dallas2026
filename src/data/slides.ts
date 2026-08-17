@@ -100,11 +100,12 @@ export interface SpecimenCallout {
   body?: string
   /** Smaller Spanish line under the English label. */
   es?: string
-  /** Label position on the plate (0–1). Skips edge stacking. */
-  lx?: number
+  /** Vertical label position on the plate (0–1). Skips edge stacking. */
   ly?: number
   /** Degrees. For the overload beat. */
   tilt?: number
+  /** Extra gutter inset toward the specimen, in rem. */
+  inset?: number
 }
 
 export interface SceneBeat {
@@ -153,8 +154,10 @@ export interface Slide {
     fit?: 'cover' | 'contain'
     /** Normalized crop the impact hold should fill. */
     focus?: { x: number; y: number; w: number; h: number }
-    /** High-res plate of `focus` — used for the zoomed-in hold, then faded as the full image pulls back. */
+    /** High-res plate used for the zoomed-in hold, then faded as the full image pulls back. */
     detail?: string
+    /** Where `detail` sits on the full image. Defaults to `focus`. */
+    detailFocus?: { x: number; y: number; w: number; h: number }}
     /** Specimen callouts, normalized to the full image. */
     marks?: StoneMark[]
   }
@@ -272,7 +275,8 @@ export const slides: Slide[] = [
       alt: 'Central doorway of the Borghese-Windsor Cabinet',
       fit: 'contain',
       focus: { x: 0.347876, y: 0.427042, w: 0.342135, h: 0.176953 },
-      detail: asset('images/cabinet-doorway.jpg'),
+      detail: asset('images/cabinet-doorway.webp'),
+      detailFocus: { x: 0.140009, y: 0.174991, w: 0.719983, h: 0.519979 },
       marks: [
         {
           label: 'Agate',
@@ -950,9 +954,10 @@ export const slides: Slide[] = [
             id: 'dump-elbaite',
             x: 0.338,
             y: 0.52,
-            lx: 0.24,
-            ly: 0.58,
-            tilt: -6,
+            side: 'left',
+            ly: 0.64,
+            tilt: -5,
+            inset: 0.4,
             title: 'Elbaite, var. rubellite.',
             body: 'Schorl at the base.',
           },
@@ -960,17 +965,18 @@ export const slides: Slide[] = [
             id: 'dump-carnegie',
             x: 0.42,
             y: 0.64,
-            lx: 0.4,
-            ly: 0.7,
+            side: 'left',
+            ly: 0.8,
             tilt: 3,
+            inset: 1.8,
             title: 'Andrew Carnegie collection.',
           },
           {
             id: 'dump-growth',
             x: 0.36,
             y: 0.198,
-            lx: 0.22,
-            ly: 0.12,
+            side: 'left',
+            ly: 0.1,
             tilt: -4,
             title: 'Uninterrupted growth history.',
           },
@@ -978,9 +984,10 @@ export const slides: Slide[] = [
             id: 'dump-formula',
             x: 0.35,
             y: 0.3,
-            lx: 0.5,
-            ly: 0.28,
+            side: 'right',
+            ly: 0.34,
             tilt: 2,
+            inset: 0.9,
             title: 'Elbaite.',
             formula: 'Na(Li,Al,Fe²⁺)₃Al₆(BO₃)₃Si₆O₁₈(OH)₄',
           },
@@ -988,9 +995,10 @@ export const slides: Slide[] = [
             id: 'dump-schorl',
             x: 0.332,
             y: 0.48,
-            lx: 0.2,
-            ly: 0.42,
+            side: 'left',
+            ly: 0.46,
             tilt: 5,
+            inset: 2.2,
             title: 'Schorl → elbaite.',
             body: 'Early Fe-rich growth gives way to Li-Mn enrichment.',
           },
@@ -998,9 +1006,10 @@ export const slides: Slide[] = [
             id: 'dump-mn',
             x: 0.344,
             y: 0.38,
-            lx: 0.46,
-            ly: 0.44,
+            side: 'right',
+            ly: 0.5,
             tilt: -3,
+            inset: 2.4,
             title: 'Mn³⁺ chromophore.',
             body: 'The pink.',
           },
@@ -1008,9 +1017,10 @@ export const slides: Slide[] = [
             id: 'dump-fe',
             x: 0.36,
             y: 0.218,
-            lx: 0.52,
-            ly: 0.16,
+            side: 'right',
+            ly: 0.12,
             tilt: 4,
+            inset: 0.3,
             title: 'Fe²⁺–Ti⁴⁺ charge transfer.',
             body: 'The blue cap.',
           },
@@ -1018,9 +1028,10 @@ export const slides: Slide[] = [
             id: 'dump-feedstock',
             x: 0.38,
             y: 0.36,
-            lx: 0.56,
-            ly: 0.56,
+            side: 'right',
+            ly: 0.68,
             tilt: -5,
+            inset: 1.5,
             title: 'Tourmaline sculpting its own feedstock.',
             body: 'Of elements as it grows.',
           },

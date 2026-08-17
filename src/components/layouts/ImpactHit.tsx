@@ -8,7 +8,8 @@ type Phase = 'hold' | 'pull' | 'stones' | 'argument'
 
 const HOLD_MS = 2000
 const PULL_MS = 15000
-const DETAIL_FADE_S = 2
+const DETAIL_FADE_S = 4
+const DETAIL_FADE_DELAY_S = 9
 const ORB_START_MS = 10000
 const STONE_STAGGER_MS = 480
 const LINE_DELAY_MS = 220
@@ -95,6 +96,7 @@ export function ImpactHit({
   facts,
   focus,
   detailSrc,
+  detailFocus,
   marks,
 }: {
   src: string
@@ -103,6 +105,7 @@ export function ImpactHit({
   facts?: string[]
   focus?: Focus
   detailSrc?: string
+  detailFocus?: Focus
   marks?: StoneMark[]
 }) {
   const lines = facts ?? NONE
@@ -123,7 +126,8 @@ export function ImpactHit({
 
   const pulling = reduced || phase !== 'hold'
   const arguing = phase === 'argument'
-  const overlay = Boolean(focus && detailSrc)
+  const plate = detailFocus ?? focus
+  const overlay = Boolean(plate && detailSrc)
 
   useEffect(() => {
     const root = rootRef.current
@@ -301,21 +305,22 @@ export function ImpactHit({
             }
           >
             <img src={src} alt={alt} className={styles.photo} draggable={false} />
-            {overlay && focus && (
+            {overlay && plate && (
               <motion.img
                 src={detailSrc}
                 alt=""
                 className={styles.detail}
                 style={{
-                  left: `${focus.x * 100}%`,
-                  top: `${focus.y * 100}%`,
-                  width: `${focus.w * 100}%`,
-                  height: `${focus.h * 100}%`,
+                  left: `${plate.x * 100}%`,
+                  top: `${plate.y * 100}%`,
+                  width: `${plate.w * 100}%`,
+                  height: `${plate.h * 100}%`,
                 }}
                 initial={false}
-                animate={{ opacity: pulling ? 0 : 1 }}
+                animate={{ opacity: phase === 'hold' ? 1 : 0 }}
                 transition={{
-                  duration: reduced ? 0 : pulling ? DETAIL_FADE_S : 0,
+                  duration: reduced ? 0 : phase === 'pull' ? DETAIL_FADE_S : phase === 'hold' ? 0 : 0.8,
+                  delay: reduced ? 0 : phase === 'pull' ? DETAIL_FADE_DELAY_S : 0,
                   ease: 'linear',
                 }}
                 draggable={false}

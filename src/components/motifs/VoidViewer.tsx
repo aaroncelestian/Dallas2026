@@ -238,7 +238,7 @@ function Scene({
     const orbit = controls.current
     if (!root || !orbit) return
 
-    mix.current = THREE.MathUtils.damp(mix.current, focus ? 1 : 0, reduced ? 18 : 3.4, dt)
+    mix.current = THREE.MathUtils.damp(mix.current, focus ? 1 : 0, reduced ? 18 : 7.2, dt)
     const wall = THREE.MathUtils.lerp(1, WALL_FOCUS, mix.current)
     setWallOpacity(innerMat.current, wall)
     setWallOpacity(outerMat.current, wall)
@@ -252,10 +252,10 @@ function Scene({
       const dist = mol.radius * SCALE * 3.4 + 2.15
       offset.copy(camera.position).sub(orbit.target)
       if (offset.lengthSq() < 1e-6) offset.copy(HOME_POS)
-      if (!dragging.current && !reduced && mix.current > 0.9) {
+      if (!dragging.current && !reduced && mix.current > 0.7) {
         offset.applyAxisAngle(Y_AXIS, dt * ORBIT_SPEED)
       }
-      offset.setLength(THREE.MathUtils.damp(offset.length(), dist, reduced ? 18 : 2.4, dt))
+      offset.setLength(THREE.MathUtils.damp(offset.length(), dist, reduced ? 18 : 7.5, dt))
       goalTarget.copy(worldCenter)
       goalPos.copy(worldCenter).add(offset)
     } else {
@@ -263,7 +263,7 @@ function Scene({
       goalPos.copy(HOME_POS)
     }
 
-    const k = 1 - Math.exp(-dt * (reduced ? 18 : 3.2))
+    const k = 1 - Math.exp(-dt * (reduced ? 18 : 8.4))
     if (!dragging.current) camera.position.lerp(goalPos, k)
     orbit.target.lerp(goalTarget, k)
     orbit.update()

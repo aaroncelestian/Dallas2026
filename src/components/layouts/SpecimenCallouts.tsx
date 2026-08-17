@@ -21,31 +21,30 @@ function curve(p: Pair) {
   return `M ${p.orbX} ${p.orbY} C ${mx} ${p.orbY}, ${mx} ${p.textY}, ${p.textX} ${p.textY}`
 }
 
-function isFree(mark: SpecimenCallout) {
-  return mark.lx != null && mark.ly != null
+function isDump(mark: SpecimenCallout) {
+  return mark.ly != null
 }
 
-function attach(
-  orbX: number,
-  orbY: number,
-  lb: DOMRect,
-  rr: DOMRect,
-  side?: 'left' | 'right',
-) {
-  const left = lb.left - rr.left
-  const right = lb.right - rr.left
-  const top = lb.top - rr.top
-  const cy = top + lb.height / 2
-  if (side === 'left') return { textX: right, textY: cy }
-  if (side === 'right') return { textX: left, textY: cy }
-  const cx = left + lb.width / 2
-  const bottom = top + lb.height
-  const dx = orbX - cx
-  const dy = orbY - cy
-  if (Math.abs(dx) > Math.abs(dy)) {
-    return { textX: dx > 0 ? right : left, textY: cy }
+function sameBox(a: Box | null, b: Box) {
+  return Boolean(
+    a &&
+      a.left === b.left &&
+      a.top === b.top &&
+      a.width === b.width &&
+      a.height === b.height,
+  )
+}
+
+function sameTops(a: Record<string, number>, b: Record<string, number>) {
+  const keys = Object.keys(b)
+  return keys.length === Object.keys(a).length && keys.every((key) => a[key] === b[key])
+}
+
+function attach(lb: DOMRect, rr: DOMRect, side: 'left' | 'right') {
+  return {
+    textX: (side === 'left' ? lb.right : lb.left) - rr.left,
+    textY: lb.top - rr.top + lb.height / 2,
   }
-  return { textX: cx, textY: dy > 0 ? bottom : top }
 }
 
 function stackTops(
@@ -86,12 +85,10 @@ export function SpecimenCallouts({
     const root = rootRef.current
     if (!root || !active || !shownKey) {
       setPlate(null)
-      setPairs([])
-      setTops({})
       return
     }
 
-    const measure = () => {
+    const readPlate = () => {
       const img = root.closest('[data-scene]')?.querySelector<HTMLElement>('[data-plate]')
       if (!img) return
       const rr = root.getBoundingClientRect()
@@ -102,62 +99,77 @@ export function SpecimenCallouts({
         width: pr.width,
         height: pr.height,
       }
-      setPlate(next)
+      setPlate((prev) => (sameBox(prev, next) ? prev : next))
+    }
 
-      const current = shownKey
-        .split('|')
-        .map((id) => marksRef.current.find((m) => m.id === id))
-        .filter((mark): mark is SpecimenCallout => Boolean(mark))
+    readPlate()
+    const img = root.closest('[data-scene]')?.querySelector('[data-plate]')
+    const ro = new ResizeObserver(readPlate)
+    ro.observe(root)
+    if (img) ro.observe(img)
+    window.addEventListener('resize', readPlate)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', readPlate)
+    }
+  }, [active, shownKey])
 
-      const bySide: Record<'left' | 'right', Array<{ id: string; preferred: number; height: number }>> = {
-        left: [],
-        right: [],
+  useLayoutEffect(() => {
+    const root = rootRef.current
+    if (!root || !active || !shownKey || !plate) {
+      setTops({})
+      return
+    }
+
+    const current = shownKey
+      .split('|')
+      .map((id) => marksRef.current.find((m) => m.id === id))
+      .filter((mark): mark is SpecimenCallout => Boolean(mark))
+
+    const bySide: Record<'left' | 'right', Array<{ id: string; preferred: number; height: number }>> = {
+      left: [],
+      right: [],
+    }
+    const dumpTops: Record<string, number> = {}
+    current.forEach((mark, i) => {
+      const height = labelRefs.current[i]?.getBoundingClientRect().height ?? 64
+      const preferred = plate.top + (mark.ly ?? mark.y) * plate.height
+      if (isDump(mark)) {
+        dumpTops[mark.id] = preferred - height / 2
+        return
       }
-      current.forEach((mark, i) => {
-        if (isFree(mark)) return
-        const side = mark.side ?? 'right'
-        const height = labelRefs.current[i]?.getBoundingClientRect().height ?? 64
-        bySide[side].push({
-          id: mark.id,
-          preferred: next.top + mark.y * next.height,
-          height,
-        })
-      })
-      const nextTops = { ...stackTops(bySide.left), ...stackTops(bySide.right) }
-      setTops(nextTops)
+      bySide[mark.side ?? 'right'].push({ id: mark.id, preferred, height })
+    })
+    const next = { ...stackTops(bySide.left), ...stackTops(bySide.right), ...dumpTops }
+    setTops((prev) => (sameTops(prev, next) ? prev : next))
+  }, [active, shownKey, plate])
 
-      const nextPairs = current.map((mark, i) => {
-        const label = labelRefs.current[i]
-        const lb = label?.getBoundingClientRect()
-        const orbX = next.left + mark.x * next.width
-        const orbY = next.top + mark.y * next.height
-        const edge = lb
-          ? attach(orbX, orbY, lb, rr, isFree(mark) ? undefined : (mark.side ?? 'right'))
-          : { textX: 0, textY: 0 }
+  useLayoutEffect(() => {
+    const root = rootRef.current
+    if (!root || !active || !shownKey || !plate) {
+      setPairs([])
+      return
+    }
+
+    const current = shownKey
+      .split('|')
+      .map((id) => marksRef.current.find((m) => m.id === id))
+      .filter((mark): mark is SpecimenCallout => Boolean(mark))
+    const rr = root.getBoundingClientRect()
+    setPairs(
+      current.map((mark, i) => {
+        const lb = labelRefs.current[i]?.getBoundingClientRect()
+        const edge = lb ? attach(lb, rr, mark.side ?? 'right') : { textX: 0, textY: 0 }
         return {
           id: mark.id,
-          orbX,
-          orbY,
+          orbX: plate.left + mark.x * plate.width,
+          orbY: plate.top + mark.y * plate.height,
           textX: edge.textX,
           textY: edge.textY,
         }
-      })
-      setPairs(nextPairs)
-    }
-
-    measure()
-    const id = window.requestAnimationFrame(measure)
-    const img = root.closest('[data-scene]')?.querySelector('[data-plate]')
-    const ro = new ResizeObserver(measure)
-    ro.observe(root)
-    if (img) ro.observe(img)
-    window.addEventListener('resize', measure)
-    return () => {
-      window.cancelAnimationFrame(id)
-      ro.disconnect()
-      window.removeEventListener('resize', measure)
-    }
-  }, [active, shownKey])
+      }),
+    )
+  }, [active, shownKey, plate, tops])
 
   if (!shown.length) return null
 
@@ -167,15 +179,15 @@ export function SpecimenCallouts({
     <div
       ref={rootRef}
       className={styles.root}
-      data-clutter={shown.some(isFree) || undefined}
+      data-clutter={shown.some(isDump) || undefined}
       aria-hidden={!active}
     >
       <svg className={styles.svg} aria-hidden>
         {pairs.map((p) => {
           const mark = shown.find((item) => item.id === p.id)
-          const free = mark ? isFree(mark) : false
-          const order = mark ? shown.filter(isFree).findIndex((item) => item.id === p.id) : 0
-          const delay = reduced ? 0 : free ? 0.06 + Math.max(0, order) * 0.11 : 0
+          const dumped = mark ? isDump(mark) : false
+          const order = mark ? shown.filter(isDump).findIndex((item) => item.id === p.id) : 0
+          const delay = reduced ? 0 : dumped ? 0.06 + Math.max(0, order) * 0.11 : 0
           return (
             <g key={p.id}>
               <motion.circle
@@ -203,8 +215,8 @@ export function SpecimenCallouts({
       </svg>
 
       {shown.map((mark, i) => {
-        const free = isFree(mark)
-        const delay = reduced ? 0 : free ? 0.06 + dump++ * 0.11 : 0.08
+        const dumped = isDump(mark)
+        const delay = reduced ? 0 : dumped ? 0.06 + dump++ * 0.11 : 0.08
         return (
           <motion.div
             key={mark.id}
@@ -212,23 +224,17 @@ export function SpecimenCallouts({
               labelRefs.current[i] = el
             }}
             className={styles.label}
-            data-side={free ? undefined : (mark.side ?? 'right')}
-            data-free={free || undefined}
-            style={
-              free && plate && mark.lx != null && mark.ly != null
-                ? {
-                    left: plate.left + mark.lx * plate.width,
-                    top: plate.top + mark.ly * plate.height,
-                    ['--tilt' as string]: `${mark.tilt ?? 0}deg`,
-                  }
-                : {
-                    top:
-                      tops[mark.id] ??
-                      (plate ? plate.top + mark.y * plate.height : `${mark.y * 100}%`),
-                  }
-            }
-            initial={free ? { opacity: 0 } : false}
-            animate={{ opacity: active && (!free || plate) ? 1 : 0 }}
+            data-side={mark.side ?? 'right'}
+            data-dump={dumped || undefined}
+            style={{
+              top:
+                tops[mark.id] ??
+                (plate ? plate.top + (mark.ly ?? mark.y) * plate.height : `${(mark.ly ?? mark.y) * 100}%`),
+              ['--tilt' as string]: `${mark.tilt ?? 0}deg`,
+              ['--inset' as string]: `${mark.inset ?? 0}rem`,
+            }}
+            initial={dumped ? { opacity: 0 } : false}
+            animate={{ opacity: active ? 1 : 0 }}
             transition={{ duration: reduced ? 0 : 0.4, delay }}
           >
             <div className={styles.title}>{mark.title}</div>
