@@ -21,6 +21,33 @@ function curve(p: Pair) {
   return `M ${p.orbX} ${p.orbY} C ${mx} ${p.orbY}, ${mx} ${p.textY}, ${p.textX} ${p.textY}`
 }
 
+function isFree(mark: SpecimenCallout) {
+  return mark.lx != null && mark.ly != null
+}
+
+function attach(
+  orbX: number,
+  orbY: number,
+  lb: DOMRect,
+  rr: DOMRect,
+  side?: 'left' | 'right',
+) {
+  const left = lb.left - rr.left
+  const right = lb.right - rr.left
+  const top = lb.top - rr.top
+  const cy = top + lb.height / 2
+  if (side === 'left') return { textX: right, textY: cy }
+  if (side === 'right') return { textX: left, textY: cy }
+  const cx = left + lb.width / 2
+  const bottom = top + lb.height
+  const dx = orbX - cx
+  const dy = orbY - cy
+  if (Math.abs(dx) > Math.abs(dy)) {
+    return { textX: dx > 0 ? right : left, textY: cy }
+  }
+  return { textX: cx, textY: dy > 0 ? bottom : top }
+}
+
 function stackTops(
   items: Array<{ id: string; preferred: number; height: number }>,
 ): Record<string, number> {
@@ -87,6 +114,7 @@ export function SpecimenCallouts({
         right: [],
       }
       current.forEach((mark, i) => {
+        if (isFree(mark)) return
         const side = mark.side ?? 'right'
         const height = labelRefs.current[i]?.getBoundingClientRect().height ?? 64
         bySide[side].push({
@@ -101,13 +129,17 @@ export function SpecimenCallouts({
       const nextPairs = current.map((mark, i) => {
         const label = labelRefs.current[i]
         const lb = label?.getBoundingClientRect()
-        const side = mark.side ?? 'right'
+        const orbX = next.left + mark.x * next.width
+        const orbY = next.top + mark.y * next.height
+        const edge = lb
+          ? attach(orbX, orbY, lb, rr, isFree(mark) ? undefined : (mark.side ?? 'right'))
+          : { textX: 0, textY: 0 }
         return {
           id: mark.id,
-          orbX: next.left + mark.x * next.width,
-          orbY: next.top + mark.y * next.height,
-          textX: lb ? (side === 'left' ? lb.right : lb.left) - rr.left : 0,
-          textY: lb ? lb.top - rr.top + lb.height / 2 : 0,
+          orbX,
+          orbY,
+          textX: edge.textX,
+          textY: edge.textY,
         }
       })
       setPairs(nextPairs)
@@ -129,57 +161,83 @@ export function SpecimenCallouts({
 
   if (!shown.length) return null
 
-  return (
-    <div ref={rootRef} className={styles.root} aria-hidden={!active}>
-      {shown.map((mark, i) => (
-        <motion.div
-          key={mark.id}
-          ref={(el) => {
-            labelRefs.current[i] = el
-          }}
-          className={styles.label}
-          data-side={mark.side ?? 'right'}
-          style={{
-            top:
-              tops[mark.id] ??
-              (plate ? plate.top + mark.y * plate.height : `${mark.y * 100}%`),
-          }}
-          initial={false}
-          animate={{ opacity: active ? 1 : 0 }}
-          transition={{ duration: reduced ? 0 : 0.45, delay: reduced ? 0 : 0.08 }}
-        >
-          <div className={styles.title}>{mark.title}</div>
-          {mark.formula && <div className={styles.formula}>{mark.formula}</div>}
-          {mark.body && <div className={styles.body}>{mark.body}</div>}
-          {mark.es && <div className={styles.es}>{mark.es}</div>}
-        </motion.div>
-      ))}
+  let dump = 0
 
+  return (
+    <div
+      ref={rootRef}
+      className={styles.root}
+      data-clutter={shown.some(isFree) || undefined}
+      aria-hidden={!active}
+    >
       <svg className={styles.svg} aria-hidden>
-        {pairs.map((p) => (
-          <g key={p.id}>
-            <motion.circle
-              cx={p.orbX}
-              cy={p.orbY}
-              r={3.5}
-              className={styles.tick}
-              initial={false}
-              animate={{ opacity: active ? 1 : 0 }}
-              transition={{ duration: reduced ? 0 : 0.35 }}
-            />
-            <motion.path
-              d={curve(p)}
-              className={styles.line}
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: active ? 0.9 : 0 }}
-              transition={{
-                pathLength: { duration: reduced ? 0 : 0.75, ease: [0.4, 0, 0.2, 1] },
-                opacity: { duration: reduced ? 0 : 0.35 },
-              }}
-            />
-          </g>
-        ))}
+        {pairs.map((p) => {
+          const mark = shown.find((item) => item.id === p.id)
+          const free = mark ? isFree(mark) : false
+          const order = mark ? shown.filter(isFree).findIndex((item) => item.id === p.id) : 0
+          const delay = reduced ? 0 : free ? 0.06 + Math.max(0, order) * 0.11 : 0
+          return (
+            <g key={p.id}>
+              <motion.circle
+                cx={p.orbX}
+                cy={p.orbY}
+                r={3.5}
+                className={styles.tick}
+                initial={false}
+                animate={{ opacity: active ? 1 : 0 }}
+                transition={{ duration: reduced ? 0 : 0.35, delay }}
+              />
+              <motion.path
+                d={curve(p)}
+                className={styles.line}
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: active ? 0.9 : 0 }}
+                transition={{
+                  pathLength: { duration: reduced ? 0 : 0.7, delay, ease: [0.4, 0, 0.2, 1] },
+                  opacity: { duration: reduced ? 0 : 0.3, delay },
+                }}
+              />
+            </g>
+          )
+        })}
       </svg>
+
+      {shown.map((mark, i) => {
+        const free = isFree(mark)
+        const delay = reduced ? 0 : free ? 0.06 + dump++ * 0.11 : 0.08
+        return (
+          <motion.div
+            key={mark.id}
+            ref={(el) => {
+              labelRefs.current[i] = el
+            }}
+            className={styles.label}
+            data-side={free ? undefined : (mark.side ?? 'right')}
+            data-free={free || undefined}
+            style={
+              free && plate && mark.lx != null && mark.ly != null
+                ? {
+                    left: plate.left + mark.lx * plate.width,
+                    top: plate.top + mark.ly * plate.height,
+                    ['--tilt' as string]: `${mark.tilt ?? 0}deg`,
+                  }
+                : {
+                    top:
+                      tops[mark.id] ??
+                      (plate ? plate.top + mark.y * plate.height : `${mark.y * 100}%`),
+                  }
+            }
+            initial={free ? { opacity: 0 } : false}
+            animate={{ opacity: active && (!free || plate) ? 1 : 0 }}
+            transition={{ duration: reduced ? 0 : 0.4, delay }}
+          >
+            <div className={styles.title}>{mark.title}</div>
+            {mark.formula && <div className={styles.formula}>{mark.formula}</div>}
+            {mark.body && <div className={styles.body}>{mark.body}</div>}
+            {mark.es && <div className={styles.es}>{mark.es}</div>}
+          </motion.div>
+        )
+      })}
     </div>
   )
 }

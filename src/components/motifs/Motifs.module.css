@@ -325,7 +325,7 @@
   overflow: hidden;
 }
 
-.legendGuestsInner .legendRow:first-child {
+.legendGuestsInner > :first-child {
   margin-top: 4px;
 }
 
@@ -333,6 +333,43 @@
   display: flex;
   align-items: center;
   gap: 7px;
+}
+
+.legendGuest {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  text-align: left;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.legendGuests:not([data-on]) .legendGuest {
+  pointer-events: none;
+}
+
+.legendGuest:hover,
+.legendGuest[data-on] {
+  opacity: 1;
+}
+
+.legendGuest[data-on] .swatch {
+  outline: 1px solid color-mix(in srgb, var(--color-text) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.legendGuest:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--color-text) 40%, transparent);
+  outline-offset: 3px;
 }
 
 .swatch {

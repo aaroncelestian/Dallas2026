@@ -43,6 +43,14 @@
   text-align: right;
 }
 
+.label[data-free] {
+  right: auto;
+  max-width: min(24ch, 22vw);
+  text-align: left;
+  transform: translate(-50%, -50%) rotate(var(--tilt, 0deg));
+  transform-origin: center;
+}
+
 .title {
   font-family: var(--font-heading);
   font-size: clamp(0.95rem, 1.5vw, 1.2rem);

@@ -57,7 +57,37 @@ export interface SceneLayer {
   dwellMs?: [number, number]
   /** Seconds. Play once, then hold this frame. */
   holdAt?: number
+  /** Pause the video at these times; advance resumes to the next hold. */
+  holds?: VideoHold[]
+  scaleBar?: ScaleBar
   marks?: SpecimenCallout[]
+}
+
+export type VideoMarkKind = 'mineral' | 'biomass' | 'onion'
+
+export interface VideoMark {
+  id: string
+  x: number
+  y: number
+  kind: VideoMarkKind
+  title: string
+  body?: string
+  side?: 'left' | 'right'
+  /** Ellipse radii, normalized to the video frame. Onion marks. */
+  rx?: number
+  ry?: number
+  rings?: number
+}
+
+export interface VideoHold {
+  at: number
+  marks?: VideoMark[]
+}
+
+export interface ScaleBar {
+  mm: number
+  /** Bar length as a fraction of the video width. */
+  width: number
 }
 
 export interface SpecimenCallout {
@@ -70,6 +100,11 @@ export interface SpecimenCallout {
   body?: string
   /** Smaller Spanish line under the English label. */
   es?: string
+  /** Label position on the plate (0–1). Skips edge stacking. */
+  lx?: number
+  ly?: number
+  /** Degrees. For the overload beat. */
+  tilt?: number
 }
 
 export interface SceneBeat {
@@ -284,7 +319,7 @@ export const slides: Slide[] = [
       'Two populations. Two source rocks.',
     ],
     notes:
-      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Five seconds. Then it pulls back and it is a cabinet. As it settles, the stones light: quartz, agate, travertine, lapis. Talk the minerals off the close-ups. Then advance. The plates go to blur and the facts come in: papal commission, the materials, moganite dating the agate, two populations from two source rocks. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
+      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Two seconds. Then fifteen seconds pulling back, and it is a cabinet. As it settles, the stones light: quartz, agate, travertine, lapis. Talk the minerals off the close-ups. Then advance. The plates go to blur and the facts come in: papal commission, the materials, moganite dating the agate, two populations from two source rocks. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
   },
 
   // ── Act I ─────────────────────────────────────────────
@@ -552,8 +587,96 @@ export const slides: Slide[] = [
         src: asset('images/ks78-thickness.mp4'),
         poster: asset('images/ks78-cut.jpg'),
         alt: 'CT thickness map of a kidney stone, orbiting',
-        fit: 'cover',
-        holdAt: 39,
+        fit: 'contain',
+        scaleBar: { mm: 1, width: 0.11 },
+        holds: [
+          {
+            at: 9,
+            marks: [
+              {
+                id: 'mineral-tip',
+                x: 0.475,
+                y: 0.237,
+                kind: 'mineral',
+                side: 'left',
+                title: 'Mineral.',
+                body: 'High-density scattering.',
+              },
+              {
+                id: 'biomass-matrix',
+                x: 0.53,
+                y: 0.449,
+                kind: 'biomass',
+                side: 'right',
+                title: 'Biomass.',
+                body: 'The low-density volume.',
+              },
+            ],
+          },
+          {
+            at: 16,
+            marks: [
+              {
+                id: 'mineral-crown',
+                x: 0.539,
+                y: 0.338,
+                kind: 'mineral',
+                side: 'right',
+                title: 'Mineral, again.',
+                body: 'Discrete sites — not a smear.',
+              },
+              {
+                id: 'mineral-ridge',
+                x: 0.334,
+                y: 0.146,
+                kind: 'mineral',
+                side: 'left',
+                title: 'Scattered through the volume.',
+              },
+              {
+                id: 'biomass-shell',
+                x: 0.324,
+                y: 0.447,
+                kind: 'biomass',
+                side: 'left',
+                title: 'Biomass at the edge.',
+              },
+            ],
+          },
+          {
+            at: 25,
+            marks: [
+              {
+                id: 'onion',
+                x: 0.46,
+                y: 0.32,
+                kind: 'onion',
+                side: 'left',
+                title: 'Onion structure.',
+                body: 'Concentric growth layers — mineral and biomass, in sequence.',
+                rx: 0.072,
+                ry: 0.08,
+                rings: 3,
+              },
+              {
+                id: 'mineral-lamina',
+                x: 0.624,
+                y: 0.275,
+                kind: 'mineral',
+                side: 'right',
+                title: 'Mineral in the lamina.',
+              },
+              {
+                id: 'biomass-layers',
+                x: 0.533,
+                y: 0.45,
+                kind: 'biomass',
+                side: 'right',
+                title: 'Biomass between the layers.',
+              },
+            ],
+          },
+        ],
       },
       {
         id: 'stromatolite',
@@ -598,7 +721,7 @@ export const slides: Slide[] = [
         title: 'It has an inside.',
         layers: ['ct'],
         notes:
-          'High-resolution imaging of the volume — layers, voids, thickness. Not a pebble. An architecture.',
+          'The volume starts moving. Let it run — it will hold. First hold: the color is the argument. Red is mineral, high-density scattering. Blue is biomass. The bar is a millimeter. Advance and it orbits again. Second hold: the red is not a smear — discrete mineral sites, scattered through the volume. Advance. Third hold: the onion. Concentric layers of mineral and biomass. That architecture is the point. Then the life.',
       },
       {
         id: 'biofilm',
@@ -823,6 +946,84 @@ export const slides: Slide[] = [
             title: 'ex. Andrew Carnegie collection.',
             es: 'ex. colección Andrew Carnegie.',
           },
+          {
+            id: 'dump-elbaite',
+            x: 0.338,
+            y: 0.52,
+            lx: 0.24,
+            ly: 0.58,
+            tilt: -6,
+            title: 'Elbaite, var. rubellite.',
+            body: 'Schorl at the base.',
+          },
+          {
+            id: 'dump-carnegie',
+            x: 0.42,
+            y: 0.64,
+            lx: 0.4,
+            ly: 0.7,
+            tilt: 3,
+            title: 'Andrew Carnegie collection.',
+          },
+          {
+            id: 'dump-growth',
+            x: 0.36,
+            y: 0.198,
+            lx: 0.22,
+            ly: 0.12,
+            tilt: -4,
+            title: 'Uninterrupted growth history.',
+          },
+          {
+            id: 'dump-formula',
+            x: 0.35,
+            y: 0.3,
+            lx: 0.5,
+            ly: 0.28,
+            tilt: 2,
+            title: 'Elbaite.',
+            formula: 'Na(Li,Al,Fe²⁺)₃Al₆(BO₃)₃Si₆O₁₈(OH)₄',
+          },
+          {
+            id: 'dump-schorl',
+            x: 0.332,
+            y: 0.48,
+            lx: 0.2,
+            ly: 0.42,
+            tilt: 5,
+            title: 'Schorl → elbaite.',
+            body: 'Early Fe-rich growth gives way to Li-Mn enrichment.',
+          },
+          {
+            id: 'dump-mn',
+            x: 0.344,
+            y: 0.38,
+            lx: 0.46,
+            ly: 0.44,
+            tilt: -3,
+            title: 'Mn³⁺ chromophore.',
+            body: 'The pink.',
+          },
+          {
+            id: 'dump-fe',
+            x: 0.36,
+            y: 0.218,
+            lx: 0.52,
+            ly: 0.16,
+            tilt: 4,
+            title: 'Fe²⁺–Ti⁴⁺ charge transfer.',
+            body: 'The blue cap.',
+          },
+          {
+            id: 'dump-feedstock',
+            x: 0.38,
+            y: 0.36,
+            lx: 0.56,
+            ly: 0.56,
+            tilt: -5,
+            title: 'Tourmaline sculpting its own feedstock.',
+            body: 'Of elements as it grows.',
+          },
         ],
       },
     ],
@@ -865,16 +1066,19 @@ export const slides: Slide[] = [
         id: 'less',
         label: 'Less is more',
         layers: ['bluecap'],
-        callouts: ['termination', 'cap', 'body', 'pocket'],
-        bullets: [
-          'Elbaite, var. rubellite — schorl at the base',
-          'Andrew Carnegie collection',
-          'Uninterrupted growth history',
-          'Na(Li,Al,Fe²⁺)₃Al₆(BO₃)₃Si₆O₁₈(OH)₄',
-          'Schorl → elbaite: early Fe-rich growth gives way to Li-Mn enrichment',
-          'Mn³⁺ chromophore — the pink',
-          'Fe²⁺–Ti⁴⁺ charge transfer — the blue cap',
-          'Tourmaline sculpting its own feedstock of elements as it grows',
+        callouts: [
+          'termination',
+          'cap',
+          'body',
+          'pocket',
+          'dump-elbaite',
+          'dump-carnegie',
+          'dump-growth',
+          'dump-formula',
+          'dump-schorl',
+          'dump-mn',
+          'dump-fe',
+          'dump-feedstock',
         ],
         notes:
           'Look at that. A display specimen does not get better because we laid the science on top of it. Less is more. The crystal is already pleasing. Keeping that simple is more inviting. Now strip it back to what a visitor can actually take.',
@@ -987,7 +1191,7 @@ export const slides: Slide[] = [
         id: 'ranges',
         kind: 'slideshow',
         fit: 'contain',
-        dwellMs: [12000, 8000],
+        dwellMs: [4000, 4000],
         slides: [
           {
             src: asset('images/tourmaline.jpg'),

@@ -95,6 +95,22 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
       } else if (layer?.alt) {
         lines.push(layer.kind === 'video' ? `Video: ${layer.alt}` : `Image: ${layer.alt}`)
       }
+      if (layer?.scaleBar) {
+        lines.push(`Scale: ${layer.scaleBar.mm} mm`)
+      }
+      if (layer?.holds?.length) {
+        lines.push('Legend: red = mineral, blue = biomass')
+        for (const hold of layer.holds) {
+          const labels = (hold.marks ?? [])
+            .map((mark) => [mark.title, mark.body].filter(Boolean).join(' — '))
+            .filter(Boolean)
+          lines.push(
+            labels.length
+              ? `Hold ${hold.at}s: ${labels.join(' · ')}`
+              : `Hold ${hold.at}s`,
+          )
+        }
+      }
       if (layer?.marks && beat?.callouts?.length) {
         for (const mark of layer.marks) {
           if (!beat.callouts.includes(mark.id)) continue
@@ -118,7 +134,7 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
       if (layer?.kind === 'motif' && layer.motif === 'void-viewer') {
         lines.push(
           beat?.guests
-            ? 'Motif: Rowleyite void — doxorubicin, vincristine, cisplatin, temozolomide in the near-face cages (drag to orbit)'
+            ? 'Motif: Rowleyite void — doxorubicin, vincristine, cisplatin, temozolomide in the near-face cages (click a name to enter the cage)'
             : 'Motif: Rowleyite void space — cages and channels, no atoms (drag to orbit)',
         )
       }

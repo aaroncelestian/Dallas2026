@@ -105,10 +105,11 @@ export function Shell() {
   const [fullscreen, setFullscreen] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [resourcesOpen, setResourcesOpen] = useState(false)
+  const [notesOpen, setNotesOpen] = useState(false)
   const pickerRef = useRef<HTMLDivElement>(null)
   const resourcesRef = useRef<HTMLDivElement>(null)
   const activePickRef = useRef<HTMLButtonElement>(null)
-  const chromeOpen = pickerOpen || resourcesOpen
+  const chromeOpen = pickerOpen || resourcesOpen || notesOpen
   const lastImage = useRef<Slide['image']>(slide?.image)
   const heldCamera = useRef<CameraKind | undefined>(slide?.camera)
   const reduced = usePrefersReducedMotion()
@@ -335,6 +336,10 @@ export function Shell() {
           setResourcesOpen(false)
           return
         }
+        if (notesOpen) {
+          setNotesOpen(false)
+          return
+        }
         if (presenting) exitPresent()
         return
       }
@@ -343,6 +348,12 @@ export function Shell() {
         e.preventDefault()
         if (presenting) exitPresent()
         else openPresentWindow()
+        return
+      }
+
+      if ((e.key === 'n' || e.key === 'N') && !presenting) {
+        e.preventDefault()
+        setNotesOpen((open) => !open)
         return
       }
 
@@ -361,7 +372,7 @@ export function Shell() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [presenting, pickerOpen, resourcesOpen, toggleFullscreen])
+  }, [presenting, pickerOpen, resourcesOpen, notesOpen, toggleFullscreen])
 
   useEffect(() => {
     setPickerOpen(false)
@@ -582,6 +593,18 @@ export function Shell() {
           <button
             type="button"
             className={styles.fullscreenBtn}
+            aria-pressed={notesOpen}
+            aria-label={notesOpen ? 'Hide speaker notes' : 'Show speaker notes'}
+            title="Speaker notes (N)"
+            onClick={() => setNotesOpen((open) => !open)}
+          >
+            Notes
+          </button>
+        )}
+        {!presenting && (
+          <button
+            type="button"
+            className={styles.fullscreenBtn}
             onClick={() => openPrintView()}
             aria-label="Open speaker script"
             title="Print script — copy for AI or save as PDF"
@@ -602,6 +625,18 @@ export function Shell() {
           </button>
         )}
       </div>
+
+      {!presenting && notesOpen && (
+        <aside className={styles.notes} aria-label="Speaker notes">
+          <p className={styles.notesKicker}>Say</p>
+          <h2 className={styles.notesTitle}>
+            {scene.beat ? `${slide.label} · ${scene.beat.label}` : slide.label}
+          </h2>
+          <p className={styles.notesBody}>
+            {spokenAlt(slide, scene.beat) || 'No spoken notes on this beat.'}
+          </p>
+        </aside>
+      )}
     </SceneProvider>
     </NavContext.Provider>
   )

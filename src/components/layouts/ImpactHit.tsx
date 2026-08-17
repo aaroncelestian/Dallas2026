@@ -6,10 +6,10 @@ import styles from './ImpactHit.module.css'
 
 type Phase = 'hold' | 'pull' | 'stones' | 'argument'
 
-const HOLD_MS = 5000
-const PULL_MS = 8000
+const HOLD_MS = 2000
+const PULL_MS = 15000
 const DETAIL_FADE_S = 2
-const ORB_START_MS = 4500
+const ORB_START_MS = 10000
 const STONE_STAGGER_MS = 480
 const LINE_DELAY_MS = 220
 const PLATE_DELAY_MS = 780

@@ -1,6 +1,7 @@
-import { Suspense, useEffect, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { ContactShadows, Line, OrbitControls } from '@react-three/drei'
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import * as THREE from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import mesh from '../../data/rowleyiteVoid.json'
@@ -11,6 +12,10 @@ import styles from './Motifs.module.css'
 const VOID_IN = '#e0b15c'
 const VOID_OUT = '#5aa8b8'
 const SCALE = 0.155
+const HOME_POS = new THREE.Vector3(5.4, 3.2, 12.2)
+const Y_AXIS = new THREE.Vector3(0, 1, 0)
+const WALL_FOCUS = 0.15
+const ORBIT_SPEED = 0.3
 
 const LEGEND_WALLS = [
   { color: VOID_OUT, label: 'outside' },
@@ -23,6 +28,28 @@ const LEGEND_GUESTS = [
   { color: '#d0d6de', label: 'cisplatin' },
   { color: '#e8a0c8', label: 'temozolomide' },
 ] as const
+
+type GuestLabel = (typeof LEGEND_GUESTS)[number]['label']
+
+type MolFocus = {
+  center: THREE.Vector3
+  radius: number
+}
+
+function moleculeFocus(): Record<string, MolFocus> {
+  const out: Record<string, MolFocus> = {}
+  for (const mol of guests.molecules) {
+    const center = new THREE.Vector3()
+    for (const atom of mol.atoms) center.add(new THREE.Vector3(atom.x, atom.y, atom.z))
+    center.multiplyScalar(1 / mol.atoms.length)
+    let radius = 0
+    for (const atom of mol.atoms) {
+      radius = Math.max(radius, center.distanceTo(new THREE.Vector3(atom.x, atom.y, atom.z)) + atom.radius)
+    }
+    out[mol.name] = { center, radius }
+  }
+  return out
+}
 
 function CellWire({ size }: { size: number }) {
   const edges = useMemo(() => {
@@ -122,7 +149,7 @@ function GuestMolecules({ visible, reduced }: { visible: boolean; reduced: boole
   })
 
   return (
-    <group ref={group} visible={false}>
+    <group ref={group} visible={false} renderOrder={2}>
       {guests.molecules.map((mol) => (
         <group key={mol.name}>
           {mol.bonds.map(([i, j]) => {
@@ -167,9 +194,36 @@ function LocalEnvironment() {
   return null
 }
 
-function Scene({ active, showGuests }: { active: boolean; showGuests: boolean }) {
+function setWallOpacity(mat: THREE.MeshPhysicalMaterial | null, opacity: number) {
+  if (!mat) return
+  mat.opacity = opacity
+  mat.transparent = opacity < 0.995
+  mat.depthWrite = opacity > 0.92
+  mat.needsUpdate = true
+}
+
+function Scene({
+  active,
+  showGuests,
+  focus,
+}: {
+  active: boolean
+  showGuests: boolean
+  focus: GuestLabel | null
+}) {
   const group = useRef<THREE.Group>(null)
+  const innerMat = useRef<THREE.MeshPhysicalMaterial>(null)
+  const outerMat = useRef<THREE.MeshPhysicalMaterial>(null)
+  const controls = useRef<OrbitControlsImpl>(null)
+  const dragging = useRef(false)
+  const mix = useRef(0)
+  const goalPos = useMemo(() => new THREE.Vector3(), [])
+  const goalTarget = useMemo(() => new THREE.Vector3(), [])
+  const offset = useMemo(() => new THREE.Vector3(), [])
+  const worldCenter = useMemo(() => new THREE.Vector3(), [])
   const reduced = usePrefersReducedMotion()
+  const { camera } = useThree()
+  const molecules = useMemo(moleculeFocus, [])
 
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry()
@@ -180,8 +234,39 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
   }, [])
 
   useFrame((_, dt) => {
-    if (!group.current || reduced || !active) return
-    group.current.rotation.y += dt * 0.08
+    const root = group.current
+    const orbit = controls.current
+    if (!root || !orbit) return
+
+    mix.current = THREE.MathUtils.damp(mix.current, focus ? 1 : 0, reduced ? 18 : 3.4, dt)
+    const wall = THREE.MathUtils.lerp(1, WALL_FOCUS, mix.current)
+    setWallOpacity(innerMat.current, wall)
+    setWallOpacity(outerMat.current, wall)
+
+    if (!reduced && active && !focus) root.rotation.y += dt * 0.08
+    root.updateMatrixWorld()
+
+    const mol = focus ? molecules[focus] : undefined
+    if (mol) {
+      worldCenter.copy(mol.center).applyMatrix4(root.matrixWorld)
+      const dist = mol.radius * SCALE * 3.4 + 2.15
+      offset.copy(camera.position).sub(orbit.target)
+      if (offset.lengthSq() < 1e-6) offset.copy(HOME_POS)
+      if (!dragging.current && !reduced && mix.current > 0.9) {
+        offset.applyAxisAngle(Y_AXIS, dt * ORBIT_SPEED)
+      }
+      offset.setLength(THREE.MathUtils.damp(offset.length(), dist, reduced ? 18 : 2.4, dt))
+      goalTarget.copy(worldCenter)
+      goalPos.copy(worldCenter).add(offset)
+    } else {
+      goalTarget.set(0, 0, 0)
+      goalPos.copy(HOME_POS)
+    }
+
+    const k = 1 - Math.exp(-dt * (reduced ? 18 : 3.2))
+    if (!dragging.current) camera.position.lerp(goalPos, k)
+    orbit.target.lerp(goalTarget, k)
+    orbit.update()
   })
 
   return (
@@ -207,8 +292,9 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
       <LocalEnvironment />
       <group ref={group} scale={SCALE}>
         <CellWire size={mesh.cell.a} />
-        <mesh geometry={geometry} castShadow receiveShadow>
+        <mesh geometry={geometry} castShadow receiveShadow renderOrder={0}>
           <meshPhysicalMaterial
+            ref={innerMat}
             color={VOID_IN}
             roughness={0.38}
             metalness={0.22}
@@ -220,8 +306,9 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
             side={THREE.FrontSide}
           />
         </mesh>
-        <mesh geometry={geometry} castShadow receiveShadow>
+        <mesh geometry={geometry} castShadow receiveShadow renderOrder={0}>
           <meshPhysicalMaterial
+            ref={outerMat}
             color={VOID_OUT}
             roughness={0.62}
             metalness={0.06}
@@ -242,7 +329,18 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
         far={8}
         color="#050403"
       />
-      <OrbitControls enablePan={false} enableZoom={false} makeDefault />
+      <OrbitControls
+        ref={controls}
+        enablePan={false}
+        enableZoom={false}
+        makeDefault
+        onStart={() => {
+          dragging.current = true
+        }}
+        onEnd={() => {
+          dragging.current = false
+        }}
+      />
     </>
   )
 }
@@ -256,6 +354,12 @@ export function VoidViewer({
   guests?: boolean
   label?: string
 }) {
+  const [focus, setFocus] = useState<GuestLabel | null>(null)
+
+  useEffect(() => {
+    if (!showGuests || !active) setFocus(null)
+  }, [active, showGuests])
+
   return (
     <div
       className={styles.crystal}
@@ -276,10 +380,21 @@ export function VoidViewer({
         <div className={styles.legendGuests} data-on={showGuests || undefined}>
           <div className={styles.legendGuestsInner}>
             {LEGEND_GUESTS.map((row) => (
-              <div key={row.label} className={styles.legendRow}>
+              <button
+                key={row.label}
+                type="button"
+                className={styles.legendGuest}
+                data-on={focus === row.label || undefined}
+                aria-pressed={focus === row.label}
+                disabled={!showGuests}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setFocus((current) => (current === row.label ? null : row.label))
+                }}
+              >
                 <span className={styles.swatch} style={{ background: row.color }} />
                 {row.label}
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -292,15 +407,20 @@ export function VoidViewer({
         style={{ width: '100%', height: '100%' }}
       >
         <Suspense fallback={null}>
-          <Scene active={active} showGuests={showGuests} />
+          <Scene active={active} showGuests={showGuests} focus={focus} />
         </Suspense>
       </Canvas>
       <div className={styles.crystalCaption}>
         <span className={styles.captionSizer} aria-hidden>
-          Rowleyite · four cargos in the near cages · drag to orbit
+          Rowleyite · temozolomide in the cage · click again to pull back
         </span>
         <span data-on={!showGuests || undefined}>Rowleyite · void space · drag to orbit</span>
-        <span data-on={showGuests || undefined}>Rowleyite · four cargos in the near cages · drag to orbit</span>
+        <span data-on={(showGuests && !focus) || undefined}>
+          Rowleyite · four cargos in the near cages · drag to orbit
+        </span>
+        <span data-on={focus || undefined}>
+          Rowleyite · {focus} in the cage · click again to pull back
+        </span>
       </div>
     </div>
   )

@@ -1,0 +1,199 @@
+.stage {
+  --video-mineral: #e24b3a;
+  --video-biomass: #4aa8d8;
+  position: absolute;
+  inset: 0;
+  background: #0a0a0b;
+}
+
+.plate {
+  position: absolute;
+  overflow: hidden;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+.bleed {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.bleed[data-fit='cover'] {
+  object-fit: cover;
+}
+
+.readout {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.line {
+  fill: none;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 4px #070605);
+}
+
+.orb {
+  stroke: color-mix(in srgb, #fff 35%, transparent);
+  stroke-width: 1;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 55%, transparent));
+}
+
+.onion {
+  fill: none;
+  stroke: var(--color-accent-600);
+  stroke-width: 1.35;
+  stroke-dasharray: 5 4;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-accent) 45%, transparent));
+}
+
+.label {
+  position: absolute;
+  max-width: min(22ch, 28%);
+  transform: translateY(-8px);
+}
+
+.label[data-side='right'] {
+  right: 10px;
+  text-align: left;
+}
+
+.label[data-side='left'] {
+  left: 10px;
+  text-align: right;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: clamp(0.92rem, 1.45vw, 1.15rem);
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+  text-shadow: 0 0 18px #070605;
+}
+
+.label[data-kind='mineral'] .title {
+  color: color-mix(in srgb, var(--video-mineral) 70%, var(--color-text));
+}
+
+.label[data-kind='biomass'] .title {
+  color: color-mix(in srgb, var(--video-biomass) 72%, var(--color-text));
+}
+
+.body {
+  margin-top: 0.16rem;
+  font-family: var(--font-body);
+  font-size: clamp(0.7rem, 1vw, 0.84rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--color-text) 68%, transparent);
+  text-shadow: 0 0 16px #070605;
+}
+
+.legend {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 78%, transparent);
+  text-shadow: 0 0 12px #070605;
+}
+
+.legend span::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px color-mix(in srgb, currentColor 55%, transparent);
+}
+
+.legend span[data-kind='mineral']::before {
+  background: var(--video-mineral);
+  color: var(--video-mineral);
+}
+
+.legend span[data-kind='biomass']::before {
+  background: var(--video-biomass);
+  color: var(--video-biomass);
+}
+
+.scale {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.scaleBar {
+  position: relative;
+  height: 0;
+  border-bottom: 2px solid color-mix(in srgb, var(--color-text) 88%, transparent);
+  box-shadow: 0 0 10px #070605;
+}
+
+.scaleBar::before,
+.scaleBar::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 8px;
+  margin-top: -3px;
+  background: color-mix(in srgb, var(--color-text) 88%, transparent);
+}
+
+.scaleBar::before {
+  left: 0;
+}
+
+.scaleBar::after {
+  right: 0;
+}
+
+.scaleLabel {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 78%, transparent);
+  text-shadow: 0 0 12px #070605;
+}

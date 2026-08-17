@@ -8,6 +8,7 @@ import { LithiumCycle } from '../motifs/LithiumCycle'
 import { VoidViewer } from '../motifs/VoidViewer'
 import { spokenAlt } from '../../lib/script'
 import { DepthField } from './DepthField'
+import { SceneVideo } from './SceneVideo'
 import { SpecimenCallouts } from './SpecimenCallouts'
 import styles from './Layouts.module.css'
 
@@ -21,69 +22,6 @@ function TitleLines({ text }: { text: string }) {
         </span>
       ))}
     </>
-  )
-}
-
-function SceneVideo({
-  src,
-  poster,
-  alt,
-  active,
-  fit = 'contain',
-  holdAt,
-}: {
-  src: string
-  poster?: string
-  alt?: string
-  active: boolean
-  fit?: 'cover' | 'contain'
-  holdAt?: number
-}) {
-  const ref = useRef<HTMLVideoElement>(null)
-  const reduced = usePrefersReducedMotion()
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    if (reduced || !active) {
-      el.pause()
-      return
-    }
-    el.currentTime = 0
-    void el.play()
-  }, [active, reduced, src])
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el || holdAt == null) return
-
-    const hold = () => {
-      if (el.currentTime + 0.04 < holdAt) return
-      el.pause()
-      el.currentTime = holdAt
-    }
-
-    el.addEventListener('timeupdate', hold)
-    el.addEventListener('ended', hold)
-    return () => {
-      el.removeEventListener('timeupdate', hold)
-      el.removeEventListener('ended', hold)
-    }
-  }, [holdAt, src])
-
-  return (
-    <video
-      ref={ref}
-      className={styles.sceneVideo}
-      data-fit={fit}
-      src={src}
-      poster={poster}
-      muted
-      loop={holdAt == null}
-      playsInline
-      preload="auto"
-      aria-label={alt}
-    />
   )
 }
 
@@ -206,6 +144,8 @@ function LayerView({
         active={active}
         fit={layer.fit}
         holdAt={layer.holdAt}
+        holds={layer.holds}
+        scaleBar={layer.scaleBar}
       />
     )
   }
@@ -245,6 +185,7 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
   const camera = layers[0]?.camera
   const marks = layers.flatMap((layer) => layer.marks ?? [])
   const callouts = beat?.callouts ?? []
+  const videoHolds = layers.some((layer) => layer.holds?.length || layer.scaleBar)
 
   return (
     <div
@@ -252,7 +193,7 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
       data-scene=""
       data-empty={!hasPlate || undefined}
       data-camera={camera}
-      data-callouts={callouts.length ? '' : undefined}
+      data-callouts={callouts.length || videoHolds ? '' : undefined}
     >
       <div className={styles.sceneStage}>
         <AnimatePresence>
