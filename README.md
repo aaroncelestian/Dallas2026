@@ -40,6 +40,9 @@ That launches Chrome/Edge as an app window (`--app`), which is the cleanest shar
 | `Shift+F` | Native fullscreen (breaks Zoom window-share) |
 | `H` | Lokelma H/K exchange: K in → H pointing → bend/leave → locked |
 | `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
+| `K` | CT video play / pause (kidney-stone volume) |
+| `A` | CT video annotate mode — place callouts, set holds, copy JSON |
+| Hover CT chrome | Scrubber, hold ticks, Play/Pause, Annotate |
 | Space / → | Next scene beat, then next slide |
 | ← | Previous scene beat, then previous slide |
 | `1`–`9` | Jump to scene beat N |
