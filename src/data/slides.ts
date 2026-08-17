@@ -850,16 +850,16 @@ export const slides: Slide[] = [
         layers: ['bluecap'],
         callouts: ['termination', 'cap', 'body'],
         notes:
-          'Talk the Mn → Fe shift off the formulae. The indigo rind is why it is famous and a chemical change written into the crystal. Same looking.',
+          'Talk the Mn → Fe shift off the formulae. The indigo rind is why it is famous and a chemical change written into the crystal. Then the pocket.',
       },
       {
         id: 'same',
-        label: 'Same looking',
-        title: 'Same looking.',
+        label: 'Unique locality',
+        title: 'Unique locality.',
         layers: ['bluecap'],
         callouts: ['termination', 'cap', 'body', 'pocket'],
         notes:
-          'Carnegie kept it for the first reason. Aesthetic standing and scientific standing are one act. Hold — the wall is about to do too much.',
+          'Tourmaline Queen, 1972. One pocket. Never again. That is the locality — not a district, a single cavity. Hold — the wall is about to do too much.',
       },
       {
         id: 'less',
