@@ -160,17 +160,18 @@
 
 .facts {
   position: absolute;
-  left: calc(var(--pad-x) + clamp(184px, 25vw, 280px) * 2 + 2.2rem);
+  left: var(--pad-x);
   top: 50%;
   transform: translateY(-50%);
   z-index: 3;
   margin: 0;
-  padding: 0;
+  padding: 0 0.4rem;
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: clamp(1.1rem, 2.4vh, 1.8rem);
-  max-width: min(32vw, 400px);
+  width: calc(clamp(200px, 26vw, 300px) * 2 + clamp(0.7rem, 1.5vw, 1.2rem));
+  max-width: min(52vw, 620px);
   pointer-events: none;
 }
 
@@ -182,7 +183,10 @@
   line-height: 1.25;
   color: var(--color-text);
   text-wrap: balance;
-  text-shadow: 0 0 22px #070605;
+  text-shadow:
+    0 0 16px #070605,
+    0 0 32px #070605,
+    0 2px 10px #070605;
 }
 
 @media (prefers-reduced-motion: reduce) {

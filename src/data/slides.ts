@@ -268,7 +268,7 @@ export const slides: Slide[] = [
     enterHit: true,
     clearPlate: true,
     image: {
-      src: asset('images/cabinet-windsor.jpg'),
+      src: asset('images/cabinet-windsor.webp'),
       alt: 'Central doorway of the Borghese-Windsor Cabinet',
       fit: 'contain',
       focus: { x: 0.347876, y: 0.427042, w: 0.342135, h: 0.176953 },
