@@ -590,7 +590,7 @@ export function SceneVideo({
               ? 'Mineral.'
               : 'Biomass.',
         body: '',
-        ...(kindDraft === 'onion' ? { rx: 0.07, ry: 0.08, rings: 3 } : {}),
+        ...(kindDraft === 'onion' ? { rx: 0.12, ry: 0.135, rings: 4 } : {}),
       }
       const marks = [...(next[hi].marks ?? []), mark]
       next[hi] = { ...next[hi], marks }
@@ -895,6 +895,56 @@ export function SceneVideo({
                     </select>
                   </label>
                 </div>
+                {selected.kind === 'onion' && (
+                  <div className={styles.formRow}>
+                    <label>
+                      Radius X
+                      <input
+                        type="range"
+                        min={0.04}
+                        max={0.28}
+                        step={0.005}
+                        value={selected.rx ?? 0.12}
+                        onChange={(e) =>
+                          patchMark(selected.id, { rx: Number(e.target.value) })
+                        }
+                      />
+                      <span className={styles.formValue}>
+                        {(selected.rx ?? 0.12).toFixed(3)}
+                      </span>
+                    </label>
+                    <label>
+                      Radius Y
+                      <input
+                        type="range"
+                        min={0.04}
+                        max={0.28}
+                        step={0.005}
+                        value={selected.ry ?? 0.135}
+                        onChange={(e) =>
+                          patchMark(selected.id, { ry: Number(e.target.value) })
+                        }
+                      />
+                      <span className={styles.formValue}>
+                        {(selected.ry ?? 0.135).toFixed(3)}
+                      </span>
+                    </label>
+                    <label>
+                      Rings
+                      <input
+                        type="range"
+                        min={2}
+                        max={6}
+                        step={1}
+                        value={selected.rings ?? 4}
+                        onChange={(e) =>
+                          patchMark(selected.id, { rings: Number(e.target.value) })
+                        }
+                      />
+                      <span className={styles.formValue}>{selected.rings ?? 4}</span>
+                    </label>
+                  </div>
+                )}
                 <button
                   type="button"
                   className={styles.transportBtn}

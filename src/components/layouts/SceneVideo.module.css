@@ -1,6 +1,6 @@
 .stage {
-  --video-mineral: #e24b3a;
-  --video-biomass: #4aa8d8;
+  --video-mineral: #4aa8d8;
+  --video-biomass: #e24b3a;
   position: absolute;
   inset: 0;
   background: #0a0a0b;
@@ -403,6 +403,19 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+
+.formRow:has(label:nth-child(3)) {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.formValue {
+  font-size: 11px;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 500;
+  color: color-mix(in srgb, #1c1a17 55%, transparent);
 }
 
 .stage[data-annotate] {

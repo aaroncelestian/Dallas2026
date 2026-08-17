@@ -659,9 +659,9 @@ export const slides: Slide[] = [
                 side: 'left',
                 title: 'Onion structure.',
                 body: 'Concentric growth layers — mineral and biomass, in sequence.',
-                rx: 0.072,
-                ry: 0.08,
-                rings: 3,
+                rx: 0.12,
+                ry: 0.135,
+                rings: 4,
               },
               {
                 id: 'mineral-lamina',
@@ -726,7 +726,7 @@ export const slides: Slide[] = [
         title: 'It has an inside.',
         layers: ['ct'],
         notes:
-          'The volume starts moving. Let it run — it will hold. First hold: the color is the argument. Red is mineral, high-density scattering. Blue is biomass. Scale is already on the frame — the axis numbers are millimeters. Advance and it orbits again. Second hold: the red is not a smear — discrete mineral sites, scattered through the volume. Advance. Third hold: the onion. Concentric layers of mineral and biomass. That architecture is the point. Then the life.',
+          'The volume starts moving. Let it run — it will hold. First hold: the color is the argument. Blue is mineral, high-density scattering. Red is biomass. Scale is already on the frame — the axis numbers are millimeters. Advance and it orbits again. Second hold: the blue is not a smear — discrete mineral sites, scattered through the volume. Advance. Third hold: the onion. Concentric layers of mineral and biomass. That architecture is the point. Then the life.',
       },
       {
         id: 'biofilm',

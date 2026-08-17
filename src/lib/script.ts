@@ -99,7 +99,7 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
         lines.push(`Scale: ${layer.scaleBar.mm} mm`)
       }
       if (layer?.holds?.length) {
-        lines.push('Legend: red = mineral, blue = biomass')
+        lines.push('Legend: blue = mineral, red = biomass')
         for (const hold of layer.holds) {
           const labels = (hold.marks ?? [])
             .map((mark) => [mark.title, mark.body].filter(Boolean).join(' — '))
