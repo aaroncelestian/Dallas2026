@@ -13,9 +13,8 @@ const RING = 4.25
 const STATION_R = 0.175
 const DNA_R = 0.5
 const DNA_TURNS = 5
-const DNA_STRAND_R = 0.032
-const DNA_RUNG_R = 0.012
-const DNA_RUNGS_PER_TURN = 8
+const DNA_STRAND_R = 0.012
+const DNA_PHASE = THREE.MathUtils.degToRad(10)
 const GOLD = '#d4a04a'
 const GOLD_HOT = '#f0c878'
 const CREAM = '#f3eee4'
@@ -97,47 +96,26 @@ class TorusHelixCurve extends THREE.Curve<THREE.Vector3> {
   }
 }
 
-function helixPoint(t: number, phase: number) {
-  return new TorusHelixCurve(DNA_R, DNA_TURNS, phase).getPoint(t)
-}
-
 function TrackDna() {
-  const { strands, rungs } = useMemo(() => {
+  const strands = useMemo(() => {
     const segs = 360
-    const strandA = new THREE.TubeGeometry(
-      new TorusHelixCurve(DNA_R, DNA_TURNS, 0),
-      segs,
-      DNA_STRAND_R,
-      8,
-      true,
-    )
-    const strandB = new THREE.TubeGeometry(
-      new TorusHelixCurve(DNA_R, DNA_TURNS, Math.PI),
-      segs,
-      DNA_STRAND_R,
-      8,
-      true,
-    )
-    const count = DNA_TURNS * DNA_RUNGS_PER_TURN
-    const rungs = Array.from({ length: count }, (_, i) => {
-      const t = i / count
-      return new THREE.TubeGeometry(
-        new THREE.LineCurve3(helixPoint(t, 0), helixPoint(t, Math.PI)),
-        4,
-        DNA_RUNG_R,
-        5,
-        false,
-      )
-    })
-    return { strands: [strandA, strandB], rungs }
+    return [
+      new THREE.TubeGeometry(new TorusHelixCurve(DNA_R, DNA_TURNS, 0), segs, DNA_STRAND_R, 8, true),
+      new THREE.TubeGeometry(
+        new TorusHelixCurve(DNA_R, DNA_TURNS, DNA_PHASE),
+        segs,
+        DNA_STRAND_R,
+        8,
+        true,
+      ),
+    ]
   }, [])
 
   useEffect(
     () => () => {
       for (const geo of strands) geo.dispose()
-      for (const geo of rungs) geo.dispose()
     },
-    [rungs, strands],
+    [strands],
   )
 
   return (
@@ -160,17 +138,6 @@ function TrackDna() {
           metalness={0.4}
         />
       </mesh>
-      {rungs.map((geo, i) => (
-        <mesh key={i} geometry={geo}>
-          <meshStandardMaterial
-            color={GOLD_HOT}
-            emissive={GOLD}
-            emissiveIntensity={0.1}
-            roughness={0.48}
-            metalness={0.35}
-          />
-        </mesh>
-      ))}
     </group>
   )
 }
