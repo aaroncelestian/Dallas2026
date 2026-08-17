@@ -594,7 +594,6 @@ export const slides: Slide[] = [
         poster: asset('images/ks78-cut.jpg'),
         alt: 'CT thickness map of a kidney stone, orbiting',
         fit: 'contain',
-        scaleBar: { mm: 1, width: 0.11 },
         holds: [
           {
             at: 9,
@@ -727,7 +726,7 @@ export const slides: Slide[] = [
         title: 'It has an inside.',
         layers: ['ct'],
         notes:
-          'The volume starts moving. Let it run — it will hold. First hold: the color is the argument. Red is mineral, high-density scattering. Blue is biomass. The bar is a millimeter. Advance and it orbits again. Second hold: the red is not a smear — discrete mineral sites, scattered through the volume. Advance. Third hold: the onion. Concentric layers of mineral and biomass. That architecture is the point. Then the life.',
+          'The volume starts moving. Let it run — it will hold. First hold: the color is the argument. Red is mineral, high-density scattering. Blue is biomass. Scale is already on the frame — the axis numbers are millimeters. Advance and it orbits again. Second hold: the red is not a smear — discrete mineral sites, scattered through the volume. Advance. Third hold: the onion. Concentric layers of mineral and biomass. That architecture is the point. Then the life.',
       },
       {
         id: 'biofilm',
