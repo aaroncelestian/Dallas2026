@@ -125,12 +125,14 @@
   align-items: center;
   gap: 8px;
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--color-text) 78%, transparent);
   text-shadow: 0 0 12px #070605;
+  max-width: 18ch;
+  line-height: 1.25;
 }
 
 .legend span::before {
@@ -341,15 +343,45 @@
 
 .kindPick select,
 .form select,
-.form input {
+.form input[type='text'],
+.form input:not([type]),
+.form input[type='number'] {
   font: inherit;
   font-size: 12px;
   letter-spacing: 0;
   text-transform: none;
   color: #1c1a17;
   background: #f2efe9;
-  border: 1px solid color-mix(in srgb, #fff 30%, transparent);
+  border: 1px solid color-mix(in srgb, #1c1a17 22%, transparent);
   padding: 5px 7px;
+}
+
+.form input[type='range'] {
+  width: 100%;
+  accent-color: var(--color-accent);
+  height: 1.25rem;
+  margin: 2px 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.onionSize {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, #1c1a17 16%, transparent);
+  background: color-mix(in srgb, #fff 55%, #f2efe9);
+}
+
+.onionSizeHead {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent-700);
 }
 
 .panel {
@@ -357,12 +389,12 @@
   top: 12px;
   left: 12px;
   z-index: 61;
-  width: min(320px, calc(100% - 24px));
+  width: min(340px, calc(100% - 24px));
   padding: 12px 14px;
   background: color-mix(in srgb, #f2efe9 94%, transparent);
   border: 1px solid color-mix(in srgb, #1c1a17 16%, transparent);
   color: #1c1a17;
-  max-height: calc(100% - 88px);
+  max-height: min(70vh, calc(100dvh - 96px));
   overflow: auto;
 }
 

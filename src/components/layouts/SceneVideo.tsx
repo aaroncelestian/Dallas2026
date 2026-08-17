@@ -587,8 +587,8 @@ export function SceneVideo({
           kindDraft === 'onion'
             ? 'Onion structure.'
             : kindDraft === 'mineral'
-              ? 'Mineral.'
-              : 'Biomass.',
+              ? 'Strong layering.'
+              : 'Weak / no layering.',
         body: '',
         ...(kindDraft === 'onion' ? { rx: 0.12, ry: 0.135, rings: 4 } : {}),
       }
@@ -709,8 +709,8 @@ export function SceneVideo({
           </div>
         )}
         <div className={styles.legend} aria-hidden>
-          <span data-kind="mineral">Mineral</span>
-          <span data-kind="biomass">Biomass</span>
+          <span data-kind="mineral">Strong layering</span>
+          <span data-kind="biomass">Weak / no layering</span>
         </div>
         <AnimatePresence>
           {parked && marks.length > 0 && box.w > 0 && (
@@ -810,8 +810,8 @@ export function SceneVideo({
                     value={kindDraft}
                     onChange={(e) => setKindDraft(e.target.value as VideoMarkKind)}
                   >
-                    <option value="mineral">Mineral</option>
-                    <option value="biomass">Biomass</option>
+                    <option value="mineral">Strong layering</option>
+                    <option value="biomass">Weak / no layering</option>
                     <option value="onion">Onion</option>
                   </select>
                 </label>
@@ -871,12 +871,29 @@ export function SceneVideo({
                     Kind
                     <select
                       value={selected.kind}
-                      onChange={(e) =>
-                        patchMark(selected.id, { kind: e.target.value as VideoMarkKind })
-                      }
+                      onChange={(e) => {
+                        const kind = e.target.value as VideoMarkKind
+                        patchMark(selected.id, {
+                          kind,
+                          ...(kind === 'onion'
+                            ? {
+                                rx: selected.rx ?? 0.12,
+                                ry: selected.ry ?? 0.135,
+                                rings: selected.rings ?? 4,
+                                title:
+                                  selected.title === 'Strong layering.' ||
+                                  selected.title === 'Weak / no layering.' ||
+                                  selected.title === 'Mineral.' ||
+                                  selected.title === 'Biomass.'
+                                    ? 'Onion structure.'
+                                    : selected.title,
+                              }
+                            : {}),
+                        })
+                      }}
                     >
-                      <option value="mineral">Mineral</option>
-                      <option value="biomass">Biomass</option>
+                      <option value="mineral">Strong layering</option>
+                      <option value="biomass">Weak / no layering</option>
                       <option value="onion">Onion</option>
                     </select>
                   </label>
@@ -896,53 +913,100 @@ export function SceneVideo({
                   </label>
                 </div>
                 {selected.kind === 'onion' && (
-                  <div className={styles.formRow}>
+                  <div className={styles.onionSize}>
+                    <p className={styles.onionSizeHead}>Onion size</p>
                     <label>
-                      Radius X
+                      Width (X) · {(selected.rx ?? 0.12).toFixed(3)}
                       <input
                         type="range"
                         min={0.04}
-                        max={0.28}
+                        max={0.35}
                         step={0.005}
                         value={selected.rx ?? 0.12}
                         onChange={(e) =>
-                          patchMark(selected.id, { rx: Number(e.target.value) })
+                          patchMark(selected.id, {
+                            kind: 'onion',
+                            rx: Number(e.target.value),
+                            ry: selected.ry ?? 0.135,
+                            rings: selected.rings ?? 4,
+                          })
                         }
                       />
-                      <span className={styles.formValue}>
-                        {(selected.rx ?? 0.12).toFixed(3)}
-                      </span>
                     </label>
                     <label>
-                      Radius Y
+                      Height (Y) · {(selected.ry ?? 0.135).toFixed(3)}
                       <input
                         type="range"
                         min={0.04}
-                        max={0.28}
+                        max={0.35}
                         step={0.005}
                         value={selected.ry ?? 0.135}
                         onChange={(e) =>
-                          patchMark(selected.id, { ry: Number(e.target.value) })
+                          patchMark(selected.id, {
+                            kind: 'onion',
+                            rx: selected.rx ?? 0.12,
+                            ry: Number(e.target.value),
+                            rings: selected.rings ?? 4,
+                          })
                         }
                       />
-                      <span className={styles.formValue}>
-                        {(selected.ry ?? 0.135).toFixed(3)}
-                      </span>
                     </label>
                     <label>
-                      Rings
+                      Rings · {selected.rings ?? 4}
                       <input
                         type="range"
                         min={2}
-                        max={6}
+                        max={8}
                         step={1}
                         value={selected.rings ?? 4}
                         onChange={(e) =>
-                          patchMark(selected.id, { rings: Number(e.target.value) })
+                          patchMark(selected.id, {
+                            kind: 'onion',
+                            rx: selected.rx ?? 0.12,
+                            ry: selected.ry ?? 0.135,
+                            rings: Number(e.target.value),
+                          })
                         }
                       />
-                      <span className={styles.formValue}>{selected.rings ?? 4}</span>
                     </label>
+                    <div className={styles.formRow}>
+                      <label>
+                        X
+                        <input
+                          type="number"
+                          min={0.04}
+                          max={0.35}
+                          step={0.01}
+                          value={selected.rx ?? 0.12}
+                          onChange={(e) =>
+                            patchMark(selected.id, {
+                              kind: 'onion',
+                              rx: Number(e.target.value),
+                              ry: selected.ry ?? 0.135,
+                              rings: selected.rings ?? 4,
+                            })
+                          }
+                        />
+                      </label>
+                      <label>
+                        Y
+                        <input
+                          type="number"
+                          min={0.04}
+                          max={0.35}
+                          step={0.01}
+                          value={selected.ry ?? 0.135}
+                          onChange={(e) =>
+                            patchMark(selected.id, {
+                              kind: 'onion',
+                              rx: selected.rx ?? 0.12,
+                              ry: Number(e.target.value),
+                              rings: selected.rings ?? 4,
+                            })
+                          }
+                        />
+                      </label>
+                    </div>
                   </div>
                 )}
                 <button

@@ -604,7 +604,7 @@ export const slides: Slide[] = [
                 y: 0.237,
                 kind: 'mineral',
                 side: 'left',
-                title: 'Mineral.',
+                title: 'Strong layering.',
                 body: 'High-density scattering.',
               },
               {
@@ -613,7 +613,7 @@ export const slides: Slide[] = [
                 y: 0.449,
                 kind: 'biomass',
                 side: 'right',
-                title: 'Biomass.',
+                title: 'Weak / no layering.',
                 body: 'The low-density volume.',
               },
             ],
@@ -627,7 +627,7 @@ export const slides: Slide[] = [
                 y: 0.338,
                 kind: 'mineral',
                 side: 'right',
-                title: 'Mineral, again.',
+                title: 'Strong layering.',
                 body: 'Discrete sites — not a smear.',
               },
               {
@@ -644,7 +644,7 @@ export const slides: Slide[] = [
                 y: 0.447,
                 kind: 'biomass',
                 side: 'left',
-                title: 'Biomass at the edge.',
+                title: 'Weak / no layering.',
               },
             ],
           },
@@ -669,7 +669,7 @@ export const slides: Slide[] = [
                 y: 0.275,
                 kind: 'mineral',
                 side: 'right',
-                title: 'Mineral in the lamina.',
+                title: 'Strong layering.',
               },
               {
                 id: 'biomass-layers',
@@ -677,7 +677,7 @@ export const slides: Slide[] = [
                 y: 0.45,
                 kind: 'biomass',
                 side: 'right',
-                title: 'Biomass between the layers.',
+                title: 'Weak / no layering.',
               },
             ],
           },
@@ -726,7 +726,7 @@ export const slides: Slide[] = [
         title: 'It has an inside.',
         layers: ['ct'],
         notes:
-          'The volume starts moving. Let it run — it will hold. First hold: the color is the argument. Blue is mineral, high-density scattering. Red is biomass. Scale is already on the frame — the axis numbers are millimeters. Advance and it orbits again. Second hold: the blue is not a smear — discrete mineral sites, scattered through the volume. Advance. Third hold: the onion. Concentric layers of mineral and biomass. That architecture is the point. Then the life.',
+          'The volume starts moving. Let it run — it will hold. First hold: the color is the argument. Blue is strong layering, high-density scattering. Red is weak or no layering. Scale is already on the frame — the axis numbers are millimeters. Advance and it orbits again. Second hold: the blue is not a smear — discrete layered sites, scattered through the volume. Advance. Third hold: the onion. Concentric layers. That architecture is the point. Then the life.',
       },
       {
         id: 'biofilm',
