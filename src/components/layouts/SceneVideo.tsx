@@ -94,26 +94,34 @@ function SceneVideoOverlay({
   onSelect?: (id: string) => void
 }) {
   const labelRefs = useRef<Array<HTMLDivElement | null>>([])
-  const [tops, setTops] = useState<Record<string, number>>({})
-  const shownKey = marks.map((m) => m.id).join('|')
+  const [layout, setLayout] = useState<Record<string, { top: number; width: number }>>({})
+  const shownKey = marks.map((m) => `${m.id}:${m.title}:${m.body ?? ''}:${m.side ?? ''}`).join('|')
 
   useLayoutEffect(() => {
     if (!shownKey || !plate.w) {
-      setTops({})
+      setLayout({})
       return
     }
     const bySide: Record<'left' | 'right', Array<{ id: string; preferred: number; height: number }>> =
       { left: [], right: [] }
+    const widths: Record<string, number> = {}
     marks.forEach((mark, i) => {
       const side = mark.side ?? 'right'
-      const height = labelRefs.current[i]?.getBoundingClientRect().height ?? 52
+      const box = labelRefs.current[i]?.getBoundingClientRect()
+      const height = box?.height ?? 52
+      widths[mark.id] = box?.width ?? 120
       bySide[side].push({
         id: mark.id,
         preferred: mark.y * plate.h,
         height,
       })
     })
-    setTops({ ...stackTops(bySide.left), ...stackTops(bySide.right) })
+    const tops = { ...stackTops(bySide.left), ...stackTops(bySide.right) }
+    const next: Record<string, { top: number; width: number }> = {}
+    for (const mark of marks) {
+      next[mark.id] = { top: tops[mark.id] ?? mark.y * plate.h, width: widths[mark.id] ?? 120 }
+    }
+    setLayout(next)
   }, [marks, plate.h, plate.w, shownKey])
 
   return (
@@ -123,8 +131,13 @@ function SceneVideoOverlay({
           const cx = mark.x * plate.w
           const cy = mark.y * plate.h
           const side = mark.side ?? 'right'
-          const labelY = (tops[mark.id] ?? cy) + 12
-          const textX = side === 'left' ? 8 : plate.w - 8
+          const loc = layout[mark.id]
+          const labelY = (loc?.top ?? cy) + 12
+          const labelW = loc?.width ?? 120
+          const edge = 10
+          const gap = 8
+          const textX =
+            side === 'left' ? edge + labelW + gap : plate.w - edge - labelW - gap
           const midX = (cx + textX) / 2
           const color = markColor(mark.kind)
           const rings = mark.kind === 'onion' ? (mark.rings ?? 3) : 0
@@ -195,7 +208,7 @@ function SceneVideoOverlay({
           data-side={mark.side ?? 'right'}
           data-kind={mark.kind}
           data-selected={selectedId === mark.id || undefined}
-          style={{ top: tops[mark.id] ?? mark.y * plate.h }}
+          style={{ top: layout[mark.id]?.top ?? mark.y * plate.h }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: reduced ? 0 : 0.4, delay: reduced ? 0 : 0.08 }}
