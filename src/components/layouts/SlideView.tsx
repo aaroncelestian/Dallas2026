@@ -256,7 +256,11 @@ export function SlideView({
           />
         )}
         <div className={styles.bleedScrim} aria-hidden />
-        {slide.kicker && <div className={`${styles.bleedKicker} kicker`}>{slide.kicker}</div>}
+        {slide.kicker && (
+          <div className={`${styles.bleedKicker} kicker`}>
+            <TitleLines text={slide.kicker} />
+          </div>
+        )}
         {slide.title && (
           <Rise active={active} delay={0.2} className={styles.bleedCopy}>
             <h2>

@@ -961,12 +961,12 @@ export const slides: Slide[] = [
   },
   {
     id: 'provenance',
-    label: 'Provenance',
+    label: 'The tattoo',
     chapter: 'exhibition',
     layout: 'bleed',
     camera: 'pan-left',
-    kicker: 'De’an · Wushan',
-    title: 'Named locality.',
+    kicker: 'Wushan Fluorite Mine\nDe’an · Wushan',
+    title: 'The tattoo.',
     image: {
       src: asset('images/fluorite.jpg'),
       alt: 'Fluorite with calcite, documented locality',
@@ -974,7 +974,7 @@ export const slides: Slide[] = [
     },
     yaw: -1,
     notes:
-      'Hinge between missions. De’an fluorite mine, Wushan — not “fluorite, China.” Undocumented material can still be beautiful; it can never become infrastructure. Provenance pays in both currencies. Mechanism, not metaphor.',
+      'Call it the tattoo because Rob Lavinsky has this piece on his arm. Arkenstone. This symposium is his. Then the turn: the mine name is the other tattoo — De’an, Wushan, not “fluorite, China.” A mark you can go back to. Undocumented material can still be beautiful; it can never become infrastructure.',
   },
   {
     id: 'regional',
