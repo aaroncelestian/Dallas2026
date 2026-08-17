@@ -247,14 +247,23 @@ function Scene({ active, showGuests }: { active: boolean; showGuests: boolean })
   )
 }
 
-export function VoidViewer({ active, guests: showGuests = false }: { active: boolean; guests?: boolean }) {
+export function VoidViewer({
+  active,
+  guests: showGuests = false,
+  label,
+}: {
+  active: boolean
+  guests?: boolean
+  label?: string
+}) {
   return (
     <div
       className={styles.crystal}
       aria-label={
-        showGuests
+        label ||
+        (showGuests
           ? 'Rowleyite void space with doxorubicin, vincristine, cisplatin, and temozolomide in near-face cages'
-          : 'Rowleyite void space — the cages and channels, not the atoms'
+          : 'Rowleyite void space — the cages and channels, not the atoms')
       }
     >
       <div className={styles.legend}>

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import type { SceneBeat, Slide } from '../data/slides'
 
 export interface SceneController {
@@ -33,10 +33,12 @@ export function useScene() {
 export function useSceneController(slide: Slide): SceneController {
   const beats = slide.scene
   const [index, setIndex] = useState(0)
+  const [slideId, setSlideId] = useState(slide.id)
 
-  useEffect(() => {
+  if (slide.id !== slideId) {
+    setSlideId(slide.id)
     setIndex(0)
-  }, [slide.id])
+  }
 
   const total = beats?.length ?? 0
   const clamped = total === 0 ? 0 : Math.min(index, total - 1)

@@ -571,7 +571,7 @@ function Scene({ active, phase }: { active: boolean; phase: CrystalPhase }) {
   )
 }
 
-export function CrystalViewer({ active }: { active: boolean }) {
+export function CrystalViewer({ active, label }: { active: boolean; label?: string }) {
   const scene = useScene()
   const beatPhase = phaseForBeat(scene.beat?.id)
   const [override, setOverride] = useState<CrystalPhase | null>(null)
@@ -610,7 +610,7 @@ export function CrystalViewer({ active }: { active: boolean }) {
         : LEGEND.filter((row) => row.label !== 'H')
 
   return (
-    <div className={styles.crystal} aria-label={CAPTION[phase]}>
+    <div className={styles.crystal} aria-label={label || CAPTION[phase]}>
       <div className={styles.legend}>
         {legend.map((row) => (
           <div key={row.label} className={styles.legendRow}>

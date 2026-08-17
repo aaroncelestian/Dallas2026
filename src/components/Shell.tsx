@@ -5,7 +5,9 @@ import { useActiveSlide, usePrefersReducedMotion } from '../hooks/useActiveSlide
 import { SceneProvider, useSceneController } from '../hooks/useSceneBeats'
 import { useViewportHeight } from '../hooks/useViewportHeight'
 import { NavContext } from '../hooks/useSlideNav'
-import { exitPresent, fillAvailableScreen, isPresentMode, openPresentWindow, openPrintView } from '../lib/asset'
+import { exitPresent, fillAvailableScreen, isPresentMode, openPresentWindow } from '../lib/asset'
+import { openPrintView } from '../lib/printDocument'
+import { spokenAlt } from '../lib/script'
 import { DepthField, type PlateMode } from './layouts/DepthField'
 import { SlideView } from './layouts/SlideView'
 import styles from './Shell.module.css'
@@ -312,6 +314,11 @@ export function Shell() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'p' || e.key === 'P')) {
+        e.preventDefault()
+        openPrintView()
+        return
+      }
       if (e.metaKey || e.ctrlKey || e.altKey) return
       const tag = (e.target as HTMLElement)?.tagName
       const editable =
@@ -407,7 +414,11 @@ export function Shell() {
           <DepthField
             key={plate.image.src}
             src={plate.image.src}
-            alt={plate.image.alt}
+            alt={
+              plate.mode === 'ghost'
+                ? ''
+                : (spokenAlt(slide) || plate.image.alt || '')
+            }
             active
             fit={plate.image.fit ?? 'contain'}
             yaw={slide.yaw ?? 1}

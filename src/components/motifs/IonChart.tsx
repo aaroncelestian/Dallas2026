@@ -10,11 +10,11 @@ const ions = [
 
 const maxR = 1.5
 
-export function IonChart({ active }: { active: boolean }) {
+export function IonChart({ active, label }: { active: boolean; label?: string }) {
   const reduced = usePrefersReducedMotion()
 
   return (
-    <div className={styles.ion} aria-label="Ion radius versus channel selectivity">
+    <div className={styles.ion} aria-label={label || 'Ion radius versus channel selectivity'}>
       <div className={styles.ionBars}>
         {ions.map((ion, i) => (
           <div key={ion.id} className={styles.ionRow} data-pass={ion.pass || undefined}>

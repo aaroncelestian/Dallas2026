@@ -25,25 +25,6 @@ export function printUrl(): string {
   return url.toString()
 }
 
-/** Opens the speaker script — copy for an AI, or print / save as PDF. */
-export function openPrintView() {
-  const win = window.open(printUrl(), 'dallas-print')
-  win?.focus()
-  return win
-}
-
-export function exitPrint() {
-  if (window.opener && !window.opener.closed) {
-    window.close()
-    return
-  }
-  const url = new URL(window.location.href)
-  if (!url.searchParams.has('print')) return
-  url.searchParams.delete('print')
-  const next = `${url.pathname}${url.search}${url.hash}`
-  window.location.replace(next || './')
-}
-
 export function presentUrl(): string {
   const url = new URL(window.location.href)
   url.searchParams.set('present', '1')

@@ -9,6 +9,7 @@ import { LithiumCycle } from '../motifs/LithiumCycle'
 import { VoidViewer } from '../motifs/VoidViewer'
 import { PrepModes } from '../motifs/PrepModes'
 import { PREP_MODES } from '../../data/prepModes'
+import { spokenAlt } from '../../lib/script'
 import { SceneView } from './SceneView'
 import styles from './Layouts.module.css'
 
@@ -67,18 +68,26 @@ function TitleLines({ text }: { text: string }) {
   )
 }
 
-function Motif({ kind, active }: { kind: MotifKind; active: boolean }) {
+function Motif({
+  kind,
+  active,
+  label,
+}: {
+  kind: MotifKind
+  active: boolean
+  label?: string
+}) {
   switch (kind) {
     case 'ion-chart':
-      return <IonChart active={active} />
+      return <IonChart active={active} label={label} />
     case 'crystal-viewer':
-      return <CrystalViewer active={active} />
+      return <CrystalViewer active={active} label={label} />
     case 'void-viewer':
-      return <VoidViewer active={active} />
+      return <VoidViewer active={active} label={label} />
     case 'lithium-cycle':
-      return <LithiumCycle active={active} />
+      return <LithiumCycle active={active} label={label} />
     case 'prep-modes':
-      return <PrepModes active={active} modes={PREP_MODES} />
+      return <PrepModes active={active} modes={PREP_MODES} label={label} />
     default:
       return null
   }
@@ -97,6 +106,8 @@ export function SlideView({
 }) {
   const yaw = (slide.yaw ?? 1) as 1 | -1
   const ownImage = !plated
+  const say = spokenAlt(slide)
+  const alt = say || slide.image?.alt || ''
 
   if (slide.scene) {
     return <SceneView slide={slide} active={active} />
@@ -106,7 +117,7 @@ export function SlideView({
     return (
       <ImpactHit
         src={slide.image?.src ?? ''}
-        alt={slide.image?.alt ?? 'Cabinet'}
+        alt={alt || 'Cabinet'}
         active={active}
         facts={slide.bullets}
         focus={slide.image?.focus}
@@ -122,7 +133,7 @@ export function SlideView({
         {ownImage && slide.image && (
           <DepthField
             src={slide.image.src}
-            alt={slide.image.alt}
+            alt={alt}
             active={active}
             fit={slide.image.fit ?? 'contain'}
             yaw={yaw}
@@ -137,6 +148,7 @@ export function SlideView({
     return (
       <div className={styles.voidSlide}>
         <Rise active={copyActive} snap={Boolean(slide.copySnap)} className={styles.voidInner}>
+          {say && <p className="sr-only">{say}</p>}
           <Kicker text={slide.kicker} />
           {slide.title && (
             <h2 className={styles.voidTitle}>
@@ -152,6 +164,7 @@ export function SlideView({
     const snap = Boolean(slide.copySnap)
     return (
       <div className={styles.monument}>
+        {say && <p className="sr-only">{say}</p>}
         <Rise active={copyActive} snap={snap}>
           {slide.heroNum && <div className={styles.monumentYear}>{slide.heroNum}</div>}
         </Rise>
@@ -167,6 +180,7 @@ export function SlideView({
   if (slide.layout === 'litany') {
     return (
       <div className={styles.litany}>
+        {say && <p className="sr-only">{say}</p>}
         <Rise active={active}>
           <Kicker text={slide.kicker} />
         </Rise>
@@ -187,7 +201,7 @@ export function SlideView({
         {ownImage && slide.image && (
           <DepthField
             src={slide.image.src}
-            alt={slide.image.alt}
+            alt={alt}
             active={active}
             fit={slide.image.fit ?? 'cover'}
             yaw={yaw}
@@ -215,6 +229,7 @@ export function SlideView({
   if (slide.layout === 'divider') {
     return (
       <div className={styles.divider}>
+        {say && <p className="sr-only">{say}</p>}
         <Rise active={active}>
           <div className={styles.ghost}>{slide.ghostNum}</div>
         </Rise>
@@ -233,7 +248,7 @@ export function SlideView({
         {ownImage && slide.image && (
           <DepthField
             src={slide.image.src}
-            alt={slide.image.alt}
+            alt={alt}
             active={active}
             fit={slide.image.fit ?? 'cover'}
             yaw={yaw}
@@ -260,7 +275,7 @@ export function SlideView({
         {ownImage && slide.image && !motifFull && (
           <DepthField
             src={slide.image.src}
-            alt={slide.image.alt}
+            alt={alt}
             active={active}
             fit={slide.image.fit ?? 'cover'}
             yaw={yaw}
@@ -269,7 +284,7 @@ export function SlideView({
         )}
         {slide.motif === 'crystal-viewer' && (
           <div className={styles.stageCrystal}>
-            <Motif kind="crystal-viewer" active={active} />
+            <Motif kind="crystal-viewer" active={active} label={say} />
           </div>
         )}
         <div className={styles.stageScrim} aria-hidden />
@@ -294,7 +309,7 @@ export function SlideView({
               )}
             </Rise>
             <Rise active={active} delay={0.14} className={styles.stageMotifWide}>
-              <Motif kind="prep-modes" active={active} />
+              <Motif kind="prep-modes" active={active} label={say} />
             </Rise>
           </div>
         ) : (
@@ -307,7 +322,7 @@ export function SlideView({
             )}
             {slide.motif && (
               <div className={styles.stageMotif}>
-                <Motif kind={slide.motif} active={active} />
+                <Motif kind={slide.motif} active={active} label={say} />
               </div>
             )}
           </Rise>
@@ -330,7 +345,7 @@ export function SlideView({
         </Rise>
         {slide.motif && (
           <Rise active={active} delay={0.16} className={styles.heroMotif}>
-            <Motif kind={slide.motif} active={active} />
+            <Motif kind={slide.motif} active={active} label={say} />
           </Rise>
         )}
       </div>
@@ -351,12 +366,12 @@ export function SlideView({
         </Rise>
         <Rise active={active} delay={0.1} className={styles.splitMedia}>
           {slide.motif ? (
-            <Motif kind={slide.motif} active={active} />
+            <Motif kind={slide.motif} active={active} label={say} />
           ) : slide.image ? (
             <div className={styles.splitDepth}>
               <DepthField
                 src={slide.image.src}
-                alt={slide.image.alt}
+                alt={alt}
                 active={active}
                 fit={slide.image.fit ?? 'cover'}
                 yaw={yaw}
@@ -370,6 +385,7 @@ export function SlideView({
 
   return (
     <div className={styles.contentSlide}>
+      {say && <p className="sr-only">{say}</p>}
       <Rise active={active} className={styles.contentFill}>
         <Kicker text={slide.kicker} />
         {slide.title && (

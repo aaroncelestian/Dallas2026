@@ -24,6 +24,37 @@ export function chapterTitle(id: ChapterId) {
   return CHAPTER_HEAD[id]
 }
 
+/** Spoken notes are the accessible description for whatever is on screen. */
+export function spokenAlt(slide: Slide, beat?: Pick<SceneBeat, 'notes'> | null): string {
+  return (beat?.notes ?? slide.notes ?? '').trim()
+}
+
+export function beatPreview(beat: ScriptBeat): { src: string; alt: string } | null {
+  const layer = beat.slide.layers?.find(
+    (item) =>
+      (item.kind === 'image' || item.kind === 'video' || item.kind === 'slideshow') &&
+      (item.poster || item.src || item.slides?.[0]?.src) &&
+      (!beat.sceneLabel ||
+        beat.slide.scene
+          ?.find((scene) => scene.label === beat.sceneLabel)
+          ?.layers?.includes(item.id)),
+  )
+  const src =
+    (layer?.kind === 'video'
+      ? layer.poster
+      : layer?.kind === 'slideshow'
+        ? layer.slides?.[0]?.src
+        : layer?.src) ?? beat.slide.image?.src
+  if (!src) return null
+  const alt =
+    beat.notes ||
+    layer?.slides?.[0]?.alt ||
+    layer?.alt ||
+    beat.slide.image?.alt ||
+    ''
+  return { src, alt }
+}
+
 function motifLine(slide: Slide): string | undefined {
   if (slide.motif === 'prep-modes') return undefined
   if (slide.motif === 'ion-chart') return 'Motif: ion-exchange chart'

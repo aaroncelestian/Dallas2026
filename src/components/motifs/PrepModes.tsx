@@ -17,9 +17,11 @@ export type PrepMode = {
 function FeatureMedia({
   mode,
   active,
+  label,
 }: {
   mode: PrepMode
   active: boolean
+  label?: string
 }) {
   const ref = useRef<HTMLVideoElement>(null)
   const reduced = usePrefersReducedMotion()
@@ -46,20 +48,22 @@ function FeatureMedia({
         loop
         playsInline
         preload="auto"
-        aria-label={mode.alt}
+        aria-label={label || mode.alt}
       />
     )
   }
 
-  return <img className={styles.prepMedia} src={mode.src} alt={mode.alt} />
+  return <img className={styles.prepMedia} src={mode.src} alt={label || mode.alt} />
 }
 
 export function PrepModes({
   active,
   modes,
+  label,
 }: {
   active: boolean
   modes: PrepMode[]
+  label?: string
 }) {
   const reduced = usePrefersReducedMotion()
   const [focus, setFocus] = useState(0)
@@ -87,7 +91,7 @@ export function PrepModes({
   }, [active, reduced, modes.length])
 
   return (
-    <div className={styles.prep} aria-label="Spectrum of preparation modes">
+    <div className={styles.prep} aria-label={label || 'Spectrum of preparation modes'}>
       <div className={styles.prepStrip}>
         {modes.map((m, i) => (
           <button
@@ -118,7 +122,7 @@ export function PrepModes({
               exit={reduced ? undefined : { opacity: 0 }}
               transition={{ duration: 0.35 }}
             >
-              <FeatureMedia mode={current} active={active} />
+              <FeatureMedia mode={current} active={active} label={label} />
               <div className={styles.prepCaption}>
                 <h3>{current.title}</h3>
                 <p>{current.body}</p>

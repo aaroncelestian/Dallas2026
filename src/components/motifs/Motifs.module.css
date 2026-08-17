@@ -223,10 +223,10 @@
 .cycleFormula {
   display: block;
   font-family: var(--font-heading);
-  font-size: 42px;
+  font-size: 72px;
   font-weight: 700;
   font-optical-sizing: none;
-  font-variation-settings: "opsz" 60;
+  font-variation-settings: "opsz" 72;
   color: var(--color-text);
   letter-spacing: 0.01em;
   white-space: nowrap;

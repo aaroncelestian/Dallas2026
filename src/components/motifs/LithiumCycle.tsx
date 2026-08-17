@@ -10,6 +10,9 @@ type CycleBeat = 'brine' | 'absorb' | 'air' | 'product' | 'award' | 'recycle'
 type StationId = 'brine' | 'spinel' | 'air' | 'product'
 
 const RING = 4.25
+const STATION_R = 0.175
+const SPIRAL_R = 0.26
+const SPIRAL_COILS = 38
 const GOLD = '#d4a04a'
 const GOLD_HOT = '#f0c878'
 const CREAM = '#f3eee4'
@@ -72,6 +75,66 @@ function wrapAngle(deg: number) {
 function onRing(deg: number, radius = RING): THREE.Vector3 {
   const rad = (deg * Math.PI) / 180
   return new THREE.Vector3(Math.cos(rad) * radius, 0, Math.sin(rad) * radius)
+}
+
+class TorusHelixCurve extends THREE.Curve<THREE.Vector3> {
+  constructor(
+    private minor: number,
+    private coils: number,
+    private phase: number,
+  ) {
+    super()
+  }
+
+  getPoint(t: number, target = new THREE.Vector3()) {
+    const theta = t * Math.PI * 2
+    const phi = theta * this.coils + this.phase
+    const r = RING + this.minor * Math.cos(phi)
+    return target.set(r * Math.cos(theta), this.minor * Math.sin(phi), r * Math.sin(theta))
+  }
+}
+
+function TrackSpiral() {
+  const geos = useMemo(() => {
+    const segs = 720
+    return [
+      new THREE.TubeGeometry(new TorusHelixCurve(SPIRAL_R, SPIRAL_COILS, 0), segs, 0.014, 6, true),
+      new THREE.TubeGeometry(new TorusHelixCurve(SPIRAL_R, SPIRAL_COILS, Math.PI), segs, 0.01, 6, true),
+    ]
+  }, [])
+
+  useEffect(() => () => {
+    for (const geo of geos) geo.dispose()
+  }, [geos])
+
+  return (
+    <>
+      <mesh geometry={geos[0]}>
+        <meshStandardMaterial
+          color={GOLD}
+          emissive={GOLD}
+          emissiveIntensity={0.24}
+          roughness={0.42}
+          metalness={0.5}
+          transparent
+          opacity={0.4}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh geometry={geos[1]}>
+        <meshStandardMaterial
+          color={CREAM}
+          emissive={CREAM}
+          emissiveIntensity={0.08}
+          roughness={0.5}
+          metalness={0.28}
+          transparent
+          opacity={0.22}
+          depthWrite={false}
+        />
+      </mesh>
+    </>
+  )
 }
 
 function tangent(deg: number): THREE.Vector3 {
@@ -381,6 +444,8 @@ function CycleRig({
         />
       </mesh>
 
+      <TrackSpiral />
+
       <group ref={returnLine} visible={false}>
         <Line
           points={[
@@ -404,11 +469,11 @@ function CycleRig({
         const labeled = here
         const lit = glow === station.id
         const p = onRing(station.angle)
-        const label = onRing(station.angle, RING + 0.62)
+        const label = onRing(station.angle, RING + 0.98)
         return (
           <group key={station.id}>
             <mesh position={[p.x, 0.02, p.z]} visible={live}>
-              <sphereGeometry args={[0.09, 16, 16]} />
+              <sphereGeometry args={[STATION_R, 20, 20]} />
               <meshStandardMaterial
                 color={GOLD}
                 emissive={GOLD_HOT}
@@ -417,7 +482,7 @@ function CycleRig({
             </mesh>
             {labeled && (
               <Html
-                position={[label.x, 0.48, label.z]}
+                position={[label.x, 0.78, label.z]}
                 center
                 transform={false}
                 occlude={false}
@@ -467,7 +532,7 @@ function CycleRig({
   )
 }
 
-export function LithiumCycle({ active }: { active: boolean }) {
+export function LithiumCycle({ active, label }: { active: boolean; label?: string }) {
   const scene = useScene()
   const reduced = usePrefersReducedMotion()
   const beat = asBeat(scene.beat?.id)
@@ -478,7 +543,7 @@ export function LithiumCycle({ active }: { active: boolean }) {
     <div
       className={styles.cycle}
       data-wide={recycled || undefined}
-      aria-label="Lithium extraction loop"
+      aria-label={label || 'Lithium extraction loop'}
     >
       <Canvas
         dpr={[1, 2]}

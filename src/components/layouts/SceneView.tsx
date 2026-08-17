@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import type { SceneLayer, SceneSlide, Slide } from '../../data/slides'
+import type { SceneBeat, SceneLayer, SceneSlide, Slide } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
 import { CrystalViewer } from '../motifs/CrystalViewer'
 import { LithiumCycle } from '../motifs/LithiumCycle'
 import { VoidViewer } from '../motifs/VoidViewer'
+import { spokenAlt } from '../../lib/script'
 import { DepthField } from './DepthField'
 import { SpecimenCallouts } from './SpecimenCallouts'
 import styles from './Layouts.module.css'
@@ -91,11 +92,13 @@ function SceneSlideshow({
   active,
   fit = 'contain',
   dwellMs = [14000, 9000],
+  alt,
 }: {
   slides: SceneSlide[]
   active: boolean
   fit?: 'cover' | 'contain'
   dwellMs?: [number, number]
+  alt?: string
 }) {
   const [index, setIndex] = useState(0)
   const reduced = usePrefersReducedMotion()
@@ -135,7 +138,7 @@ function SceneSlideshow({
         >
           <DepthField
             src={plate.src}
-            alt={plate.alt}
+            alt={alt || plate.alt}
             active={active}
             fit={fit}
             yaw={1}
@@ -151,15 +154,17 @@ function LayerView({
   layer,
   active,
   showGuests,
+  alt,
 }: {
   layer: SceneLayer
   active: boolean
   showGuests?: boolean
+  alt?: string
 }) {
   if (layer.kind === 'motif' && layer.motif === 'crystal-viewer') {
     return (
       <div className={styles.sceneMotif}>
-        <CrystalViewer active={active} />
+        <CrystalViewer active={active} label={alt} />
       </div>
     )
   }
@@ -167,7 +172,7 @@ function LayerView({
   if (layer.kind === 'motif' && layer.motif === 'void-viewer') {
     return (
       <div className={styles.sceneMotif}>
-        <VoidViewer active={active} guests={showGuests} />
+        <VoidViewer active={active} guests={showGuests} label={alt} />
       </div>
     )
   }
@@ -175,7 +180,7 @@ function LayerView({
   if (layer.kind === 'motif' && layer.motif === 'lithium-cycle') {
     return (
       <div className={styles.sceneMotif}>
-        <LithiumCycle active={active} />
+        <LithiumCycle active={active} label={alt} />
       </div>
     )
   }
@@ -187,6 +192,7 @@ function LayerView({
         active={active}
         fit={layer.fit}
         dwellMs={layer.dwellMs}
+        alt={alt}
       />
     )
   }
@@ -196,7 +202,7 @@ function LayerView({
       <SceneVideo
         src={layer.src}
         poster={layer.poster}
-        alt={layer.alt}
+        alt={alt || layer.alt}
         active={active}
         fit={layer.fit}
         holdAt={layer.holdAt}
@@ -208,7 +214,7 @@ function LayerView({
     return (
       <DepthField
         src={layer.src}
-        alt={layer.alt ?? ''}
+        alt={alt || layer.alt || ''}
         active={active}
         fit={layer.fit ?? 'contain'}
         yaw={1}
@@ -220,10 +226,18 @@ function LayerView({
   return null
 }
 
+function beatForSlide(slide: Slide, live?: SceneBeat) {
+  return live && slide.scene?.includes(live) ? live : undefined
+}
+
 export function SceneView({ slide, active }: { slide: Slide; active: boolean }) {
   const scene = useScene()
   const reduced = usePrefersReducedMotion()
-  const beat = scene.beat
+  const liveBeat = beatForSlide(slide, scene.beat)
+  const heldBeat = useRef(liveBeat ?? slide.scene?.[0])
+  if (liveBeat) heldBeat.current = liveBeat
+  const beat = liveBeat ?? heldBeat.current
+  const say = spokenAlt(slide, beat)
   const visible = new Set(beat?.layers ?? [])
   const layers = (slide.layers ?? []).filter((layer) => visible.has(layer.id))
   const hasPlate = layers.length > 0
@@ -251,12 +265,13 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
               exit={reduced ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration, ease: [0.16, 1, 0.3, 1] }}
             >
-              <LayerView layer={layer} active={active} showGuests={beat?.guests} />
+              <LayerView layer={layer} active={active} showGuests={beat?.guests} alt={say} />
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
       {hasPlate && <div className={styles.stageScrim} aria-hidden />}
+      {!hasPlate && say && <p className="sr-only">{say}</p>}
       <SpecimenCallouts marks={marks} visible={callouts} active={active} />
       <AnimatePresence mode="wait">
         {(beat?.kicker || beat?.title || beat?.subtitle) && (
