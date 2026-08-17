@@ -408,6 +408,17 @@ export function SceneVideo({
         return
       }
 
+      if (
+        live.current.annotate &&
+        (e.key === 'Backspace' || e.key === 'Delete') &&
+        live.current.parked
+      ) {
+        e.preventDefault()
+        e.stopPropagation()
+        removeHold()
+        return
+      }
+
       if (live.current.annotate) return
 
       const next = ['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)
@@ -472,11 +483,28 @@ export function SceneVideo({
     if (i >= 0 && i !== step) setStep(i)
   }, [parked, stops, t, step])
 
-  const removeHold = () => {
-    if (!parked || !stops[step]) return
-    setDraft((prev) => prev.filter((_, i) => i !== step))
-    setParked(false)
+  const removeHold = (index?: number) => {
+    const i = index ?? (parked ? step : stops.findIndex((h) => Math.abs(h.at - t) <= NEAR))
+    if (i < 0 || !stops[i]) return
+    const remaining = stops.filter((_, j) => j !== i)
+    setDraft(remaining)
     setSelectedId(null)
+    const el = videoRef.current
+    if (!remaining.length) {
+      setParked(false)
+      setStep(0)
+      return
+    }
+    const next = Math.min(i, remaining.length - 1)
+    const hold = remaining[next]
+    if (el) {
+      el.pause()
+      el.currentTime = hold.at
+      setT(hold.at)
+      setPlaying(false)
+    }
+    setStep(next)
+    setParked(true)
   }
 
   const placeMark = (clientX: number, clientY: number) => {
@@ -690,10 +718,21 @@ export function SceneVideo({
                 key={`${h.at}-${i}`}
                 type="button"
                 className={styles.holdTick}
-                data-active={parked && step === i || undefined}
+                data-active={(parked && step === i) || undefined}
                 style={{ left: `${dur ? (h.at / dur) * 100 : 0}%` }}
-                title={`Hold ${i + 1} · ${fmt(h.at)}`}
-                onClick={() => scrubTo(h.at)}
+                title={
+                  annotate
+                    ? `Hold ${i + 1} · ${fmt(h.at)} — click to jump, Shift+click to delete`
+                    : `Hold ${i + 1} · ${fmt(h.at)}`
+                }
+                onClick={(e) => {
+                  if (annotate && e.shiftKey) {
+                    e.preventDefault()
+                    removeHold(i)
+                    return
+                  }
+                  scrubTo(h.at)
+                }}
               />
             ))}
           </div>
@@ -729,11 +768,15 @@ export function SceneVideo({
             <button type="button" className={styles.transportBtn} onClick={addHoldHere}>
               Hold here
             </button>
-            {parked && (
-              <button type="button" className={styles.transportBtn} onClick={removeHold}>
-                Remove hold
-              </button>
-            )}
+            <button
+              type="button"
+              className={styles.transportBtn}
+              disabled={!parked && stops.every((h) => Math.abs(h.at - t) > NEAR)}
+              onClick={() => removeHold()}
+              title="Delete current pause (Delete / Backspace, or Shift+click a tick)"
+            >
+              Remove hold
+            </button>
             <button type="button" className={styles.transportBtn} onClick={() => void copyJson()}>
               {copied ? 'Copied' : 'Copy JSON'}
             </button>
@@ -744,9 +787,10 @@ export function SceneVideo({
       {annotate && (
         <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
           <p className={styles.panelHint}>
-            Click the CT frame to place a circle. Scrub, then <strong>Hold here</strong> for a pause
-            moment. Edit text below, then <strong>Copy JSON</strong> into the `holds` array in{' '}
-            <code>slides.ts</code> (stones → ct layer).
+            Click the CT frame to place a circle. Scrub, then <strong>Hold here</strong> for a pause.
+            Delete a pause with <strong>Remove hold</strong>, <strong>Delete</strong>, or{' '}
+            <strong>Shift+click</strong> an orange tick. Then <strong>Copy JSON</strong> into the{' '}
+            <code>holds</code> array in <code>slides.ts</code> (stones → ct layer) to keep it.
           </p>
           {selected ? (
             <div className={styles.form}>

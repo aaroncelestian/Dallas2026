@@ -207,7 +207,8 @@
   position: absolute;
   left: 12px;
   right: 12px;
-  bottom: 12px;
+  /* Clear Shell STAGE / RESOURCES / NOTES / PRINT row */
+  bottom: 72px;
   z-index: 6;
   display: flex;
   flex-wrap: wrap;
@@ -243,9 +244,9 @@
   white-space: nowrap;
 }
 
-.transportBtn:hover,
-.transportBtn:focus-visible {
-  background: color-mix(in srgb, #fff 14%, transparent);
+.transportBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .transportBtn[data-on] {
