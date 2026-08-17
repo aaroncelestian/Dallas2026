@@ -127,6 +127,9 @@ function TrackDna() {
           emissiveIntensity={0.22}
           roughness={0.38}
           metalness={0.52}
+          transparent
+          opacity={0.5}
+          depthWrite={false}
         />
       </mesh>
       <mesh geometry={strands[1]}>
@@ -136,6 +139,9 @@ function TrackDna() {
           emissiveIntensity={0.12}
           roughness={0.4}
           metalness={0.4}
+          transparent
+          opacity={0.5}
+          depthWrite={false}
         />
       </mesh>
     </group>
