@@ -209,7 +209,7 @@ export const slides: Slide[] = [
     },
     yaw: 1,
     notes:
-      'Hold. Do not name it. Do not start the title. Let the room look. This is the whole talk in one object: something kept because it was extraordinary, not because anyone knew what it would be asked to do.',
+      'Just look at this for a moment. I\'m not going to name it yet. This is the whole talk in one object — something kept because it was extraordinary, not because anyone knew what it would later be asked to do.',
   },
   {
     id: 'title',
@@ -228,7 +228,7 @@ export const slides: Slide[] = [
     yaw: 1,
     exitHold: 1,
     notes:
-      'Title card only. The thesis stays in your mouth, not on the wall: acquisition is a bet on future analytical capacity — and on how the public learns to see.',
+      'Exhibitions and the mission of a natural history museum. The thesis isn\'t on the wall yet — it\'s this: every acquisition is a bet on future analytical capacity, and on how the public learns to see.',
   },
   {
     id: 'question',
@@ -241,7 +241,7 @@ export const slides: Slide[] = [
     enterBlack: true,
     copySnap: true,
     notes:
-      'Open verbatim with the abstract line. Add, spoken: or put on public display? Don’t answer. Promise two answers that turn out to be the same answer.',
+      'Every acquisition is a bet you can\'t price yet. Is this for research, or for public display? Don\'t answer that yet. I\'m going to give you two answers tonight — and they\'ll turn out to be the same answer.',
   },
   {
     id: 'twice',
@@ -254,7 +254,7 @@ export const slides: Slide[] = [
     enterBlack: true,
     copySnap: true,
     notes:
-      'Once through research. Once through exhibition. Both answers converge. Then go to 1620.',
+      'We\'ll walk it once through research, and once through exhibition. Both answers converge. But first, 1620.',
   },
   {
     id: 'cabinet',
@@ -267,7 +267,7 @@ export const slides: Slide[] = [
     exitHold: 1,
     copySnap: true,
     notes:
-      'Papal cabinet specimen — acquired for curiosity, princely display, natural philosophy. Asked later to answer under instruments nobody in 1620 could imagine. A specimen’s use is not fixed at acquisition. This is the talk in miniature. Then the doorway hits. Don’t caption it.',
+      'This came out of a papal cabinet. It was acquired for curiosity, for princely display, for natural philosophy. Later it was asked to answer under instruments nobody in 1620 could have imagined. A specimen\'s use is not fixed at acquisition. That\'s the talk in miniature.',
   },
   {
     id: 'cabinet-hit',
@@ -329,7 +329,7 @@ export const slides: Slide[] = [
       'Two populations. Two source rocks.',
     ],
     notes:
-      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Two seconds. Then fifteen seconds pulling back, and it is a cabinet. As it settles, the stones light: agate, amethyst, travertine, lapis. Talk the minerals off the close-ups. Then advance. The plates go to blur and the facts come in: papal commission, the materials, moganite dating the agate, two populations from two source rocks. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
+      'For a moment, just look at the doorway. Don\'t call it a cabinet yet. Let it feel like a temple threshold — something larger than furniture. As we pull back, it becomes a cabinet. The stones light up: agate, amethyst, travertine, lapis. And then the facts arrive — papal commission, the materials themselves, moganite dating the agate, two populations from two source rocks. What we keep opens onto more than we knew.',
   },
 
   // ── Act I ─────────────────────────────────────────────
@@ -341,7 +341,7 @@ export const slides: Slide[] = [
     ghostNum: '01',
     title: 'Acquired for one reason.\nPaid off for another.',
     notes:
-      'A handful of specimens. Centuries, in aggregate, of waiting. Each acquired for a reason that had nothing to do with its eventual payoff — and one recurring signature that shows up in more of them than you’d expect.',
+      'A handful of specimens. Centuries of waiting, in aggregate. Each one acquired for a reason that had nothing to do with its eventual payoff — and one recurring signature that shows up in more of them than you\'d expect.',
   },
   {
     id: 'lithium',
@@ -371,7 +371,7 @@ export const slides: Slide[] = [
         title: 'Not the mineral.\nThe property.',
         layers: ['spinel'],
         notes:
-          'First research case. Hold the spinel. This is not lithium ore. Nobody accessioned it as a battery plant. Natural structures already know how to host a small cation, how to be selective, how to let something in and hold it. Sometimes we never put the specimen in the reactor. We take the property and build with it. That inspiration is the point of this story.',
+          'Look at this spinel. This is not lithium ore. Nobody accessioned it as a battery plant. Natural structures already know how to host a small cation, how to be selective, how to let something in and hold it. Sometimes we never put the specimen in the reactor. We take the property and build with it. That inspiration is the point of this story.',
       },
       {
         id: 'brine',
@@ -380,7 +380,7 @@ export const slides: Slide[] = [
         title: 'Desalination already\nconcentrated the brine.',
         layers: ['cycle'],
         notes:
-          'The plant already did the hard work. Reject brine, sitting there. This is not a new evaporative pond. Not a new pit in the Atacama. The lithium is in a liquid we already make. The double helix on the rail is DNA. Materials Genome. Hold it — it pays at the spinel.',
+          'The plant already did the hard work. Reject brine, just sitting there. This is not a new evaporative pond. Not a new pit in the Atacama. The lithium is in a liquid we already make. That double helix on the rail is DNA — the Materials Genome. It pays off at the spinel.',
       },
       {
         id: 'absorb',
@@ -389,7 +389,7 @@ export const slides: Slide[] = [
         title: 'The spinel takes\nthe lithium.',
         layers: ['cycle'],
         notes:
-          'HMn₂O₄ — the protonated manganese spinel. Size-selective uptake. Lithium fits. The bigger cations in seawater do not. Watch it move in. We used the property, not the specimen. That helix is the Materials Genome Project. That is how we made this spinel, and made it better than anything else out there.',
+          'HMn₂O₄ — the protonated manganese spinel. Size-selective uptake. Lithium fits. The bigger cations in seawater do not. Watch it move in. We used the property, not the specimen. That helix is the Materials Genome Project — that\'s how we made this spinel, and made it better than anything else out there.',
       },
       {
         id: 'air',
@@ -398,7 +398,7 @@ export const slides: Slide[] = [
         title: 'The acid comes\nfrom the air.',
         layers: ['cycle'],
         notes:
-          'CO₂ out of the atmosphere, turned into carbonic acid. That is the wash. No mined acid. No roast. The air does the stripping.',
+          'CO₂ out of the atmosphere, turned into carbonic acid. That\'s the wash. No mined acid. No roast. The air does the stripping.',
       },
       {
         id: 'product',
@@ -407,7 +407,7 @@ export const slides: Slide[] = [
         title: 'Li₂CO₃\nReady for a battery.',
         layers: ['cycle'],
         notes:
-          'The wash is also the product. Lithium carbonate, the feedstock battery plants already know how to use. Loop closed.',
+          'And the wash is also the product. Lithium carbonate — the feedstock battery plants already know how to use. Loop closed.',
       },
       {
         id: 'award',
@@ -416,7 +416,7 @@ export const slides: Slide[] = [
         title: 'An R&D 100.',
         layers: ['cycle'],
         notes:
-          'R&D World. Global competition. The stamp that a mineral-inspired process left the cabinet and entered a live supply-chain conversation. The prize is not the point for this room. The point is that a museum was on the team because someone had spent years watching how natural structures already solve the problem.',
+          'R&D World. Global competition. This is the stamp that a mineral-inspired process left the cabinet and entered a live supply-chain conversation. The prize isn\'t the point for this room. The point is that a museum was on the team because someone had spent years watching how natural structures already solve the problem.',
       },
       {
         id: 'recycle',
@@ -425,7 +425,7 @@ export const slides: Slide[] = [
         title: 'The spinel comes back.',
         layers: ['cycle'],
         notes:
-          'One hundred percent recyclable. The dashed line is the return — after the CO₂ wash, the empty spinel goes back to the brine. This pullback is the first time the room sees the circle they just rode. Hold. The loop will keep running. Then rowleyite — that same structural selectivity doesn’t stop at extraction.',
+          'One hundred percent recyclable. That dashed line is the return — after the CO₂ wash, the empty spinel goes back to the brine. This is the circle we just rode. The loop will keep running. And that same structural selectivity doesn\'t stop at extraction.',
       },
     ],
   },
@@ -457,7 +457,7 @@ export const slides: Slide[] = [
         title: 'Prized for novelty.',
         layers: ['specimen'],
         notes:
-          'That same structural selectivity doesn’t stop at extraction. It goes into medicine too. Collector logic here was pure taxonomic curiosity — not medicine. Dallas may already know the species-description story. Don’t retell it.',
+          'That same structural selectivity doesn\'t stop at extraction. It goes into medicine too. The collector logic here was pure taxonomic curiosity — not medicine. Some of you may already know the species-description story. I won\'t retell it.',
       },
       {
         id: 'voids',
@@ -466,7 +466,7 @@ export const slides: Slide[] = [
         title: 'The architecture\nis empty space.',
         layers: ['voids'],
         notes:
-          'Don’t draw the atoms. The framework is vanadium and phosphate; what the structure actually offers is the hole — cages and a connected channel network. Drag if you want the room to look into a cage. That empty space is what made it more than a new species.',
+          'I\'m not going to draw the atoms. The framework is vanadium and phosphate. What the structure actually offers is the hole — cages and a connected channel network. That empty space is what made it more than a new species.',
       },
       {
         id: 'cargo',
@@ -476,7 +476,7 @@ export const slides: Slide[] = [
         layers: ['voids'],
         guests: true,
         notes:
-          'Four chemotherapeutics sitting in openings on the near face of the cell. The cages are large enough. Don’t overclaim a calculated pose — this is the picture of the idea: the hole is the useful part. Drag to look in from the side.',
+          'Four chemotherapeutics sitting in openings on the near face of the cell. The cages are large enough. I\'m not overclaiming a calculated pose — this is the picture of the idea: the hole is the useful part.',
       },
       {
         id: 'lead',
@@ -486,7 +486,7 @@ export const slides: Slide[] = [
         layers: ['voids'],
         guests: true,
         notes:
-          'Vanadium-bearing framework, cytotoxic selectivity, controlled-release potential. The cargo is still on the wall. That channel architecture is what informed targeted oncology. The delay between “new species” and “drug-design lead” is the point.',
+          'A vanadium-bearing framework. Cytotoxic selectivity. Controlled-release potential. The cargo is still on the wall. That channel architecture is what informed targeted oncology. And the delay between "new species" and "drug-design lead" — that\'s the point.',
       },
     ],
   },
@@ -518,7 +518,7 @@ export const slides: Slide[] = [
         title: 'Nobody bought this\nas medicine.',
         layers: ['zeolite'],
         notes:
-          'Acquired for channel structure and aesthetic rarity. State it plainly: nobody acquired this as medical research. The specimen is the class, not the drug. The names that matter are next.',
+          'This was acquired for channel structure and aesthetic rarity. Nobody acquired this as medical research. The specimen is the class, not the drug. The names that matter are next.',
       },
       {
         id: 'precedents',
@@ -527,7 +527,7 @@ export const slides: Slide[] = [
         title: 'Georgechaoite.\nUmbite.\nSitinakite.',
         layers: ['zeolite'],
         notes:
-          'Name the minerals that taught the pore. Georgechaoite and umbite are the natural zirconosilicates — Na/K sitting in a Zr–Si channel. Sitinakite is the titanosilicate cousin. Lokelma is the synthetic that left the cabinet. Don’t lecture the structures. The names are the lineage.',
+          'These are the minerals that taught the pore. Georgechaoite and umbite — the natural zirconosilicates, with sodium and potassium sitting in a zirconium–silicon channel. Sitinakite is the titanosilicate cousin. Lokelma is the synthetic that left the cabinet. The names are the lineage.',
       },
       {
         id: 'gut',
@@ -536,7 +536,7 @@ export const slides: Slide[] = [
         title: 'Not blood.\nNot kidney.\nGut.',
         layers: ['structure'],
         notes:
-          'One channel-selective mineral is still years from a patient. Another already is one. Correct a likely assumption: Lokelma doesn’t circulate in the blood, and it doesn’t act on the kidney. It’s non-absorbed — it never leaves the gut. Drag if you want the room to look into a channel.',
+          'One channel-selective mineral is still years from a patient. Another already is one. And here\'s what people often get wrong: Lokelma doesn\'t circulate in the blood, and it doesn\'t act on the kidney. It\'s non-absorbed — it never leaves the gut.',
       },
       {
         id: 'pore',
@@ -545,7 +545,7 @@ export const slides: Slide[] = [
         title: 'A ~3 Å pore, built to\nmimic a K⁺ channel.',
         layers: ['structure'],
         notes:
-          'K fades first — then the 3 Å window. The crystal lattice opens a pore about three angstroms wide, engineered to mimic the selectivity of the body’s own potassium channels. Extremely selective over Na⁺, Ca²⁺, Mg²⁺. It captures potassium as food moves through the intestine, before the kidney would ever have to clear it. Deployed exactly where the kidney isn’t, because the kidney is the organ that’s failing.',
+          'Watch the potassium fade first — then the three-angstrom window. The crystal lattice opens a pore about three angstroms wide, engineered to mimic the selectivity of the body\'s own potassium channels. Extremely selective over sodium, calcium, magnesium. It captures potassium as food moves through the intestine, before the kidney would ever have to clear it. Deployed exactly where the kidney isn\'t — because the kidney is the organ that\'s failing.',
       },
       {
         id: 'protons',
@@ -554,7 +554,7 @@ export const slides: Slide[] = [
         title: 'Protons point\nat the empty site.',
         layers: ['structure'],
         notes:
-          'Strip the potassium. Hydrogens sit on the ring oxygens, pointing into the channel — toward the site K wants. Watch the cell contract. The framework is doing the work, not a soak. H steps the exchange if you want to run it by hand.',
+          'Strip the potassium. Hydrogens sit on the ring oxygens, pointing into the channel — toward the site potassium wants. Watch the cell contract. The framework is doing the work, not a soak.',
       },
       {
         id: 'lock',
@@ -563,7 +563,7 @@ export const slides: Slide[] = [
         title: 'They bend.\nThey leave.\nK stays.',
         layers: ['structure'],
         notes:
-          'The protons reorient, then exchange out. The cell opens as potassium occupies the 7-ring and the window closes behind it. Size-selective capture, not a reversible soak.',
+          'The protons reorient, then exchange out. The cell opens as potassium occupies the seven-ring, and the window closes behind it. Size-selective capture — not a reversible soak.',
       },
       {
         id: 'patients',
@@ -573,7 +573,7 @@ export const slides: Slide[] = [
         subtitle: '3 million patients.',
         layers: ['structure'],
         notes:
-          'The three million is already on the wall. Then leave it.',
+          'Three million patients. That\'s already on the wall. Let it sit.',
       },
     ],
   },
@@ -711,7 +711,7 @@ export const slides: Slide[] = [
         subtitle: 'One mineral builds itself, uninvited.',
         layers: ['polish'],
         notes:
-          'The kidney’s own mineral chemistry is a different story. Not compensation from outside — a mineral forming inside the kidney’s own machinery. The oldest assumption about the most common kidney stone, calcium oxalate, is that it’s purely abiotic.',
+          'The kidney\'s own mineral chemistry is a different story. Not compensation from outside — a mineral forming inside the kidney\'s own machinery. The oldest assumption about the most common kidney stone, calcium oxalate, is that it\'s purely abiotic.',
       },
       {
         id: 'inside',
@@ -719,7 +719,7 @@ export const slides: Slide[] = [
         title: 'It has an inside.',
         layers: ['ct'],
         notes:
-          'The volume starts moving. Let it run — it will hold. First hold: the color is the argument. Blue is strong layering, high-density scattering. Red is weak or no layering. Scale is already on the frame — the axis numbers are millimeters. Advance and it orbits again. Second hold: the blue is not a smear — discrete layered sites, scattered through the volume. Advance. Third hold: the onion. Concentric layers. That architecture is the point. Then the life.',
+          'The volume starts moving. The color is the argument. Blue is strong layering — high-density scattering. Red is weak or no layering. The scale is already on the frame; those axis numbers are millimeters. Look — the blue is not a smear. Discrete layered sites, scattered through the volume. And then the onion: concentric layers. That architecture is the point. Then the life.',
       },
       {
         id: 'biofilm',
@@ -727,7 +727,7 @@ export const slides: Slide[] = [
         title: 'It doesn’t build alone.',
         layers: ['biofilm'],
         notes:
-          'Hold the colony. That’s the life, at 2500× — a biofilm, not a smear. Then the same life sitting in the mineral, in the voids. High-resolution electron imaging and synchrotron XRD: bacterial biofilms structurally intercalated through the internal architecture, in layers, in patients with no diagnosed infection at all. Schmidt et al., PNAS 2026. Kidney stone disease, partly microbial in origin. Click the plate if you want the cut now; it will come back to the colony.',
+          'That\'s the life, at twenty-five hundred times — a biofilm, not a smear. And then the same life sitting in the mineral, in the voids. High-resolution electron imaging and synchrotron XRD show bacterial biofilms structurally intercalated through the internal architecture, in layers, in patients with no diagnosed infection at all. Schmidt and colleagues, PNAS 2026. Kidney stone disease is partly microbial in origin.',
       },
       {
         id: 'layers',
@@ -735,7 +735,7 @@ export const slides: Slide[] = [
         title: 'Layers, again.',
         layers: ['stromatolite'],
         notes:
-          'You just saw the life in those layers. That architecture should look familiar to anyone who’s cut open a stromatolite. The blue is epoxy in the pores, not the mineral. Different mineral — calcium carbonate instead of calcium oxalate — but the same open question: is the layering evidence of a microbial mat building upward, one generation at a time? We don’t yet know that a kidney stone and a stromatolite form by the identical mechanism. What we do know is that both are laminated structures where biology appears to be templating mineral growth in sequence, not just contaminating it once.',
+          'You just saw the life in those layers. That architecture should look familiar to anyone who\'s cut open a stromatolite. The blue here is epoxy in the pores, not the mineral. Different mineral — calcium carbonate instead of calcium oxalate — but the same open question: is the layering evidence of a microbial mat building upward, one generation at a time? We don\'t yet know that a kidney stone and a stromatolite form by the identical mechanism. What we do know is that both are laminated structures where biology appears to be templating mineral growth in sequence — not just contaminating it once.',
       },
     ],
   },
@@ -769,7 +769,7 @@ export const slides: Slide[] = [
         title: 'Why entomb yourself\nin mineral at all?',
         layers: ['halite'],
         notes:
-          'There’s a reason biology keeps doing this, at every scale we’ve just walked through. Halophilic organisms don’t just tolerate salt — they use it. Mineral encasement, salt-crystal fluid inclusions, layered carbonate mats: all of it functions as protection, a way to survive conditions that would otherwise be lethal. A stromatolite, looked at this way, isn’t just a record. It’s a shelter its builders kept constructing.',
+          'There\'s a reason biology keeps doing this, at every scale we\'ve just walked through. Halophilic organisms don\'t just tolerate salt — they use it. Mineral encasement, salt-crystal fluid inclusions, layered carbonate mats: all of it functions as protection, a way to survive conditions that would otherwise be lethal. A stromatolite, looked at this way, isn\'t just a record. It\'s a shelter its builders kept constructing.',
       },
       {
         id: 'elsewhere',
@@ -778,7 +778,7 @@ export const slides: Slide[] = [
         title: 'If salt is a shelter here,\nask where else.',
         layers: ['mars'],
         notes:
-          'Don’t advance yet. The plate is the argument — let the camera walk it, left to right, and bounce. Microbes, Isidis, hopper crystals, inclusions. If mineral encasement is a survival strategy on this planet, it doesn’t stay confined to this planet. Mars-analog evaporites. Halophile carotenoid biosignatures. The same shelter-building strategy, looked for somewhere no one’s confirmed biology ever existed at all.',
+          'Look at this plate. Microbes. Isidis. Hopper crystals. Inclusions. If mineral encasement is a survival strategy on this planet, it doesn\'t stay confined to this planet. Mars-analog evaporites. Halophile carotenoid biosignatures. The same shelter-building strategy — looked for somewhere no one\'s confirmed biology ever existed at all.',
       },
     ],
   },
@@ -794,7 +794,7 @@ export const slides: Slide[] = [
         label: 'Signature',
         title: 'The same signature.\nThree scales apart.',
         notes:
-          'Hinge of the talk. A kidney stone’s biofilm layers, a stromatolite’s laminae, a halophile’s salt-crystal shelter, a Mars-analog evaporite’s texture — not four unrelated curiosities, but one recurring strategy, read at scales from a human body to a planet nobody’s stood on. No single specimen could show that pattern. It only became visible because the specimens existed together, waiting to be read against each other. Then step back.',
+          'This is the hinge of the talk. A kidney stone\'s biofilm layers, a stromatolite\'s laminae, a halophile\'s salt-crystal shelter, a Mars-analog evaporite\'s texture — not four unrelated curiosities, but one recurring strategy, read at scales from a human body to a planet nobody\'s stood on. No single specimen could show that pattern. It only became visible because the specimens existed together, waiting to be read against each other.',
       },
     ],
   },
@@ -811,7 +811,7 @@ export const slides: Slide[] = [
         title: 'Rare. Beautiful. Functional.',
         subtitle: 'A treasure holds all three.',
         notes:
-          'Step back. Rare alone is just scarcity. Beautiful alone is decoration. Functional alone is utility. A treasure is what happens when one specimen holds all three at once — and every specimen in the last twenty minutes earned that word without me saying it. The spinel that taught a sorbent. The porous mineral. The rowleyite. The biofilm inside a kidney stone. Same pattern, every time.',
+          'Step back for a moment. Rare alone is just scarcity. Beautiful alone is decoration. Functional alone is utility. A treasure is what happens when one specimen holds all three at once — and every specimen in the last twenty minutes earned that word without me saying it. The spinel that taught a sorbent. The porous mineral. The rowleyite. The biofilm inside a kidney stone. Same pattern, every time.',
       },
     ],
   },
@@ -828,7 +828,7 @@ export const slides: Slide[] = [
         title: 'Every specimen is a record.',
         subtitle: 'Beauty is one way to read it.',
         notes:
-          'Any real work of art is never just an object to look at — it’s a story, about a place and time, or about what was happening inside the person who made it. A specimen holds a story too. Not a metaphor. Literal information: how it formed, when, what changed around it while it grew. Beauty is one way to read that story. It was never the only one.',
+          'Any real work of art is never just an object to look at — it\'s a story, about a place and time, or about what was happening inside the person who made it. A specimen holds a story too. Not a metaphor. Literal information: how it formed, when, what changed around it while it grew. Beauty is one way to read that story. It was never the only one.',
       },
     ],
   },
@@ -842,7 +842,7 @@ export const slides: Slide[] = [
     ghostNum: '02',
     title: 'Exhibition as the same bet,\npointed at the public',
     notes:
-      'Research infrastructure is the half of the mission the public doesn’t see. Exhibition is the half they do. Same acquisition logic, different audience, same story, read differently. Name Unearthed.',
+      'Research infrastructure is the half of the mission the public doesn\'t see. Exhibition is the half they do. Same acquisition logic, different audience, same story — read differently. Which brings us to Unearthed.',
   },
   {
     id: 'unearthed',
@@ -859,7 +859,7 @@ export const slides: Slide[] = [
     },
     yaw: -1,
     notes:
-      'Crystallized minerals as finished aesthetic objects — not illustrations of principle, not raw material for lapidary. No pairing against human-made art. Further than Rare Earth at the Crow Museum here in Dallas, and Santa Barbara. Strong local hook.',
+      'Crystallized minerals as finished aesthetic objects — not illustrations of a principle, not raw material for lapidary. No pairing against human-made art. Further than Rare Earth at the Crow Museum here in Dallas, and further than Santa Barbara.',
   },
   {
     id: 'criteria',
@@ -1159,7 +1159,7 @@ export const slides: Slide[] = [
         label: 'Alone',
         layers: ['bluecap'],
         notes:
-          'Hold. Do not name it. Unearthed’s first instruction is still in force: the mineral stands alone. Let the room look.',
+          'Don\'t name it yet. Unearthed\'s first instruction is still in force: the mineral stands alone. Just look.',
       },
       {
         id: 'termination',
@@ -1168,7 +1168,7 @@ export const slides: Slide[] = [
         layers: ['bluecap'],
         callouts: ['termination'],
         notes:
-          'Collectors pay for that termination. It is also an uninterrupted growth history. Size, form, matrix stay in your mouth, not on the wall.',
+          'Collectors pay for that termination. And it is also an uninterrupted growth history. Size, form, matrix — those stay in what we say, not on the wall.',
       },
       {
         id: 'cap',
@@ -1177,7 +1177,7 @@ export const slides: Slide[] = [
         layers: ['bluecap'],
         callouts: ['termination', 'cap', 'body'],
         notes:
-          'Talk the Mn → Fe shift off the formulae. The indigo rind is why it is famous and a chemical change written into the crystal. Then the pocket.',
+          'The manganese-to-iron shift is right there in the formulae. That indigo rind is why this piece is famous — and it\'s a chemical change written into the crystal. Then the pocket.',
       },
       {
         id: 'same',
@@ -1186,7 +1186,7 @@ export const slides: Slide[] = [
         layers: ['bluecap'],
         callouts: ['termination', 'cap', 'body', 'pocket'],
         notes:
-          'Tourmaline Queen, 1972. One pocket. Never again. That is the locality — not a district, a single cavity. Hold — the wall is about to do too much.',
+          'Tourmaline Queen, 1972. One pocket. Never again. That is the locality — not a district, a single cavity. And now the wall is about to do too much.',
       },
       {
         id: 'less',
@@ -1218,7 +1218,7 @@ export const slides: Slide[] = [
           'dump-grade',
         ],
         notes:
-          'Look at that. A display specimen does not get better because we laid the science on top of it. Less is more. The crystal is already pleasing. Keeping that simple is more inviting. Now strip it back to what a visitor can actually take.',
+          'Look at that. A display specimen does not get better because we laid the science on top of it. Less is more. The crystal is already pleasing. Keeping that simple is more inviting. So let\'s strip it back to what a visitor can actually take.',
       },
       {
         id: 'enough',
@@ -1228,7 +1228,7 @@ export const slides: Slide[] = [
         calloutDelay: 2,
         calloutFade: 2,
         notes:
-          'This is enough. Indicolite, rubellite, one pocket, Carnegie. A visitor can take that and still look. Then the wave.',
+          'This is enough. Indicolite, rubellite, one pocket, Carnegie. A visitor can take that and still look. Now the wave.',
       },
     ],
   },
@@ -1254,7 +1254,7 @@ export const slides: Slide[] = [
         label: 'The wave',
         layers: ['wave'],
         notes:
-          'Hold. This is the real color. Do not say dyed. Let the room read a wave that never moved — water, frozen by crystallization, still carrying the chemistry of the fluid that made it.',
+          'This is the real color. A wave that never moved — water, frozen by crystallization, still carrying the chemistry of the fluid that made it.',
       },
       {
         id: 'water',
@@ -1270,7 +1270,7 @@ export const slides: Slide[] = [
         title: 'The color came\nwith the water.',
         layers: ['wave'],
         notes:
-          'Trace copper in the aragonite lattice — the fluid’s chemistry, not a dye. Same transition-metal mechanism as malachite and azurite. Visitors will assume dyed. Don’t lead with that. They have already seen the form as water. Now the blue is what that water was carrying.',
+          'There\'s trace copper in the aragonite lattice — the fluid\'s chemistry, not a dye. Same transition-metal mechanism as malachite and azurite. Visitors will assume it\'s dyed. Don\'t lead with that. They\'ve already seen the form as water. Now the blue is what that water was carrying.',
       },
     ],
   },
@@ -1289,7 +1289,7 @@ export const slides: Slide[] = [
     },
     yaw: 1,
     notes:
-      'Wuning stibnite pocket preserved instead of ground for antimony. Crystallized gold worth orders of magnitude above melt value — because it wasn’t melted. Every exceptional specimen destroyed is an irretrievable loss. Infrastructure argument in reverse: preservation against economic pressure.',
+      'This Wuning stibnite pocket was preserved instead of ground for antimony. Crystallized gold is worth orders of magnitude above melt value — because it wasn\'t melted. Every exceptional specimen destroyed is an irretrievable loss. That\'s the infrastructure argument in reverse: preservation against economic pressure.',
   },
   {
     id: 'prep-spectrum',
@@ -1300,7 +1300,7 @@ export const slides: Slide[] = [
     title: 'Where does geology end\nand intention begin?',
     motif: 'prep-modes',
     notes:
-      'Unearthed holds the open question with four deliberate modes. Use [ ] or , . to pull focus: citrine teapot (total transformation), chrysanthemum stone (subtraction), malachite feet in azurite (architecture exposed — cut and polished), ammolite reconstruction swimming left (interpretive reconstruction). Don’t resolve the question.',
+      'Unearthed holds the open question with four deliberate modes. A citrine teapot — total transformation. Chrysanthemum stone — subtraction. Malachite feet in azurite — architecture exposed, cut and polished. And an ammolite reconstruction, swimming — interpretive reconstruction. Where does geology end and intention begin? I\'m not going to resolve that question.',
   },
   {
     id: 'provenance',
@@ -1317,7 +1317,7 @@ export const slides: Slide[] = [
     },
     yaw: -1,
     notes:
-      'Call it the tattoo because Rob Lavinsky has this piece on his arm. Arkenstone. This symposium is his. Then the turn: the mine name is the other tattoo — De’an, Wushan, not “fluorite, China.” A mark you can go back to. Undocumented material can still be beautiful; it can never become infrastructure.',
+      'Call it the tattoo because Rob Lavinsky has this piece on his arm. Arkenstone. This symposium is his. But the mine name is the other tattoo — De’an, Wushan, not just “fluorite, China.” A mark you can go back to. Undocumented material can still be beautiful. It can never become infrastructure.',
   },
   {
     id: 'regional',
@@ -1364,7 +1364,7 @@ export const slides: Slide[] = [
         title: 'Himalaya, King, Stewart, more.',
         layers: ['ranges'],
         notes:
-          'Peninsular Ranges pegmatites — Himalaya, King, Stewart, then more. The plates walk: Himalaya tourmaline, Morganite Queen, King Mine ex. Larson, Little Three, Crevoshay pendant — wearable, not a ring. NHMLAC’s collection as the largest public gathering of that material assembled to date. Keep tight. Regional color, not new argument.',
+          'Peninsular Ranges pegmatites — Himalaya, King, Stewart, and more. Himalaya tourmaline. The Morganite Queen. King Mine, ex. Larson. Little Three. A Crevoshay pendant — wearable, not a ring. NHMLAC\'s collection is the largest public gathering of that material assembled to date. Regional color. Not a new argument.',
       },
     ],
   },
@@ -1383,7 +1383,7 @@ export const slides: Slide[] = [
     },
     yaw: -1,
     notes:
-      'What the museum “keeps” isn’t necessarily these objects — it’s the practice of bringing exceptional borrowed material to change how visitors see the permanent collection. A temporary exhibition is a lens, not a holding. Blue Wave leaves in 2027; the way of looking doesn’t.',
+      'What the museum “keeps” isn’t necessarily these objects — it’s the practice of bringing exceptional borrowed material to change how visitors see the permanent collection. A temporary exhibition is a lens, not a holding. Blue Wave leaves in 2027. The way of looking doesn’t.',
   },
   {
     id: 'both',
@@ -1398,7 +1398,7 @@ export const slides: Slide[] = [
       'Exhibit loans in',
     ],
     notes:
-      'Each depends on the others. Not a generic claim about “museums” — specific to what this institution is built to do. Act I could not run on a loan clock. Accession is the only path by which a collector’s private judgment enters the centuries-long story we opened with. Don’t over-explain the ask. State the mechanism.',
+      'Each of these depends on the others. That\'s not a generic claim about museums — it\'s specific to what this institution is built to do. Act I could not run on a loan clock. Accession is the only path by which a collector\'s private judgment enters the centuries-long story we opened with.',
   },
 
   // ── Close ─────────────────────────────────────────────
@@ -1410,7 +1410,7 @@ export const slides: Slide[] = [
     ghostNum: '03',
     title: 'One acquisition logic.',
     notes:
-      'Provenance, rarity, structural intuition in — drugs, templates, biosignatures, and a changed permanent collection out. Loans recruit attention; ownership holds it. Complementary, not competitors.',
+      'Provenance, rarity, structural intuition go in. Drugs, templates, biosignatures, and a changed permanent collection come out. Loans recruit attention. Ownership holds it. Complementary, not competitors.',
   },
   {
     id: 'bet',
@@ -1419,7 +1419,7 @@ export const slides: Slide[] = [
     layout: 'void',
     title: 'Today’s specimen is\ntomorrow’s unanswered\nquestion.',
     notes:
-      'Run on an instrument not yet built — or seen by a visitor who hasn’t yet learned how to look. Strategic collecting is scientific and cultural infrastructure. Restate the abstract closing claim, then return to the aquamarine.',
+      'Today\'s specimen is tomorrow\'s unanswered question — run on an instrument not yet built, or seen by a visitor who hasn\'t yet learned how to look. Strategic collecting is scientific and cultural infrastructure.',
   },
   {
     id: 'close',
@@ -1428,6 +1428,7 @@ export const slides: Slide[] = [
     layout: 'bleed',
     camera: 'push',
     title: 'A museum is a reflection\nof who cared enough\nto keep it.',
+    enterDelay: 2,
     image: {
       src: asset('images/aquamarine.jpg'),
       alt: 'Aquamarine crystals in albite with schorl, Unearthed',
@@ -1435,6 +1436,6 @@ export const slides: Slide[] = [
     },
     yaw: 1,
     notes:
-      'Full blast. The line is on the wall. Then, spoken: Unearthed closes April 2027. Nearly everything is on loan. That’s not a weakness; it’s the argument. What NHMLAC is betting on isn’t these objects — it’s you. A private collection can show you something extraordinary once. A public museum is making a longer bet: that showing you something extraordinary, even temporarily, changes what you notice in what’s already, permanently, yours. Then thank-yous. Not before.',
+      'A museum is a reflection of who cared enough to keep it. Unearthed closes April 2027. Nearly everything is on loan. That\'s not a weakness — it\'s the argument. What NHMLAC is betting on isn\'t these objects. It\'s you. A private collection can show you something extraordinary once. A public museum is making a longer bet: that showing you something extraordinary, even temporarily, changes what you notice in what\'s already, permanently, yours.',
   },
 ]

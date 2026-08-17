@@ -404,6 +404,10 @@
   overflow: hidden;
 }
 
+:global(html[data-present]) .buildId {
+  display: none;
+}
+
 :global(html[data-present]) .shell {
   scrollbar-width: none;
 }
