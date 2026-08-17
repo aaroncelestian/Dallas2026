@@ -90,7 +90,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `morganite-queen.jpg` | Peninsular Ranges · Morganite Queen |
 | `king-mine.jpg` | Peninsular Ranges · King Mine |
 | `little-three.jpg` | Peninsular Ranges · Little Three |
-| `crevoshay-pendant.jpg` | Peninsular Ranges · Crevoshay pendant |
+| `crevoshay-pendant.png` | Peninsular Ranges · Crevoshay pendant |
 | `unearthed-gallery.jpg` | Loans |
 | `prep-teapot.jpg` | Prep mode 1 |
 | `prep-chrysanthemum.jpg` | Prep mode 2 |
