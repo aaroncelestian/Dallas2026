@@ -71,10 +71,11 @@ export function useActiveSlide(
       )
     }
 
+    const fromEdge = (x: number) => x <= EDGE || x >= window.innerWidth - EDGE
+
     const ignore = (target: EventTarget | null, x: number) => {
       if (chrome(target)) return true
-      const fromEdge = x <= EDGE || x >= window.innerWidth - EDGE
-      if (fromEdge) return false
+      if (fromEdge(x)) return false
       return target instanceof Element && Boolean(target.closest('canvas'))
     }
 
@@ -87,9 +88,16 @@ export function useActiveSlide(
       pointerId = e.pointerId
       startX = e.clientX
       startY = e.clientY
+      if (
+        fromEdge(e.clientX) &&
+        e.target instanceof Element &&
+        e.target.closest('canvas')
+      ) {
+        e.stopPropagation()
+      }
     }
 
-    const finish = (e: PointerEvent) => {
+    const onUp = (e: PointerEvent) => {
       if (!tracking || e.pointerId !== pointerId) return
       tracking = false
       const dx = e.clientX - startX
@@ -106,13 +114,17 @@ export function useActiveSlide(
       goTo(activeIndexRef.current + (dx < 0 ? 1 : -1))
     }
 
-    window.addEventListener('pointerdown', onDown)
-    window.addEventListener('pointerup', finish)
-    window.addEventListener('pointercancel', finish)
+    const onCancel = (e: PointerEvent) => {
+      if (e.pointerId === pointerId) tracking = false
+    }
+
+    window.addEventListener('pointerdown', onDown, true)
+    window.addEventListener('pointerup', onUp, true)
+    window.addEventListener('pointercancel', onCancel, true)
     return () => {
-      window.removeEventListener('pointerdown', onDown)
-      window.removeEventListener('pointerup', finish)
-      window.removeEventListener('pointercancel', finish)
+      window.removeEventListener('pointerdown', onDown, true)
+      window.removeEventListener('pointerup', onUp, true)
+      window.removeEventListener('pointercancel', onCancel, true)
     }
   }, [goTo])
 
