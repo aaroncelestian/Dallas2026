@@ -268,11 +268,11 @@ export const slides: Slide[] = [
     enterHit: true,
     clearPlate: true,
     image: {
-      src: asset('images/cabinet-windsor.webp'),
+      src: asset('images/cabinet-windsor.jpg'),
       alt: 'Central doorway of the Borghese-Windsor Cabinet',
       fit: 'contain',
       focus: { x: 0.347876, y: 0.427042, w: 0.342135, h: 0.176953 },
-      detail: asset('images/cabinet-doorway.webp'),
+      detail: asset('images/cabinet-doorway.jpg'),
       marks: [
         {
           label: 'Agate',
@@ -280,17 +280,17 @@ export const slides: Slide[] = [
           y: 0.244,
           w: 0.105,
           h: 0.048,
-          src: asset('images/cabinet-agate.webp'),
+          src: asset('images/cabinet-agate.png'),
           tint: '#d47848',
         },
         {
-          label: 'Quartz',
+          label: 'Amethyst',
           x: 0.448,
           y: 0.328,
           w: 0.132,
           h: 0.036,
-          src: asset('images/cabinet-quartz.webp'),
-          tint: '#c4a0d4',
+          src: asset('images/cabinet-amethyst.png'),
+          tint: '#9a4a8c',
         },
         {
           label: 'Travertine',
@@ -298,7 +298,7 @@ export const slides: Slide[] = [
           y: 0.422,
           w: 0.12,
           h: 0.014,
-          src: asset('images/cabinet-travertine.webp'),
+          src: asset('images/cabinet-travertine.png'),
           tint: '#d8c4a4',
         },
         {
@@ -307,7 +307,7 @@ export const slides: Slide[] = [
           y: 0.614,
           w: 0.044,
           h: 0.020,
-          src: asset('images/cabinet-lapis.webp'),
+          src: asset('images/cabinet-lapis.png'),
           tint: '#4a7ec8',
         },
       ],
@@ -319,7 +319,7 @@ export const slides: Slide[] = [
       'Two populations. Two source rocks.',
     ],
     notes:
-      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Two seconds. Then fifteen seconds pulling back, and it is a cabinet. As it settles, the stones light: quartz, agate, travertine, lapis. Talk the minerals off the close-ups. Then advance. The plates go to blur and the facts come in: papal commission, the materials, moganite dating the agate, two populations from two source rocks. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
+      'Hold the doorway. Do not say cabinet. Do not say furniture. Let it read as a temple threshold — something biblical, larger than the object. Two seconds. Then fifteen seconds pulling back, and it is a cabinet. As it settles, the stones light: agate, amethyst, travertine, lapis. Talk the minerals off the close-ups. Then advance. The plates go to blur and the facts come in: papal commission, the materials, moganite dating the agate, two populations from two source rocks. The point stays in your mouth: what we keep opens onto more than we knew. Then Act I.',
   },
 
   // ── Act I ─────────────────────────────────────────────
