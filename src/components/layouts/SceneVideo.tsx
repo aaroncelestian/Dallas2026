@@ -294,7 +294,7 @@ export function SceneVideo({
       if (live.current.parked || !stops.length) return
       if (el.currentTime < resumeGateRef.current) return
       const target = stops[live.current.step]
-      if (!target) return
+      if (!target) return // tail after last hold — play through to the end
       if (el.currentTime + SLACK < target.at) return
       el.pause()
       el.currentTime = target.at
@@ -307,36 +307,54 @@ export function SceneVideo({
     const onMeta = () => setDur(el.duration || 0)
     const onPlay = () => setPlaying(true)
     const onPause = () => setPlaying(false)
+    const onEnded = () => {
+      setPlaying(false)
+      setParked(false)
+      live.current.parked = false
+      live.current.step = stops.length
+      setStep(stops.length)
+      setT(el.duration || 0)
+      resumeGateRef.current = 0
+    }
 
     el.addEventListener('timeupdate', onTime)
-    el.addEventListener('ended', onTime)
+    el.addEventListener('ended', onEnded)
     el.addEventListener('loadedmetadata', onMeta)
     el.addEventListener('play', onPlay)
     el.addEventListener('pause', onPause)
     if (el.duration) setDur(el.duration)
     return () => {
       el.removeEventListener('timeupdate', onTime)
-      el.removeEventListener('ended', onTime)
+      el.removeEventListener('ended', onEnded)
       el.removeEventListener('loadedmetadata', onMeta)
       el.removeEventListener('play', onPlay)
       el.removeEventListener('pause', onPause)
     }
   }, [src, stops])
 
-  /** Leave a hold and play forward to the next — do not seek (keyframe snap jumps holds). */
+  /** Leave a hold and play forward. Last hold plays through to the end of the clip. */
   const resumeFromHold = (i: number) => {
     const el = videoRef.current
-    if (!el || i >= last) return false
+    if (!el || i < 0) return false
     const gate = stops[i].at + 0.2
     resumeGateRef.current = gate
     live.current.parked = false
-    live.current.step = i + 1
+    const nextStep = i >= last ? stops.length : i + 1
+    live.current.step = nextStep
     setParked(false)
-    setStep(i + 1)
+    setStep(nextStep)
     setSelectedId(null)
     setPlaying(true)
     void el.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
     return true
+  }
+
+  const atClipEnd = (el: HTMLVideoElement | null) => {
+    if (!el) return false
+    if (el.ended) return true
+    const d = el.duration
+    if (!Number.isFinite(d) || d <= 0) return false
+    return el.currentTime >= d - 0.2
   }
 
   const togglePlay = () => {
@@ -347,22 +365,16 @@ export function SceneVideo({
       setPlaying(false)
       return
     }
-    const { step: i, parked: atHold, last: end } = live.current
+    const { step: i, parked: atHold } = live.current
     if (atHold) {
-      if (i >= end) {
-        resumeGateRef.current = 0
-        live.current.parked = false
-        live.current.step = 0
-        setParked(false)
-        setStep(0)
-        setSelectedId(null)
-        el.currentTime = 0
-        setT(0)
-        void el.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
-        return
-      }
       resumeFromHold(i)
       return
+    }
+    if (atClipEnd(el)) {
+      el.currentTime = 0
+      setT(0)
+      setStep(0)
+      live.current.step = 0
     }
     void el.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
   }
@@ -373,9 +385,23 @@ export function SceneVideo({
 
     const goNext = () => {
       const { step: i, parked: atHold } = live.current
+      if (atClipEnd(el)) return false
+
       if (!atHold) {
         const target = stops[i]
-        if (!target || !el) return false
+        if (!target) {
+          // Playing the tail after the last hold — skip to the end, then next advance leaves.
+          if (!el) return false
+          el.pause()
+          if (Number.isFinite(el.duration)) {
+            el.currentTime = el.duration
+            setT(el.duration)
+          }
+          setPlaying(false)
+          live.current.step = stops.length
+          setStep(stops.length)
+          return true
+        }
         resumeGateRef.current = 0
         el.pause()
         el.currentTime = target.at
@@ -389,6 +415,19 @@ export function SceneVideo({
 
     const goPrev = () => {
       const { step: i, parked: atHold } = live.current
+      if (atClipEnd(el) && !atHold) {
+        // From end of clip, go back to last hold
+        if (!el || !stops.length) return false
+        const back = last
+        el.pause()
+        el.currentTime = stops[back].at
+        setT(stops[back].at)
+        setStep(back)
+        setParked(true)
+        setPlaying(false)
+        setSelectedId(null)
+        return true
+      }
       const back = atHold ? i - 1 : i - 1
       if (back < 0) return false
       if (!el) return false
@@ -697,177 +736,177 @@ export function SceneVideo({
 
       {active &&
         createPortal(
-          <>
-            <div
-              className={styles.chrome}
-              onClick={(e) => e.stopPropagation()}
-              onPointerDown={(e) => e.stopPropagation()}
+          <div
+            className={styles.chrome}
+            onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className={styles.transportBtn}
+              onClick={togglePlay}
+              aria-label={playing ? 'Pause' : 'Play'}
+              title="Play / pause (K)"
             >
-              <button
-                type="button"
-                className={styles.transportBtn}
-                onClick={togglePlay}
-                aria-label={playing ? 'Pause' : 'Play'}
-                title="Play / pause (K)"
-              >
-                {playing ? 'Pause' : 'Play'}
-              </button>
+              {playing ? 'Pause' : 'Play'}
+            </button>
 
-              <div className={styles.scrubWrap}>
-                <input
-                  className={styles.scrub}
-                  type="range"
-                  min={0}
-                  max={Math.max(dur, 0.01)}
-                  step={0.01}
-                  value={Math.min(t, dur || t)}
-                  aria-label="Scrub timeline"
-                  onChange={(e) => scrubTo(Number(e.target.value))}
-                />
-                <div className={styles.holdTicks} aria-hidden>
-                  {stops.map((h, i) => (
-                    <button
-                      key={`${h.at}-${i}`}
-                      type="button"
-                      className={styles.holdTick}
-                      data-active={(parked && step === i) || undefined}
-                      style={{ left: `${dur ? (h.at / dur) * 100 : 0}%` }}
-                      title={
-                        annotate
-                          ? `Hold ${i + 1} · ${fmt(h.at)} — click to jump, Shift+click to delete`
-                          : `Hold ${i + 1} · ${fmt(h.at)}`
+            <div className={styles.scrubWrap}>
+              <input
+                className={styles.scrub}
+                type="range"
+                min={0}
+                max={Math.max(dur, 0.01)}
+                step={0.01}
+                value={Math.min(t, dur || t)}
+                aria-label="Scrub timeline"
+                onChange={(e) => scrubTo(Number(e.target.value))}
+              />
+              <div className={styles.holdTicks} aria-hidden>
+                {stops.map((h, i) => (
+                  <button
+                    key={`${h.at}-${i}`}
+                    type="button"
+                    className={styles.holdTick}
+                    data-active={(parked && step === i) || undefined}
+                    style={{ left: `${dur ? (h.at / dur) * 100 : 0}%` }}
+                    title={
+                      annotate
+                        ? `Hold ${i + 1} · ${fmt(h.at)} — click to jump, Shift+click to delete`
+                        : `Hold ${i + 1} · ${fmt(h.at)}`
+                    }
+                    onClick={(e) => {
+                      if (annotate && e.shiftKey) {
+                        e.preventDefault()
+                        removeHold(i)
+                        return
                       }
-                      onClick={(e) => {
-                        if (annotate && e.shiftKey) {
-                          e.preventDefault()
-                          removeHold(i)
-                          return
-                        }
-                        scrubTo(h.at)
-                      }}
-                    />
-                  ))}
-                </div>
+                      scrubTo(h.at)
+                    }}
+                  />
+                ))}
               </div>
+            </div>
 
-              <span className={styles.time}>
-                {fmt(t)} / {fmt(dur)}
-              </span>
+            <span className={styles.time}>
+              {fmt(t)} / {fmt(dur)}
+            </span>
 
-              <button
-                type="button"
-                className={styles.transportBtn}
-                data-on={annotate || undefined}
-                onClick={() => setAnnotate((v) => !v)}
-                title="Annotate callouts (A)"
-              >
-                Annotate
-              </button>
+            <button
+              type="button"
+              className={styles.transportBtn}
+              data-on={annotate || undefined}
+              onClick={() => setAnnotate((v) => !v)}
+              title="Annotate callouts (A)"
+            >
+              Annotate
+            </button>
 
-              {annotate && (
-                <>
-                  <label className={styles.kindPick}>
-                    <span>Mark</span>
+            {annotate && (
+              <>
+                <label className={styles.kindPick}>
+                  <span>Mark</span>
+                  <select
+                    value={kindDraft}
+                    onChange={(e) => setKindDraft(e.target.value as VideoMarkKind)}
+                  >
+                    <option value="mineral">Mineral</option>
+                    <option value="biomass">Biomass</option>
+                    <option value="onion">Onion</option>
+                  </select>
+                </label>
+                <button type="button" className={styles.transportBtn} onClick={addHoldHere}>
+                  Hold here
+                </button>
+                <button
+                  type="button"
+                  className={styles.transportBtn}
+                  disabled={!parked && stops.every((h) => Math.abs(h.at - t) > NEAR)}
+                  onClick={() => removeHold()}
+                  title="Delete current pause (Delete / Backspace, or Shift+click a tick)"
+                >
+                  Remove hold
+                </button>
+                <button
+                  type="button"
+                  className={styles.transportBtn}
+                  onClick={() => void copyJson()}
+                >
+                  {copied ? 'Copied' : 'Copy JSON'}
+                </button>
+              </>
+            )}
+          </div>,
+          document.getElementById('talk-transport') ?? document.body,
+        )}
+
+      {active &&
+        annotate &&
+        createPortal(
+          <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.panelHint}>
+              Click the CT frame to place a circle. Scrub, then <strong>Hold here</strong> for a
+              pause. Delete a pause with <strong>Remove hold</strong>, <strong>Delete</strong>, or{' '}
+              <strong>Shift+click</strong> an orange tick. Then <strong>Copy JSON</strong> into the{' '}
+              <code>holds</code> array in <code>slides.ts</code> (stones → ct layer) to keep it.
+            </p>
+            {selected ? (
+              <div className={styles.form}>
+                <label>
+                  Title
+                  <input
+                    value={selected.title}
+                    onChange={(e) => patchMark(selected.id, { title: e.target.value })}
+                  />
+                </label>
+                <label>
+                  Body
+                  <input
+                    value={selected.body ?? ''}
+                    onChange={(e) => patchMark(selected.id, { body: e.target.value })}
+                  />
+                </label>
+                <div className={styles.formRow}>
+                  <label>
+                    Kind
                     <select
-                      value={kindDraft}
-                      onChange={(e) => setKindDraft(e.target.value as VideoMarkKind)}
+                      value={selected.kind}
+                      onChange={(e) =>
+                        patchMark(selected.id, { kind: e.target.value as VideoMarkKind })
+                      }
                     >
                       <option value="mineral">Mineral</option>
                       <option value="biomass">Biomass</option>
                       <option value="onion">Onion</option>
                     </select>
                   </label>
-                  <button type="button" className={styles.transportBtn} onClick={addHoldHere}>
-                    Hold here
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.transportBtn}
-                    disabled={!parked && stops.every((h) => Math.abs(h.at - t) > NEAR)}
-                    onClick={() => removeHold()}
-                    title="Delete current pause (Delete / Backspace, or Shift+click a tick)"
-                  >
-                    Remove hold
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.transportBtn}
-                    onClick={() => void copyJson()}
-                  >
-                    {copied ? 'Copied' : 'Copy JSON'}
-                  </button>
-                </>
-              )}
-            </div>
-
-            {annotate && (
-              <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
-                <p className={styles.panelHint}>
-                  Click the CT frame to place a circle. Scrub, then <strong>Hold here</strong> for a
-                  pause. Delete a pause with <strong>Remove hold</strong>, <strong>Delete</strong>,
-                  or <strong>Shift+click</strong> an orange tick. Then <strong>Copy JSON</strong>{' '}
-                  into the <code>holds</code> array in <code>slides.ts</code> (stones → ct layer) to
-                  keep it.
-                </p>
-                {selected ? (
-                  <div className={styles.form}>
-                    <label>
-                      Title
-                      <input
-                        value={selected.title}
-                        onChange={(e) => patchMark(selected.id, { title: e.target.value })}
-                      />
-                    </label>
-                    <label>
-                      Body
-                      <input
-                        value={selected.body ?? ''}
-                        onChange={(e) => patchMark(selected.id, { body: e.target.value })}
-                      />
-                    </label>
-                    <div className={styles.formRow}>
-                      <label>
-                        Kind
-                        <select
-                          value={selected.kind}
-                          onChange={(e) =>
-                            patchMark(selected.id, { kind: e.target.value as VideoMarkKind })
-                          }
-                        >
-                          <option value="mineral">Mineral</option>
-                          <option value="biomass">Biomass</option>
-                          <option value="onion">Onion</option>
-                        </select>
-                      </label>
-                      <label>
-                        Side
-                        <select
-                          value={selected.side ?? 'right'}
-                          onChange={(e) =>
-                            patchMark(selected.id, {
-                              side: e.target.value as 'left' | 'right',
-                            })
-                          }
-                        >
-                          <option value="left">Left</option>
-                          <option value="right">Right</option>
-                        </select>
-                      </label>
-                    </div>
-                    <button
-                      type="button"
-                      className={styles.transportBtn}
-                      onClick={() => deleteMark(selected.id)}
+                  <label>
+                    Side
+                    <select
+                      value={selected.side ?? 'right'}
+                      onChange={(e) =>
+                        patchMark(selected.id, {
+                          side: e.target.value as 'left' | 'right',
+                        })
+                      }
                     >
-                      Delete mark
-                    </button>
-                  </div>
-                ) : (
-                  <p className={styles.panelEmpty}>No mark selected.</p>
-                )}
+                      <option value="left">Left</option>
+                      <option value="right">Right</option>
+                    </select>
+                  </label>
+                </div>
+                <button
+                  type="button"
+                  className={styles.transportBtn}
+                  onClick={() => deleteMark(selected.id)}
+                >
+                  Delete mark
+                </button>
               </div>
+            ) : (
+              <p className={styles.panelEmpty}>No mark selected.</p>
             )}
-          </>,
+          </div>,
           document.body,
         )}
     </div>

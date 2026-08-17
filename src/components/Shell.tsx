@@ -624,6 +624,7 @@ export function Shell() {
             Exit full screen
           </button>
         )}
+        <div id="talk-transport" className={styles.transportSlot} />
       </div>
 
       {!presenting && notesOpen && (
