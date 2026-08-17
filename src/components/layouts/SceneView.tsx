@@ -81,6 +81,7 @@ function SceneSlideshow({
             fit={fit}
             yaw={1}
             camera="hold"
+            cutout={plate.cutout}
           />
         </motion.div>
       </AnimatePresence>

@@ -15,6 +15,7 @@ export type DepthFieldProps = {
   yaw?: 1 | -1
   camera?: CameraKind
   mode?: PlateMode
+  cutout?: boolean
   className?: string
   children?: React.ReactNode
 }
@@ -66,6 +67,7 @@ export function DepthField({
   fit = 'cover',
   camera = 'push',
   mode = 'live',
+  cutout = false,
   className,
   children,
 }: DepthFieldProps) {
@@ -73,7 +75,7 @@ export function DepthField({
   const present = isPresentMode()
   const rootRef = useRef<HTMLDivElement>(null)
   const [ready, setReady] = useState(false)
-  const edges = useEdgeExtend(src, fit === 'contain')
+  const edges = useEdgeExtend(src, fit === 'contain' && !cutout)
 
   const px = useSpring(0, { stiffness: 28, damping: 24, mass: 0.8 })
   const py = useSpring(0, { stiffness: 28, damping: 24, mass: 0.8 })
@@ -123,6 +125,7 @@ export function DepthField({
       ref={rootRef}
       className={`${styles.root}${className ? ` ${className}` : ''}`}
       data-fit={fit}
+      data-cutout={cutout || undefined}
       data-active={active || undefined}
       data-ready={ready || undefined}
       data-camera={reduced ? 'hold' : camera}

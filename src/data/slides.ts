@@ -41,6 +41,8 @@ export type SceneLayerKind = 'image' | 'motif' | 'video' | 'slideshow'
 export interface SceneSlide {
   src: string
   alt: string
+  /** Float on the stage. No edge bleed. */
+  cutout?: boolean
 }
 
 export interface SceneLayer {
@@ -1221,8 +1223,9 @@ export const slides: Slide[] = [
             alt: 'Spessartine and schorl, Little Three Mine, Ramona',
           },
           {
-            src: asset('images/crevoshay-pendant.jpg'),
+            src: asset('images/crevoshay-pendant.png'),
             alt: 'Paula Crevoshay pendant — San Diego tourmaline',
+            cutout: true,
           },
         ],
       },
