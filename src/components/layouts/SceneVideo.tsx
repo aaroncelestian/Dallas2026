@@ -228,6 +228,7 @@ export function SceneVideo({
   const [box, setBox] = useState<Box>({ x: 0, y: 0, w: 0, h: 0 })
   const [videoSize, setVideoSize] = useState({ w: VIDEO_W, h: VIDEO_H })
   const [kindDraft, setKindDraft] = useState<VideoMarkKind>('mineral')
+  const resumeGateRef = useRef(0)
   const live = useRef({ step: 0, parked: false, annotate: false, last: 0 })
   live.current = { step, parked, annotate, last }
 
@@ -290,6 +291,7 @@ export function SceneVideo({
     const onTime = () => {
       setT(el.currentTime)
       if (live.current.parked || !stops.length) return
+      if (el.currentTime < resumeGateRef.current) return
       const target = stops[live.current.step]
       if (!target) return
       if (el.currentTime + SLACK < target.at) return
@@ -299,6 +301,7 @@ export function SceneVideo({
       setStep(live.current.step)
       setParked(true)
       setPlaying(false)
+      resumeGateRef.current = 0
     }
     const onMeta = () => setDur(el.duration || 0)
     const onPlay = () => setPlaying(true)
@@ -319,6 +322,22 @@ export function SceneVideo({
     }
   }, [src, stops])
 
+  /** Leave a hold and play forward to the next — do not seek (keyframe snap jumps holds). */
+  const resumeFromHold = (i: number) => {
+    const el = videoRef.current
+    if (!el || i >= last) return false
+    const gate = stops[i].at + 0.2
+    resumeGateRef.current = gate
+    live.current.parked = false
+    live.current.step = i + 1
+    setParked(false)
+    setStep(i + 1)
+    setSelectedId(null)
+    setPlaying(true)
+    void el.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
+    return true
+  }
+
   const togglePlay = () => {
     const el = videoRef.current
     if (!el) return
@@ -330,19 +349,21 @@ export function SceneVideo({
     const { step: i, parked: atHold, last: end } = live.current
     if (atHold) {
       if (i >= end) {
+        resumeGateRef.current = 0
+        live.current.parked = false
+        live.current.step = 0
         setParked(false)
         setStep(0)
+        setSelectedId(null)
         el.currentTime = 0
         setT(0)
-      } else {
-        setParked(false)
-        setStep(i + 1)
-        el.currentTime = stops[i].at + 0.05
-        setT(el.currentTime)
+        void el.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
+        return
       }
-      setSelectedId(null)
+      resumeFromHold(i)
+      return
     }
-    void el.play()
+    void el.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
   }
 
   useEffect(() => {
@@ -354,6 +375,7 @@ export function SceneVideo({
       if (!atHold) {
         const target = stops[i]
         if (!target || !el) return false
+        resumeGateRef.current = 0
         el.pause()
         el.currentTime = target.at
         setT(target.at)
@@ -361,16 +383,7 @@ export function SceneVideo({
         setPlaying(false)
         return true
       }
-      if (i >= last) return false
-      const following = i + 1
-      setParked(false)
-      setStep(following)
-      setSelectedId(null)
-      if (el) {
-        el.currentTime = stops[i].at + 0.05
-        void el.play()
-      }
-      return true
+      return resumeFromHold(i)
     }
 
     const goPrev = () => {
@@ -378,6 +391,7 @@ export function SceneVideo({
       const back = atHold ? i - 1 : i - 1
       if (back < 0) return false
       if (!el) return false
+      resumeGateRef.current = 0
       el.pause()
       el.currentTime = stops[back].at
       setT(stops[back].at)
@@ -631,6 +645,7 @@ export function SceneVideo({
         if (!atHold) {
           const target = stops[i]
           if (!target || !el) return
+          resumeGateRef.current = 0
           el.pause()
           el.currentTime = target.at
           setT(target.at)
@@ -638,14 +653,7 @@ export function SceneVideo({
           setPlaying(false)
           return
         }
-        if (i >= last) return
-        setParked(false)
-        setStep(i + 1)
-        setSelectedId(null)
-        if (el) {
-          el.currentTime = stops[i].at + 0.05
-          void el.play()
-        }
+        resumeFromHold(i)
       }}
     >
       <div
