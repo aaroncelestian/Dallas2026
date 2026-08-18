@@ -21,7 +21,8 @@ const CREAM = '#f3eee4'
 const FLIGHT_S = 1.85
 const ALIGN_S = 0.72
 const ORBIT_IN_S = 1.4
-const HOLD_YAW_DEG = 0.7
+const HOLD_YAW_DEG = 12
+const HOLD_YAW_FREQ = 0.28
 const HOLD_PITCH_DEG = 0.45
 const PULL_S = 2.3
 const REPLAY_DELAY_MS = 3000
@@ -354,7 +355,10 @@ function CycleRig({
       a.orbitClock += dt
       const k = easeOut(a.orbitMix)
       viewDir.copy(travelPos).sub(travelLook)
-      viewDir.applyAxisAngle(WORLD_UP, THREE.MathUtils.degToRad(HOLD_YAW_DEG) * a.orbitClock * k)
+      viewDir.applyAxisAngle(
+        WORLD_UP,
+        Math.sin(a.orbitClock * HOLD_YAW_FREQ) * THREE.MathUtils.degToRad(HOLD_YAW_DEG) * k,
+      )
       side.crossVectors(WORLD_UP, viewDir).normalize()
       viewDir.applyAxisAngle(
         side,
