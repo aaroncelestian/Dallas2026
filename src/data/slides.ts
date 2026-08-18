@@ -414,6 +414,7 @@ export const slides: Slide[] = [
         label: 'R&D 100',
         kicker: 'Resource security',
         title: 'An R&D 100.',
+        subtitle: 'Innovation award.',
         layers: ['cycle'],
         notes:
           'R&D World. Global competition. This is the stamp that a mineral-inspired process left the cabinet and entered a live supply-chain conversation. The prize isn\'t the point for this room. The point is that a museum was on the team because someone had spent years watching how natural structures already solve the problem.',

@@ -130,7 +130,7 @@ function TrackDna() {
           metalness={0.52}
           transparent
           opacity={0.5}
-          depthWrite={false}
+          depthWrite
         />
       </mesh>
       <mesh geometry={strands[1]}>
@@ -142,7 +142,7 @@ function TrackDna() {
           metalness={0.4}
           transparent
           opacity={0.5}
-          depthWrite={false}
+          depthWrite
         />
       </mesh>
     </group>
@@ -428,6 +428,9 @@ function CycleRig({
         : THREE.MathUtils.damp(co2.current.position.y, destY, 1.4, dt)
       const mat = co2.current.material as THREE.MeshStandardMaterial
       mat.opacity = reduced ? destOp : THREE.MathUtils.damp(mat.opacity, destOp, 1.8, dt)
+      const solid = mat.opacity >= 0.98
+      mat.transparent = !solid
+      mat.depthWrite = mat.opacity > 0.08
     }
 
     if (returnLine.current) {
@@ -454,8 +457,6 @@ function CycleRig({
           metalness={0.55}
           emissive={GOLD}
           emissiveIntensity={0.2}
-          transparent
-          opacity={0.9}
         />
       </mesh>
 
@@ -532,7 +533,7 @@ function CycleRig({
           emissiveIntensity={0.7}
           transparent
           opacity={0}
-          depthWrite={false}
+          depthWrite
         />
       </mesh>
 
