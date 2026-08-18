@@ -730,7 +730,7 @@ export const slides: Slide[] = [
         title: 'It has an inside.',
         layers: ['ct'],
         notes:
-          'The volume starts moving. The color is the argument. Blue is strong layering — high-density scattering. Red is weak or no layering. The scale is already on the frame; those axis numbers are millimeters. Look — the blue is not a smear. Discrete layered sites, scattered through the volume. And then the onion: concentric layers. That architecture is the point. Then the life.',
+          'The volume starts moving. The color is the argument. Red is strong layering — high-density scattering. Blue is weak or no layering. The scale is already on the frame; those axis numbers are millimeters. Look — the red is not a smear. Discrete layered sites, scattered through the volume. And then the onion: concentric layers. That architecture is the point. Then the life.',
       },
       {
         id: 'biofilm',
