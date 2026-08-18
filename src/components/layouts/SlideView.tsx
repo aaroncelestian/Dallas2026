@@ -125,8 +125,8 @@ function BleedSlide({
             transition={{ duration, ease: [0.16, 1, 0.3, 1] }}
           >
             <img src={promo.src} alt={promo.alt} className={styles.bleedPromoLogo} />
+            {promo.kicker && <div className={`kicker ${styles.bleedPromoKicker}`}>{promo.kicker}</div>}
             <div className={styles.bleedPromoCopy}>
-              {promo.kicker && <div className="kicker">{promo.kicker}</div>}
               {promo.title && (
                 <h2>
                   <TitleLines text={promo.title} />

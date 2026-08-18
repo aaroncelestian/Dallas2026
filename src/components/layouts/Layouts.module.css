@@ -156,13 +156,17 @@
   right: var(--pad-x);
   bottom: var(--pad-y);
   z-index: 3;
-  display: flex;
-  align-items: flex-end;
-  gap: clamp(28px, 4vw, 64px);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: clamp(28px, 4vw, 64px);
+  align-items: start;
 }
 
 .bleedPromoLogo {
   display: block;
+  grid-column: 1;
+  grid-row: 2;
   height: clamp(72px, 12vh, 128px);
   width: auto;
   max-width: min(46vw, 620px);
@@ -170,9 +174,15 @@
   mix-blend-mode: screen;
 }
 
+.bleedPromoKicker {
+  grid-column: 2;
+  grid-row: 1;
+}
+
 .bleedPromoCopy {
+  grid-column: 2;
+  grid-row: 2;
   min-width: 0;
-  max-width: 38em;
 }
 
 .bleedPromoCopy h2 {
@@ -180,6 +190,7 @@
   font-weight: 700;
   line-height: 1.12;
   margin: 0 0 var(--space-3);
+  white-space: nowrap;
   text-shadow: 0 12px 40px color-mix(in srgb, #000 55%, transparent);
 }
 
@@ -600,13 +611,21 @@
     max-width: calc(100% - 2 * var(--pad-x));
   }
   .bleedPromo {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-6);
+    grid-template-columns: 1fr;
+    row-gap: var(--space-6);
+  }
+  .bleedPromoLogo,
+  .bleedPromoKicker,
+  .bleedPromoCopy {
+    grid-column: 1;
+    grid-row: auto;
   }
   .bleedPromoLogo {
     max-width: min(88vw, 520px);
     height: auto;
+  }
+  .bleedPromoCopy h2 {
+    white-space: normal;
   }
   .splitMedia {
     min-height: 42vh;
