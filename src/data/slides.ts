@@ -1296,11 +1296,61 @@ export const slides: Slide[] = [
     label: 'Preparation',
     chapter: 'exhibition',
     layout: 'stage',
-    kicker: 'Four modes',
-    title: 'Where does geology end\nand intention begin?',
-    motif: 'prep-modes',
-    notes:
-      'Unearthed holds the open question with four deliberate modes. A citrine teapot — total transformation. Chrysanthemum stone — subtraction. Malachite feet in azurite — architecture exposed, cut and polished. And an ammolite reconstruction, swimming — interpretive reconstruction. Where does geology end and intention begin? I\'m not going to resolve that question.',
+    clearPlate: true,
+    layers: [
+      {
+        id: 'modes',
+        kind: 'motif',
+        motif: 'prep-modes',
+      },
+    ],
+    scene: [
+      {
+        id: 'question',
+        label: 'The question',
+        kicker: 'Four modes',
+        title: 'Where does geology end\nand intention begin?',
+        layers: ['modes'],
+        notes:
+          'Unearthed holds the open question with four deliberate modes. Where does geology end and intention begin? I\'m not going to resolve that question. I\'m going to show you the spectrum.',
+      },
+      {
+        id: 'teapot',
+        label: 'Transformation',
+        kicker: 'Total transformation',
+        title: 'Geological material,\nfully remade.',
+        layers: ['modes'],
+        notes:
+          'A citrine teapot — total transformation. The geological material is still there, but the object is no longer a specimen. Intention won.',
+      },
+      {
+        id: 'chrysanthemum',
+        label: 'Subtraction',
+        kicker: 'Subtraction',
+        title: 'Revealing rather\nthan reshaping.',
+        layers: ['modes'],
+        notes:
+          'Chrysanthemum stone — subtraction. Almost nothing added. Matrix taken away so the flower can be read. Geology doing most of the work.',
+      },
+      {
+        id: 'malachite',
+        label: 'Architecture',
+        kicker: 'Architecture exposed',
+        title: 'Cut and polished.',
+        layers: ['modes'],
+        notes:
+          'Malachite feet in azurite — architecture exposed, cut and polished. The mineral grew the rooms. Someone chose the section.',
+      },
+      {
+        id: 'ammolite',
+        label: 'Reconstruction',
+        kicker: 'Interpretive reconstruction',
+        title: 'Meaning added\nin light.',
+        layers: ['modes'],
+        notes:
+          'An ammolite reconstruction, swimming. Interpretive reconstruction — the animal is inferred, then put back in motion. Still the open question. Still unresolved.',
+      },
+    ],
   },
   {
     id: 'provenance',

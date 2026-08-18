@@ -5,7 +5,9 @@ import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
 import { CrystalViewer } from '../motifs/CrystalViewer'
 import { LithiumCycle } from '../motifs/LithiumCycle'
+import { PrepModes } from '../motifs/PrepModes'
 import { VoidViewer } from '../motifs/VoidViewer'
+import { PREP_MODES } from '../../data/prepModes'
 import { spokenAlt } from '../../lib/script'
 import { DepthField } from './DepthField'
 import { SceneVideo } from './SceneVideo'
@@ -124,6 +126,14 @@ function LayerView({
     )
   }
 
+  if (layer.kind === 'motif' && layer.motif === 'prep-modes') {
+    return (
+      <div className={styles.sceneMotif}>
+        <PrepModes active={active} modes={PREP_MODES} label={alt} />
+      </div>
+    )
+  }
+
   if (layer.kind === 'slideshow' && layer.slides?.length) {
     return (
       <SceneSlideshow
@@ -194,6 +204,7 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
       data-scene=""
       data-empty={!hasPlate || undefined}
       data-camera={camera}
+      data-motif={layers[0]?.motif}
       data-callouts={callouts.length || videoHolds ? '' : undefined}
     >
       <div className={styles.sceneStage}>

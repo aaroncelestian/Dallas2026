@@ -103,6 +103,36 @@
   min-height: 0;
 }
 
+.prep[data-overview] {
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10vh 5vw 26vh 0;
+}
+
+.prepGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: min(48vw, 720px);
+}
+
+.prep[data-overview] .prepCell {
+  width: auto;
+  aspect-ratio: 4 / 3;
+}
+
+.prep[data-overview] .prepCell img {
+  opacity: 1;
+}
+
+.prep[data-overview] .prepCell span {
+  left: 12px;
+  right: 10px;
+  bottom: 10px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
 .prepStrip {
   display: flex;
   flex-direction: column;

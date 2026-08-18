@@ -137,6 +137,14 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
             : 'Motif: Rowleyite void space — cages and channels, no atoms (drag to orbit)',
         )
       }
+      if (layer?.kind === 'motif' && layer.motif === 'prep-modes') {
+        if (!beat || beat.id === 'question') {
+          for (const mode of PREP_MODES) lines.push(`• ${mode.title} — ${mode.body}`)
+        } else {
+          const mode = PREP_MODES.find((item) => item.id === beat.id)
+          if (mode) lines.push(`• ${mode.title} — ${mode.body}`)
+        }
+      }
       if (layer?.kind === 'motif' && layer.motif === 'lithium-cycle') {
         const cycle =
           beat?.id === 'brine'

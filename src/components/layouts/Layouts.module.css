@@ -187,6 +187,20 @@
   pointer-events: none;
 }
 
+.scene[data-motif='prep-modes'] .stageScrim {
+  background:
+    linear-gradient(
+      105deg,
+      color-mix(in srgb, var(--color-bg) 78%, transparent) 0%,
+      color-mix(in srgb, var(--color-bg) 36%, transparent) 28%,
+      transparent 58%
+    );
+}
+
+.scene[data-motif='prep-modes'] .stageCopy {
+  max-width: min(18em, 42vw);
+}
+
 .scene[data-callouts] .stageScrim,
 .scene[data-camera='pan-bounce'] .stageScrim {
   background:

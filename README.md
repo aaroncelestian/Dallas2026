@@ -39,7 +39,7 @@ That launches Chrome/Edge as an app window (`--app`), which is the cleanest shar
 | Print button | Speaker script — copy for an AI, or print / save as PDF |
 | `Shift+F` | Native fullscreen (breaks Zoom window-share) |
 | `H` | Lokelma H/K exchange: K in → H pointing → bend/leave → locked |
-| `[` `]` or `,` `.` | Prep-modes focus pull (on that beat) |
+| `[` `]` or `,` `.` | Prep-modes focus pull (question, then each mode) |
 | `K` | CT video play / pause (kidney-stone volume) |
 | `A` | CT video annotate mode — place callouts, set holds, copy JSON |
 | Hover CT chrome | Scrubber, hold ticks, Play/Pause, Annotate |

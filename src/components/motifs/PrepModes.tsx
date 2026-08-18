@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
+import { useScene } from '../../hooks/useSceneBeats'
 import styles from './Motifs.module.css'
 
 export type PrepMode = {
@@ -66,72 +67,101 @@ export function PrepModes({
   label?: string
 }) {
   const reduced = usePrefersReducedMotion()
-  const [focus, setFocus] = useState(0)
-  const current = modes[focus]
+  const scene = useScene()
+  const [local, setLocal] = useState<number | null>(null)
+  const sceneFocus = modes.findIndex((mode) => mode.id === scene.beat?.id)
+  const focus = scene.hasScene ? sceneFocus : (local ?? -1)
+  const current = focus >= 0 ? modes[focus] : undefined
+  const overview = !current
+
+  const go = (index: number | null) => {
+    if (scene.hasScene) {
+      scene.go(index === null ? 0 : index + 1)
+      return
+    }
+    setLocal(index)
+  }
 
   useEffect(() => {
     if (!active) {
-      setFocus(0)
+      setLocal(null)
       return
     }
     if (reduced) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === ']' || e.key === '.') {
-        e.preventDefault()
-        e.stopPropagation()
-        setFocus((f) => (f + 1) % modes.length)
-      } else if (e.key === '[' || e.key === ',') {
-        e.preventDefault()
-        e.stopPropagation()
-        setFocus((f) => (f - 1 + modes.length) % modes.length)
-      }
+      if (e.key !== ']' && e.key !== '.' && e.key !== '[' && e.key !== ',') return
+      e.preventDefault()
+      e.stopPropagation()
+      const pos = current ? focus + 1 : 0
+      const step = e.key === ']' || e.key === '.' ? 1 : -1
+      const next = (pos + step + modes.length + 1) % (modes.length + 1)
+      go(next === 0 ? null : next - 1)
     }
     window.addEventListener('keydown', onKey, true)
     return () => window.removeEventListener('keydown', onKey, true)
-  }, [active, reduced, modes.length])
+  }, [active, current, focus, modes.length, reduced, scene.hasScene])
 
   return (
-    <div className={styles.prep} aria-label={label || 'Spectrum of preparation modes'}>
-      <div className={styles.prepStrip}>
-        {modes.map((m, i) => (
-          <button
-            key={m.id}
-            type="button"
-            className={styles.prepCell}
-            data-focus={i === focus || undefined}
-            onClick={() => setFocus(i)}
-            aria-pressed={i === focus}
-          >
-            <img
-              src={m.src}
-              alt={m.alt}
-              style={m.objectPosition ? { objectPosition: m.objectPosition } : undefined}
-            />
-            <span>{m.title}</span>
-          </button>
-        ))}
-      </div>
-      <div className={styles.prepStage}>
-        <AnimatePresence mode="wait">
-          {current && (
-            <motion.div
-              key={current.id}
-              className={styles.prepFeature}
-              initial={reduced ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={reduced ? undefined : { opacity: 0 }}
-              transition={{ duration: 0.35 }}
+    <div
+      className={styles.prep}
+      data-overview={overview || undefined}
+      aria-label={label || 'Spectrum of preparation modes'}
+    >
+      {overview ? (
+        <div className={styles.prepGrid}>
+          {modes.map((mode, i) => (
+            <button
+              key={mode.id}
+              type="button"
+              className={styles.prepCell}
+              onClick={() => go(i)}
             >
-              <FeatureMedia mode={current} active={active} label={label} />
-              <div className={styles.prepCaption}>
-                <h3>{current.title}</h3>
-                <p>{current.body}</p>
-                <span className={styles.prepHint}>[ ] or , . to pull focus</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+              <img
+                src={mode.src}
+                alt={mode.alt}
+                style={mode.objectPosition ? { objectPosition: mode.objectPosition } : undefined}
+              />
+              <span>{mode.title}</span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className={styles.prepStrip}>
+            {modes.map((mode, i) => (
+              <button
+                key={mode.id}
+                type="button"
+                className={styles.prepCell}
+                data-focus={i === focus || undefined}
+                onClick={() => go(i)}
+                aria-pressed={i === focus}
+              >
+                <img
+                  src={mode.src}
+                  alt={mode.alt}
+                  style={mode.objectPosition ? { objectPosition: mode.objectPosition } : undefined}
+                />
+                <span>{mode.title}</span>
+              </button>
+            ))}
+          </div>
+          <div className={styles.prepStage}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current.id}
+                className={styles.prepFeature}
+                initial={reduced ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={reduced ? undefined : { opacity: 0 }}
+                transition={{ duration: 0.35 }}
+              >
+                <FeatureMedia mode={current} active={active} label={label} />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </>
+      )}
     </div>
   )
 }
