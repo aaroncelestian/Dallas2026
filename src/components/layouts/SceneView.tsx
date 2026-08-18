@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { SceneBeat, SceneLayer, SceneSlide, Slide } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
@@ -96,11 +96,13 @@ function LayerView({
   active,
   showGuests,
   alt,
+  children,
 }: {
   layer: SceneLayer
   active: boolean
   showGuests?: boolean
   alt?: string
+  children?: ReactNode
 }) {
   if (layer.kind === 'motif' && layer.motif === 'crystal-viewer') {
     return (
@@ -129,7 +131,9 @@ function LayerView({
   if (layer.kind === 'motif' && layer.motif === 'prep-modes') {
     return (
       <div className={styles.sceneMotif}>
-        <PrepModes active={active} modes={PREP_MODES} label={alt} />
+        <PrepModes active={active} modes={PREP_MODES} label={alt}>
+          {children}
+        </PrepModes>
       </div>
     )
   }
@@ -197,6 +201,37 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
   const marks = layers.flatMap((layer) => layer.marks ?? [])
   const callouts = beat?.callouts ?? []
   const videoHolds = layers.some((layer) => layer.holds?.length || layer.scaleBar)
+  const isPrepModes = layers[0]?.motif === 'prep-modes'
+  const copy = (
+    <AnimatePresence mode="wait">
+      {(beat?.kicker || beat?.title || beat?.subtitle || beat?.bullets?.length) && (
+        <motion.div
+          key={beat?.id ?? 'copy'}
+          className={hasPlate ? styles.stageCopy : styles.voidInner}
+          data-facts={beat?.bullets?.length ? '' : undefined}
+          initial={reduced ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={reduced ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {beat?.kicker && <div className="kicker">{beat.kicker}</div>}
+          {beat?.title && (
+            <h2 className={hasPlate ? undefined : styles.voidTitle}>
+              <TitleLines text={beat.title} />
+            </h2>
+          )}
+          {beat?.subtitle && <p className={`${styles.body} text-muted`}>{beat.subtitle}</p>}
+          {beat?.bullets?.length ? (
+            <ul className={styles.sceneFacts}>
+              {beat.bullets.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          ) : null}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
 
   return (
     <div
@@ -218,12 +253,14 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
               exit={reduced ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration, ease: [0.16, 1, 0.3, 1] }}
             >
-              <LayerView layer={layer} active={active} showGuests={beat?.guests} alt={say} />
+              <LayerView layer={layer} active={active} showGuests={beat?.guests} alt={say}>
+                {isPrepModes ? copy : null}
+              </LayerView>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
-      {hasPlate && <div className={styles.stageScrim} aria-hidden />}
+      {hasPlate && !isPrepModes && <div className={styles.stageScrim} aria-hidden />}
       {!hasPlate && say && <p className="sr-only">{say}</p>}
       <SpecimenCallouts
         marks={marks}
@@ -232,34 +269,7 @@ export function SceneView({ slide, active }: { slide: Slide; active: boolean }) 
         delay={beat?.calloutDelay ?? 0}
         fade={beat?.calloutFade}
       />
-      <AnimatePresence mode="wait">
-        {(beat?.kicker || beat?.title || beat?.subtitle || beat?.bullets?.length) && (
-          <motion.div
-            key={beat?.id ?? 'copy'}
-            className={hasPlate ? styles.stageCopy : styles.voidInner}
-            data-facts={beat?.bullets?.length ? '' : undefined}
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reduced ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {beat?.kicker && <div className="kicker">{beat.kicker}</div>}
-            {beat?.title && (
-              <h2 className={hasPlate ? undefined : styles.voidTitle}>
-                <TitleLines text={beat.title} />
-              </h2>
-            )}
-            {beat?.subtitle && <p className={`${styles.body} text-muted`}>{beat.subtitle}</p>}
-            {beat?.bullets?.length ? (
-              <ul className={styles.sceneFacts}>
-                {beat.bullets.map((line) => (
-                  <li key={line}>{line}</li>
-                ))}
-              </ul>
-            ) : null}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {!isPrepModes && copy}
     </div>
   )
 }

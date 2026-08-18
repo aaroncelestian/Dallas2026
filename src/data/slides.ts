@@ -182,6 +182,16 @@ export interface Slide {
   enterHit?: boolean
   /** Type cuts on and off. No fade. */
   copySnap?: boolean
+  /** Seconds after on-screen copy appears before `promo` replaces it. */
+  promoAfter?: number
+  promo?: {
+    src: string
+    alt: string
+    kicker?: string
+    title?: string
+    subtitle?: string
+    credit?: string
+  }
   splitFlip?: boolean
   notes?: string
   layers?: SceneLayer[]
@@ -890,9 +900,9 @@ export const slides: Slide[] = [
             x: 0.36,
             y: 0.218,
             side: 'right',
-            title: 'Fe in the last pulse.',
-            formula: 'Na(Li,Al,Fe²⁺)₃Al₆(BO₃)₃Si₆O₁₈(OH)₄',
-            body: 'Mn-pink body → Fe-blue cap. Same crystal, one fluid change.',
+            title: 'Fe–Ti in the last pulse.',
+            formula: 'Na(Li,Al,Fe²⁺,Ti⁴⁺)₃Al₆(BO₃)₃Si₆O₁₈(OH)₄',
+            body: 'Mn-pink body → Fe–Ti-blue cap. Same crystal, one fluid change.',
           },
           {
             id: 'body',
@@ -1178,7 +1188,7 @@ export const slides: Slide[] = [
         layers: ['bluecap'],
         callouts: ['termination', 'cap', 'body'],
         notes:
-          'The manganese-to-iron shift is right there in the formulae. That indigo rind is why this piece is famous — and it\'s a chemical change written into the crystal. Then the pocket.',
+          'The manganese-to-iron–titanium shift is right there in the formulae. That indigo rind is why this piece is famous — and it\'s a chemical change written into the crystal. Then the pocket.',
       },
       {
         id: 'same',
@@ -1480,6 +1490,15 @@ export const slides: Slide[] = [
     camera: 'push',
     title: 'A museum is a reflection\nof who cared enough\nto keep it.',
     enterDelay: 2,
+    promoAfter: 8,
+    promo: {
+      src: asset('images/unearthed-title.png'),
+      alt: 'Unearthed · Raw Beauty',
+      kicker: 'Forthcoming',
+      title: 'The Convergence of Art and Science\nin the Fine Mineral Exhibition',
+      subtitle: 'Rocks & Minerals  ·  2027',
+      credit: 'Celestian and Mills',
+    },
     image: {
       src: asset('images/aquamarine.jpg'),
       alt: 'Aquamarine crystals in albite with schorl, Unearthed',
@@ -1487,6 +1506,6 @@ export const slides: Slide[] = [
     },
     yaw: 1,
     notes:
-      'A museum is a reflection of who cared enough to keep it. Unearthed closes April 2027. Nearly everything is on loan. That\'s not a weakness — it\'s the argument. What NHMLAC is betting on isn\'t these objects. It\'s you. A private collection can show you something extraordinary once. A public museum is making a longer bet: that showing you something extraordinary, even temporarily, changes what you notice in what\'s already, permanently, yours.',
+      'A museum is a reflection of who cared enough to keep it. Unearthed closes April 2027. Nearly everything is on loan. That\'s not a weakness — it\'s the argument. What NHMLAC is betting on isn\'t these objects. It\'s you. A private collection can show you something extraordinary once. A public museum is making a longer bet: that showing you something extraordinary, even temporarily, changes what you notice in what\'s already, permanently, yours. Then the lockup — the Rocks & Minerals piece with Mills, 2027.',
   },
 ]

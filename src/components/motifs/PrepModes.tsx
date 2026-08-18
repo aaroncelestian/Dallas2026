@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { useScene } from '../../hooks/useSceneBeats'
@@ -61,10 +61,12 @@ export function PrepModes({
   active,
   modes,
   label,
+  children,
 }: {
   active: boolean
   modes: PrepMode[]
   label?: string
+  children?: ReactNode
 }) {
   const reduced = usePrefersReducedMotion()
   const scene = useScene()
@@ -107,61 +109,47 @@ export function PrepModes({
       data-overview={overview || undefined}
       aria-label={label || 'Spectrum of preparation modes'}
     >
-      {overview ? (
-        <div className={styles.prepGrid}>
+      <div className={styles.prepColumn}>
+        <div className={styles.prepThumbs}>
           {modes.map((mode, i) => (
             <button
               key={mode.id}
               type="button"
               className={styles.prepCell}
-              onClick={() => go(i)}
+              data-focus={i === focus || undefined}
+              onClick={() => go(i === focus ? null : i)}
+              aria-pressed={i === focus}
+              aria-label={mode.title}
             >
-              <img
-                src={mode.src}
-                alt={mode.alt}
-                style={mode.objectPosition ? { objectPosition: mode.objectPosition } : undefined}
-              />
-              <span>{mode.title}</span>
+              <span className={styles.prepThumb}>
+                <img
+                  src={mode.src}
+                  alt=""
+                  style={mode.objectPosition ? { objectPosition: mode.objectPosition } : undefined}
+                />
+              </span>
+              <span className={styles.prepLabel}>{mode.title}</span>
             </button>
           ))}
         </div>
-      ) : (
-        <>
-          <div className={styles.prepStrip}>
-            {modes.map((mode, i) => (
-              <button
-                key={mode.id}
-                type="button"
-                className={styles.prepCell}
-                data-focus={i === focus || undefined}
-                onClick={() => go(i)}
-                aria-pressed={i === focus}
-              >
-                <img
-                  src={mode.src}
-                  alt={mode.alt}
-                  style={mode.objectPosition ? { objectPosition: mode.objectPosition } : undefined}
-                />
-                <span>{mode.title}</span>
-              </button>
-            ))}
-          </div>
-          <div className={styles.prepStage}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={current.id}
-                className={styles.prepFeature}
-                initial={reduced ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={reduced ? undefined : { opacity: 0 }}
-                transition={{ duration: 0.35 }}
-              >
-                <FeatureMedia mode={current} active={active} label={label} />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </>
-      )}
+        <div className={styles.prepCopy}>{children}</div>
+      </div>
+      <div className={styles.prepStage}>
+        <AnimatePresence mode="wait">
+          {current ? (
+            <motion.div
+              key={current.id}
+              className={styles.prepFeature}
+              initial={reduced ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reduced ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.35 }}
+            >
+              <FeatureMedia mode={current} active={active} label={label} />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

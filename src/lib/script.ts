@@ -81,6 +81,12 @@ export function onScreenLines(slide: Slide, beat?: SceneBeat): string[] {
   if (slide.displayTitle) lines.push(slide.displayTitle.replace(/\n/g, ' '))
   if (title) lines.push(title.replace(/\n/g, ' '))
   if (subtitle) lines.push(subtitle)
+  if (slide.promo) {
+    if (slide.promo.kicker) lines.push(slide.promo.kicker)
+    if (slide.promo.title) lines.push(slide.promo.title.replace(/\n/g, ' '))
+    if (slide.promo.subtitle) lines.push(slide.promo.subtitle)
+    if (slide.promo.credit) lines.push(slide.promo.credit)
+  }
   if (slide.body) lines.push(slide.body)
   if (slide.quote) lines.push(`“${slide.quote}”`)
   if (slide.meta) lines.push(slide.meta)

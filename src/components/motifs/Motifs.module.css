@@ -94,65 +94,56 @@
 }
 
 .prep {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: minmax(240px, 34vw) minmax(0, 1fr);
   align-items: stretch;
-  gap: 20px;
+  gap: clamp(24px, 3vw, 48px);
   width: 100%;
   height: 100%;
   min-height: 0;
+  padding: var(--pad-y) var(--pad-x);
 }
 
-.prep[data-overview] {
-  align-items: center;
-  justify-content: flex-end;
-  padding: 10vh 5vw 26vh 0;
-}
-
-.prepGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  width: min(48vw, 720px);
-}
-
-.prep[data-overview] .prepCell {
-  width: auto;
-  aspect-ratio: 4 / 3;
-}
-
-.prep[data-overview] .prepCell img {
-  opacity: 1;
-}
-
-.prep[data-overview] .prepCell span {
-  left: 12px;
-  right: 10px;
-  bottom: 10px;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-}
-
-.prepStrip {
+.prepColumn {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 6px;
-  flex: none;
-  width: min(128px, 14vw);
+  gap: 1.15rem;
+  min-width: 0;
+  z-index: 2;
+}
+
+.prepThumbs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 72px));
+  gap: 8px;
+  width: max-content;
+  max-width: 100%;
+}
+
+.prepCopy {
+  min-height: 8.4em;
 }
 
 .prepCell {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   border: none;
-  background: #000;
+  background: transparent;
   padding: 0;
   cursor: pointer;
-  overflow: hidden;
-  flex: none;
-  width: 100%;
-  aspect-ratio: 16 / 10;
+  min-width: 0;
   text-align: left;
+}
+
+.prepThumb {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #000;
 }
 
 .prepCell img {
@@ -160,31 +151,48 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+  opacity: 0.5;
+  filter: blur(4px) saturate(0.7);
+  transform: scale(1.14);
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease,
+    transform 200ms ease;
+}
+
+.prepCell:hover img {
   opacity: 0.72;
-  transition: opacity 180ms ease;
+  filter: blur(2px) saturate(0.85);
 }
 
-.prepCell[data-focus] img {
+.prepCell[data-focus] .prepThumb {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.prepCell[data-focus] img,
+.prepCell[data-focus]:hover img {
   opacity: 1;
+  filter: none;
+  transform: scale(1);
 }
 
-.prepCell span {
-  position: absolute;
-  left: 6px;
-  right: 4px;
-  bottom: 5px;
+.prepLabel {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   font-size: 8px;
   font-weight: 600;
   letter-spacing: 0.08em;
-  line-height: 1.15;
+  line-height: 1.2;
   text-transform: uppercase;
-  color: #fff;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+  color: color-mix(in srgb, var(--color-text) 38%, transparent);
+  transition: color 200ms ease;
 }
 
-.prepCell[data-focus] {
-  outline: 1px solid var(--color-accent);
-  outline-offset: 2px;
+.prepCell[data-focus] .prepLabel {
+  color: var(--color-accent);
 }
 
 .prepStage {
@@ -416,7 +424,15 @@
     grid-column: 2;
   }
   .prep {
-    width: 100%;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+    padding: var(--pad-y) var(--pad-x) calc(var(--pad-y) + 28px);
+  }
+  .prepColumn {
+    justify-content: flex-start;
+  }
+  .prepCopy {
+    min-height: 0;
   }
   .criteriaCols {
     grid-template-columns: 1fr;

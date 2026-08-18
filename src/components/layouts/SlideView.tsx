@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import type { Slide, MotifKind } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
 import { DepthField } from './DepthField'
@@ -65,6 +66,100 @@ function TitleLines({ text }: { text: string }) {
         </span>
       ))}
     </>
+  )
+}
+
+function BleedSlide({
+  slide,
+  active,
+  copyActive,
+  alt,
+  yaw,
+  ownImage,
+}: {
+  slide: Slide
+  active: boolean
+  copyActive: boolean
+  alt: string
+  yaw: 1 | -1
+  ownImage: boolean
+}) {
+  const reduced = usePrefersReducedMotion()
+  const [promoOn, setPromoOn] = useState(false)
+  const promo = slide.promo
+
+  useEffect(() => {
+    if (!active || !promo) {
+      setPromoOn(false)
+      return
+    }
+    if (!copyActive) return
+    const id = window.setTimeout(() => setPromoOn(true), (slide.promoAfter ?? 8) * 1000)
+    return () => window.clearTimeout(id)
+  }, [active, copyActive, promo, slide.promoAfter])
+
+  const showPromo = Boolean(promo && promoOn)
+  const duration = reduced ? 0 : 0.7
+
+  return (
+    <div className={styles.bleedWrap}>
+      {ownImage && slide.image && (
+        <DepthField
+          src={slide.image.src}
+          alt={alt}
+          active={active}
+          fit={slide.image.fit ?? 'cover'}
+          yaw={yaw}
+          camera={slide.camera}
+        />
+      )}
+      <div className={styles.bleedScrim} aria-hidden />
+      <AnimatePresence mode="wait">
+        {showPromo && promo ? (
+          <motion.div
+            key="promo"
+            className={styles.bleedPromo}
+            initial={reduced ? false : { opacity: 0 }}
+            animate={{ opacity: copyActive ? 1 : 0 }}
+            exit={reduced ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <img src={promo.src} alt={promo.alt} className={styles.bleedPromoLogo} />
+            <div className={styles.bleedPromoCopy}>
+              {promo.kicker && <div className="kicker">{promo.kicker}</div>}
+              {promo.title && (
+                <h2>
+                  <TitleLines text={promo.title} />
+                </h2>
+              )}
+              {promo.subtitle && <p className={styles.bleedPromoMeta}>{promo.subtitle}</p>}
+              {promo.credit && <p className={styles.bleedPromoCredit}>{promo.credit}</p>}
+            </div>
+          </motion.div>
+        ) : copyActive ? (
+          <motion.div
+            key="copy"
+            initial={reduced ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={reduced ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {slide.kicker && (
+              <div className={`${styles.bleedKicker} kicker`}>
+                <TitleLines text={slide.kicker} />
+              </div>
+            )}
+            {slide.title && (
+              <div className={styles.bleedCopy}>
+                <h2>
+                  <TitleLines text={slide.title} />
+                </h2>
+              </div>
+            )}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </div>
   )
 }
 
@@ -245,31 +340,14 @@ export function SlideView({
 
   if (slide.layout === 'bleed') {
     return (
-      <div className={styles.bleedWrap}>
-        {ownImage && slide.image && (
-          <DepthField
-            src={slide.image.src}
-            alt={alt}
-            active={active}
-            fit={slide.image.fit ?? 'cover'}
-            yaw={yaw}
-            camera={slide.camera}
-          />
-        )}
-        <div className={styles.bleedScrim} aria-hidden />
-        {slide.kicker && (
-          <Rise active={copyActive} className={`${styles.bleedKicker} kicker`}>
-            <TitleLines text={slide.kicker} />
-          </Rise>
-        )}
-        {slide.title && (
-          <Rise active={copyActive} delay={copyActive ? 0.2 : 0} className={styles.bleedCopy}>
-            <h2>
-              <TitleLines text={slide.title} />
-            </h2>
-          </Rise>
-        )}
-      </div>
+      <BleedSlide
+        slide={slide}
+        active={active}
+        copyActive={copyActive}
+        alt={alt}
+        yaw={yaw}
+        ownImage={ownImage}
+      />
     )
   }
 
@@ -304,19 +382,18 @@ export function SlideView({
             {slide.subtitle && <p className={`${styles.body} text-muted`}>{slide.subtitle}</p>}
           </Rise>
         ) : slide.motif === 'prep-modes' ? (
-          <div className={styles.stagePad}>
-            <Rise active={active} className={styles.stageCopy}>
-              <Kicker text={slide.kicker} />
-              {slide.title && (
-                <h2>
-                  <TitleLines text={slide.title} />
-                </h2>
-              )}
-            </Rise>
-            <Rise active={active} delay={0.14} className={styles.stageMotifWide}>
-              <Motif kind="prep-modes" active={active} label={say} />
-            </Rise>
-          </div>
+          <Rise active={active} className={styles.stageMotifWide}>
+            <PrepModes active={active} modes={PREP_MODES} label={say}>
+              <div className={styles.stageCopy}>
+                <Kicker text={slide.kicker} />
+                {slide.title && (
+                  <h2>
+                    <TitleLines text={slide.title} />
+                  </h2>
+                )}
+              </div>
+            </PrepModes>
+          </Rise>
         ) : (
           <Rise active={active} delay={0.15} className={styles.stageCopy}>
             <Kicker text={slide.kicker} />

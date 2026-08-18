@@ -150,6 +150,52 @@
   text-shadow: 0 12px 40px color-mix(in srgb, #000 55%, transparent);
 }
 
+.bleedPromo {
+  position: absolute;
+  left: var(--pad-x);
+  right: var(--pad-x);
+  bottom: calc(var(--pad-y) + 28px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: clamp(28px, 4vw, 64px);
+}
+
+.bleedPromoLogo {
+  display: block;
+  height: clamp(72px, 12vh, 128px);
+  width: auto;
+  max-width: min(46vw, 620px);
+  object-fit: contain;
+  mix-blend-mode: screen;
+}
+
+.bleedPromoCopy {
+  min-width: 0;
+  max-width: 22em;
+}
+
+.bleedPromoCopy h2 {
+  font-size: clamp(1.45rem, 2.8vw, 2.35rem);
+  font-weight: 700;
+  line-height: 1.12;
+  margin: 0 0 var(--space-3);
+  text-shadow: 0 12px 40px color-mix(in srgb, #000 55%, transparent);
+}
+
+.bleedPromoMeta,
+.bleedPromoCredit {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--color-text) 72%, transparent);
+}
+
+.bleedPromoCredit {
+  margin-top: var(--space-2);
+  color: var(--color-accent);
+}
+
 .stage {
   position: relative;
   flex: 1;
@@ -187,18 +233,16 @@
   pointer-events: none;
 }
 
-.scene[data-motif='prep-modes'] .stageScrim {
-  background:
-    linear-gradient(
-      105deg,
-      color-mix(in srgb, var(--color-bg) 78%, transparent) 0%,
-      color-mix(in srgb, var(--color-bg) 36%, transparent) 28%,
-      transparent 58%
-    );
+.scene[data-motif='prep-modes'] .stageCopy {
+  max-width: none;
+  padding: 0;
+  margin: 0;
 }
 
-.scene[data-motif='prep-modes'] .stageCopy {
-  max-width: min(18em, 42vw);
+.scene[data-motif='prep-modes'] .stageCopy h2 {
+  font-size: clamp(1.7rem, 3.2vw, 2.65rem);
+  line-height: 1.14;
+  letter-spacing: -0.028em;
 }
 
 .scene[data-callouts] .stageScrim,
@@ -263,8 +307,19 @@
   max-width: none;
 }
 
+.stage[data-motif='prep-modes'] .stageScrim {
+  display: none;
+}
+
+.stage[data-motif='prep-modes'] .stageCopy {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
 .stage[data-motif='prep-modes'] .stageCopy h2 {
   font-size: clamp(1.6rem, 3.2vw, 2.5rem);
+  line-height: 1.14;
 }
 
 .stageMotifWide {
@@ -543,6 +598,15 @@
   }
   .bleedCopy {
     max-width: calc(100% - 2 * var(--pad-x));
+  }
+  .bleedPromo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+  .bleedPromoLogo {
+    max-width: min(88vw, 520px);
+    height: auto;
   }
   .splitMedia {
     min-height: 42vh;
