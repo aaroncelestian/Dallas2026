@@ -61,7 +61,7 @@ Output is in `dist/` with relative `base: './'` — open `dist/index.html` local
 
 ## How to play it
 
-The screen holds the specimen and a sentence. Everything else is in `notes` on each beat in `src/data/slides.ts`. Hold the cold open. Hold Blue Wave. Hold the closing aquamarine.
+The screen holds the specimen and a sentence. Everything else is in `notes` on each beat in `src/data/slides.ts`. Hold the cold open. Hold Tongbei. Hold the closing aquamarine.
 
 Argument source: `docs/Dallas_Symposium_Talk_Outline.md`.
 
@@ -86,7 +86,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 | `mars-analog.jpg` | Salt and Mars |
 | `emerald.jpg` | Unearthed |
 | `bluecap.jpg` | Blue Cap · criteria |
-| `blue-wave.jpg` | Blue Wave · water and crystallization |
+| `tongbei.jpg` | Tongbei · closed locality |
 | `stibnite.jpg` | Preservation |
 | `fluorite.jpg` | Provenance |
 | `tourmaline.jpg` | Peninsular Ranges · Himalaya |
@@ -109,7 +109,7 @@ Studio and gallery frames from `original_images/` are compressed into `public/im
 - Act II Unearthed + loans: ~16 min
 - Return + close: ~6 min
 
-Breathe on the cold open, porous mineral/Lokelma structure, Blue Wave, prep spectrum, and the closing aquamarine.
+Breathe on the cold open, porous mineral/Lokelma structure, Tongbei, prep spectrum, and the closing aquamarine.
 
 Regenerate the Lokelma atoms or the rowleyite void mesh after CIF changes:
 

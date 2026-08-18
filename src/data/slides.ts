@@ -1239,22 +1239,22 @@ export const slides: Slide[] = [
         calloutDelay: 2,
         calloutFade: 2,
         notes:
-          'This is enough. Indicolite, rubellite, one pocket, Carnegie. A visitor can take that and still look. Now the wave.',
+          'This is enough. Indicolite, rubellite, one pocket, Carnegie. A visitor can take that and still look. Now Tongbei.',
       },
     ],
   },
   {
-    id: 'blue-wave',
-    label: 'Blue Wave',
+    id: 'tongbei',
+    label: 'Tongbei',
     chapter: 'exhibition',
     layout: 'stage',
     clearPlate: true,
     layers: [
       {
-        id: 'wave',
+        id: 'garnet',
         kind: 'image',
-        src: asset('images/blue-wave.jpg'),
-        alt: 'Blue Wave aragonite, Wenshan Mine, Yunnan — the real copper-blue',
+        src: asset('images/tongbei.jpg'),
+        alt: 'Spessartine on smoky quartz, Tongbei, Yunxiao, Fujian',
         fit: 'contain',
         camera: 'hold',
       },
@@ -1262,26 +1262,26 @@ export const slides: Slide[] = [
     scene: [
       {
         id: 'hold',
-        label: 'The wave',
-        layers: ['wave'],
+        label: 'The specimen',
+        layers: ['garnet'],
         notes:
-          'This is the real color. A wave that never moved — water, frozen by crystallization, still carrying the chemistry of the fluid that made it.',
+          'Don\'t name it yet. Same instruction as the cap. This room already knows it — spessartine on smoky quartz, the classic pairing. Let them have a second with it.',
       },
       {
-        id: 'water',
-        label: 'Water',
-        title: 'Water is the sculptor.',
-        layers: ['wave'],
+        id: 'place',
+        label: 'The place',
+        title: 'Tongbei.\nYunxiao, Fujian.',
+        layers: ['garnet'],
         notes:
-          'Aragonite precipitating from solution. Every ridge is a growth front, not a carving. The same power that built every specimen tonight, made visible as one gesture: water writing mineral, over and over, until a wave stood up and stayed.',
+          'First pieces of this material, late 1990s, came out labeled Guangdong. By 2001 the source was Tongbei, Yunxiao County, Fujian. Say the place, not “garnet, China.” The name is what makes it a locality — and the locality is closed.',
       },
       {
-        id: 'color',
-        label: 'The color',
-        title: 'The color came\nwith the water.',
-        layers: ['wave'],
+        id: 'closed',
+        label: 'Closed',
+        title: 'Shut down.\nProtected.',
+        layers: ['garnet'],
         notes:
-          'There\'s trace copper in the aragonite lattice — the fluid\'s chemistry, not a dye. Same transition-metal mechanism as malachite and azurite. Visitors will assume it\'s dyed. Don\'t lead with that. They\'ve already seen the form as water. Now the blue is what that water was carrying.',
+          'Not mined out. Closed by the government. A protected scenic area now. Finite because of a decision, not because the ground was empty. That\'s the stibnite argument with the sign flipped — preservation against economic pressure, done by the state. Then a pocket that almost became ore.',
       },
     ],
   },
@@ -1300,7 +1300,7 @@ export const slides: Slide[] = [
     },
     yaw: 1,
     notes:
-      'This Wuning stibnite pocket was preserved instead of ground for antimony. Crystallized gold is worth orders of magnitude above melt value — because it wasn\'t melted. Every exceptional specimen destroyed is an irretrievable loss. That\'s the infrastructure argument in reverse: preservation against economic pressure.',
+      'Same argument, other direction. This Wuning stibnite pocket was preserved instead of ground for antimony. Crystallized gold is worth orders of magnitude above melt value — because it wasn\'t melted. Every exceptional specimen destroyed is an irretrievable loss. That\'s the infrastructure argument in reverse: preservation against economic pressure.',
   },
   {
     id: 'prep-spectrum',
@@ -1444,7 +1444,7 @@ export const slides: Slide[] = [
     },
     yaw: -1,
     notes:
-      'What the museum “keeps” isn’t necessarily these objects — it’s the practice of bringing exceptional borrowed material to change how visitors see the permanent collection. A temporary exhibition is a lens, not a holding. Blue Wave leaves in 2027. The way of looking doesn’t.',
+      'What the museum “keeps” isn’t necessarily these objects — it’s the practice of bringing exceptional borrowed material to change how visitors see the permanent collection. A temporary exhibition is a lens, not a holding. Tongbei leaves in 2027. The way of looking — a named locality, a finite window, a decision to keep — doesn’t.',
   },
   {
     id: 'both',
