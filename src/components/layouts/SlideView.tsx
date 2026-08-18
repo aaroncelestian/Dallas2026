@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import type { Slide, MotifKind } from '../../data/slides'
 import { usePrefersReducedMotion } from '../../hooks/useActiveSlide'
@@ -99,7 +99,10 @@ function BleedSlide({
   }, [active, copyActive, promo, slide.promoAfter])
 
   const showPromo = Boolean(promo && promoOn)
+  const copyVisible = copyActive && !showPromo
+  const promoVisible = Boolean(promo && showPromo && copyActive)
   const duration = reduced ? 0 : 0.7
+  const fade = { duration, ease: [0.16, 1, 0.3, 1] as const }
 
   return (
     <div className={styles.bleedWrap}>
@@ -114,51 +117,46 @@ function BleedSlide({
         />
       )}
       <div className={styles.bleedScrim} aria-hidden />
-      <AnimatePresence mode="wait">
-        {showPromo && promo ? (
-          <motion.div
-            key="promo"
-            className={styles.bleedPromo}
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: copyActive ? 1 : 0 }}
-            exit={reduced ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <img src={promo.src} alt={promo.alt} className={styles.bleedPromoLogo} />
-            {promo.kicker && <div className={`kicker ${styles.bleedPromoKicker}`}>{promo.kicker}</div>}
-            <div className={styles.bleedPromoCopy}>
-              {promo.title && (
-                <h2>
-                  <TitleLines text={promo.title} />
-                </h2>
-              )}
-              {promo.subtitle && <p className={styles.bleedPromoMeta}>{promo.subtitle}</p>}
-              {promo.credit && <p className={styles.bleedPromoCredit}>{promo.credit}</p>}
-            </div>
-          </motion.div>
-        ) : copyActive ? (
-          <motion.div
-            key="copy"
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reduced ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {slide.kicker && (
-              <div className={`${styles.bleedKicker} kicker`}>
-                <TitleLines text={slide.kicker} />
-              </div>
+      <motion.div
+        initial={false}
+        animate={{ opacity: copyVisible ? 1 : 0 }}
+        transition={fade}
+        aria-hidden={!copyVisible}
+      >
+        {slide.kicker && (
+          <div className={`${styles.bleedKicker} kicker`}>
+            <TitleLines text={slide.kicker} />
+          </div>
+        )}
+        {slide.title && (
+          <div className={styles.bleedCopy}>
+            <h2>
+              <TitleLines text={slide.title} />
+            </h2>
+          </div>
+        )}
+      </motion.div>
+      {promo ? (
+        <motion.div
+          className={styles.bleedPromo}
+          initial={false}
+          animate={{ opacity: promoVisible ? 1 : 0 }}
+          transition={fade}
+          aria-hidden={!promoVisible}
+        >
+          <img src={promo.src} alt={promoVisible ? promo.alt : ''} className={styles.bleedPromoLogo} />
+          {promo.kicker && <div className={`kicker ${styles.bleedPromoKicker}`}>{promo.kicker}</div>}
+          <div className={styles.bleedPromoCopy}>
+            {promo.title && (
+              <h2>
+                <TitleLines text={promo.title} />
+              </h2>
             )}
-            {slide.title && (
-              <div className={styles.bleedCopy}>
-                <h2>
-                  <TitleLines text={slide.title} />
-                </h2>
-              </div>
-            )}
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+            {promo.subtitle && <p className={styles.bleedPromoMeta}>{promo.subtitle}</p>}
+            {promo.credit && <p className={styles.bleedPromoCredit}>{promo.credit}</p>}
+          </div>
+        </motion.div>
+      ) : null}
     </div>
   )
 }

@@ -139,19 +139,23 @@ export function Shell() {
   const [blackoutCut, setBlackoutCut] = useState(false)
   const leavingRef = useRef(false)
 
+  let copyActive = copyOn
   if (slide.id !== gateId) {
     setGateId(slide.id)
     if (slide.enterHit) {
       setCopyOn(true)
       setBlackoutCut(true)
       setBlackout(false)
+      copyActive = true
     } else if (holdsCopy(slide)) {
       setCopyOn(false)
       setBlackout(Boolean(slide.enterBlack))
       setBlackoutCut(false)
+      copyActive = false
     } else {
       setCopyOn(true)
       setBlackoutCut(false)
+      copyActive = true
     }
   }
 
@@ -459,7 +463,7 @@ export function Shell() {
                 slide={slide}
                 active
                 plated={plate.mode !== 'hidden'}
-                copyActive={copyOn}
+                copyActive={copyActive}
               />
             </div>
           </motion.section>
