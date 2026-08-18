@@ -2,7 +2,6 @@ import { slides, type ChapterId, type SceneBeat, type Slide } from '../data/slid
 import { PREP_MODES } from '../data/prepModes'
 
 export const SCRIPT_TITLE = 'Exhibitions and the Mission of a Natural History Museum'
-export const SCRIPT_META = 'Aaron Celestian  ·  Mineral Sciences  ·  Dallas  ·  40 minutes'
 
 const CHAPTER_HEAD: Record<ChapterId, string> = {
   open: 'Open',
@@ -202,9 +201,7 @@ export function scriptMarkdown(): string {
   const parts = [
     `# ${SCRIPT_TITLE}`,
     '',
-    SCRIPT_META,
-    '',
-    'Speaker script. Each beat lists what is on the projection, then what to say. The argument lives in the spoken notes, not on the wall. Space walks scene beats; hover the counter to jump.',
+    'Speaker script. Each beat lists what is on the projection, then a short description of what is said.',
     '',
   ]
 
@@ -222,7 +219,7 @@ export function scriptMarkdown(): string {
     for (const line of beat.onScreen) parts.push(`- ${line}`)
     parts.push('')
     if (beat.notes) {
-      parts.push('**Say**', '', beat.notes, '')
+      parts.push(beat.notes, '')
     }
   }
 

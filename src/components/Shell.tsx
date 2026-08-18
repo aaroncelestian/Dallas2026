@@ -629,7 +629,6 @@ export function Shell() {
 
       {!presenting && notesOpen && (
         <aside className={styles.notes} aria-label="Speaker notes">
-          <p className={styles.notesKicker}>Say</p>
           <h2 className={styles.notesTitle}>
             {scene.beat ? `${slide.label} · ${scene.beat.label}` : slide.label}
           </h2>

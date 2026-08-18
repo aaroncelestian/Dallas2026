@@ -367,16 +367,6 @@
   pointer-events: auto;
 }
 
-.notesKicker {
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-  margin: 0 0 8px;
-}
-
 .notesTitle {
   font-family: var(--font-heading);
   font-size: 1.15rem;

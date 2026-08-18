@@ -1,6 +1,5 @@
 import { printUrl } from './asset'
 import {
-  SCRIPT_META,
   SCRIPT_TITLE,
   beatPreview,
   chapterTitle,
@@ -87,8 +86,7 @@ const PRINT_CSS = `
     line-height: 1.08;
     margin: 0 0 16px;
   }
-  .meta, .lede { color: #564f48; margin: 0 0 10px; }
-  .lede { max-width: 42em; }
+  .lede { color: #564f48; margin: 0 0 10px; max-width: 42em; }
   .chapter {
     font-size: 12px;
     font-weight: 700;
@@ -180,7 +178,7 @@ export function printDocumentHtml() {
     for (const line of beat.onScreen) parts.push(`<li>${esc(line)}</li>`)
     parts.push('</ul></div>')
     if (beat.notes) {
-      parts.push(`<div><h4>Say</h4><p>${esc(beat.notes)}</p></div>`)
+      parts.push(`<div><p>${esc(beat.notes)}</p></div>`)
     }
     parts.push('</div></section>')
   }
@@ -202,7 +200,7 @@ export function printDocumentHtml() {
   <header class="toolbar">
     <button type="button" id="back-btn">Back</button>
     <div class="actions">
-      <button type="button" id="copy-btn">Copy for AI</button>
+      <button type="button" id="copy-btn">Copy</button>
       <button type="button" id="print-btn">Print / PDF</button>
     </div>
   </header>
@@ -210,8 +208,7 @@ export function printDocumentHtml() {
     <header class="masthead">
       <p class="brand">NHMLAC</p>
       <h1>${esc(SCRIPT_TITLE)}</h1>
-      <p class="meta">${esc(SCRIPT_META)}</p>
-      <p class="lede">Speaker script. Each beat lists what is on the projection, then what to say. Paste this into an AI, or print / save as PDF.</p>
+      <p class="lede">Speaker script. Each beat lists what is on the projection, then a short description of what is said.</p>
     </header>
     ${parts.join('\n')}
   </article>
@@ -227,7 +224,7 @@ export function printDocumentHtml() {
       try {
         await navigator.clipboard.writeText(SCRIPT);
         btn.textContent = 'Copied';
-        setTimeout(() => { btn.textContent = 'Copy for AI'; }, 2000);
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
       } catch {}
     });
     document.getElementById('print-btn').addEventListener('click', () => window.print());
