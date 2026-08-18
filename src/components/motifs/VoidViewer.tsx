@@ -216,14 +216,24 @@ function Scene({
   const outerMat = useRef<THREE.MeshPhysicalMaterial>(null)
   const controls = useRef<OrbitControlsImpl>(null)
   const dragging = useRef(false)
+  const hasUserView = useRef(false)
   const mix = useRef(0)
   const goalPos = useMemo(() => new THREE.Vector3(), [])
   const goalTarget = useMemo(() => new THREE.Vector3(), [])
+  const userPos = useRef(HOME_POS.clone())
+  const userTarget = useRef(new THREE.Vector3())
   const offset = useMemo(() => new THREE.Vector3(), [])
   const worldCenter = useMemo(() => new THREE.Vector3(), [])
   const reduced = usePrefersReducedMotion()
   const { camera } = useThree()
   const molecules = useMemo(moleculeFocus, [])
+
+  useEffect(() => {
+    if (active) return
+    hasUserView.current = false
+    userPos.current.copy(HOME_POS)
+    userTarget.current.set(0, 0, 0)
+  }, [active])
 
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry()
@@ -258,6 +268,9 @@ function Scene({
       offset.setLength(THREE.MathUtils.damp(offset.length(), dist, reduced ? 18 : 7.5, dt))
       goalTarget.copy(worldCenter)
       goalPos.copy(worldCenter).add(offset)
+    } else if (hasUserView.current) {
+      goalTarget.copy(userTarget.current)
+      goalPos.copy(userPos.current)
     } else {
       goalTarget.set(0, 0, 0)
       goalPos.copy(HOME_POS)
@@ -339,6 +352,10 @@ function Scene({
         }}
         onEnd={() => {
           dragging.current = false
+          if (focus) return
+          hasUserView.current = true
+          userPos.current.copy(camera.position)
+          if (controls.current) userTarget.current.copy(controls.current.target)
         }}
       />
     </>
