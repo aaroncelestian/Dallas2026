@@ -589,6 +589,19 @@ export const slides: Slide[] = [
     ],
   },
   {
+    id: 'so-far',
+    label: 'The pattern, so far',
+    chapter: 'research',
+    layout: 'void',
+    camera: 'drift',
+    title: 'Three, so far.\nNot one collected\nfor what it became.',
+    exitHold: 2,
+    enterBlack: true,
+    copySnap: true,
+    notes:
+      'Spinel, rowleyite, Lokelma — none of them were collected for what they became. That\'s three now. Watch for the fourth.',
+  },
+  {
     id: 'stones',
     label: 'Kidney stones',
     chapter: 'research',
@@ -1270,7 +1283,7 @@ export const slides: Slide[] = [
       {
         id: 'place',
         label: 'The place',
-        title: 'Tongbei.\nYunxiao, Fujian.',
+        title: 'Tongbei, Fujian Province, China',
         layers: ['garnet'],
         notes:
           'First pieces of this material, late 1990s, came out labeled Guangdong. By 2001 the source was Tongbei, Yunxiao County, Fujian. Say the place, not “garnet, China.” The name is what makes it a locality — and the locality is closed.',
