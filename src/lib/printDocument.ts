@@ -178,7 +178,8 @@ export function printDocumentHtml() {
     for (const line of beat.onScreen) parts.push(`<li>${esc(line)}</li>`)
     parts.push('</ul></div>')
     if (beat.notes) {
-      parts.push(`<div><p>${esc(beat.notes)}</p></div>`)
+      const noteHtml = esc(beat.notes).replace(/\n/g, '<br>')
+      parts.push(`<div><p>${noteHtml}</p></div>`)
     }
     parts.push('</div></section>')
   }
