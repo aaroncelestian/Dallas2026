@@ -42,7 +42,7 @@ const WORLD_UP = new THREE.Vector3(0, 1, 0)
 
 const STATIONS: { id: StationId; html: ReactNode; angle: number; from: number }[] = [
   { id: 'brine', html: 'brine', angle: 180, from: 0 },
-  { id: 'spinel', html: <>HMn<sub>2</sub>O<sub>4</sub></>, angle: 270, from: 1 },
+  { id: 'spinel', html: <>LiMn<sub>2</sub>O<sub>4</sub></>, angle: 270, from: 1 },
   { id: 'air', html: <>CO<sub>2</sub></>, angle: 0, from: 2 },
   { id: 'product', html: <>Li<sub>2</sub>CO<sub>3</sub></>, angle: 90, from: 3 },
 ]

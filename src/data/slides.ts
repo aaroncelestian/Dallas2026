@@ -399,7 +399,7 @@ export const slides: Slide[] = [
         title: 'The spinel takes\nthe lithium.',
         layers: ['cycle'],
         notes:
-          'HMn₂O₄ — the protonated manganese spinel. Size-selective uptake. Lithium fits. The bigger cations in seawater do not. Watch it move in. We used the property, not the specimen. That helix is the Materials Genome Project — that\'s how we made this spinel, and made it better than anything else out there.',
+          'LiMn₂O₄ — the lithium manganese spinel. Size-selective uptake. Lithium fits. The bigger cations in seawater do not. Watch it move in. We used the property, not the specimen. That helix is the Materials Genome Project — that\'s how we made this spinel, and made it better than anything else out there.',
       },
       {
         id: 'air',
