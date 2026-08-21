@@ -18,11 +18,6 @@ function holdsCopy(slide?: Slide) {
 
 const RESOURCES = [
   {
-    href: 'https://aaroncelestian.github.io/PRISM/',
-    title: 'PRISM',
-    detail: 'Mineral specimen rater',
-  },
-  {
     href: 'https://aaroncelestian.github.io/SpecimenPro-Webpage/',
     title: 'SpecimenPro',
     detail: 'Document and organize a collection',
@@ -584,7 +579,7 @@ export function Shell() {
             aria-haspopup="menu"
             aria-expanded={resourcesOpen}
             aria-label="Open resources"
-            title="PRISM, SpecimenPro, site, and related work"
+            title="SpecimenPro, site, and related work"
             onClick={() => {
               setPickerOpen(false)
               setResourcesOpen((open) => !open)
