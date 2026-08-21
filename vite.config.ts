@@ -20,6 +20,8 @@ function buildStamp() {
   return `${num} · ${sha}`
 }
 
+const offline = process.env.OFFLINE === '1'
+
 // Relative base so the built folder works from USB / local disk / any host path.
 export default defineConfig({
   base: './',
@@ -27,6 +29,18 @@ export default defineConfig({
     __BUILD_ID__: JSON.stringify(buildStamp()),
   },
   plugins: [react()],
+  build: {
+    // Offline USB build: one JS file, no modulepreload (file:// has no MIME types).
+    ...(offline
+      ? {
+          cssCodeSplit: false,
+          modulePreload: false,
+          rollupOptions: {
+            output: { inlineDynamicImports: true },
+          },
+        }
+      : {}),
+  },
   server: {
     host: '127.0.0.1',
     port: 5173,

@@ -53,11 +53,19 @@ Chrome (counter, Resources) stays invisible until you hover. Cursor hides after 
 
 ## Build for projector / USB
 
+Do **not** send a `.lnk`, `.command`, `.bat`, or `.app`. Conference machines block those.
+
+```bash
+npm run offline
+```
+
+That writes `offline/Celestian_Dallas2026/` and a zip next to it. Upload the zip (or the folder). AV double-clicks `Celestian_Dallas2026.html` — no Node, no internet, no shortcut.
+
 ```bash
 npm run build
 ```
 
-Output is in `dist/` with relative `base: './'` — open `dist/index.html` locally or copy the folder to a USB stick.
+`dist/` is the GitHub Pages build. Opening `dist/index.html` from disk often fails in Chrome (ES modules on `file://`). Use `npm run offline` for a USB copy.
 
 ## How to play it
 

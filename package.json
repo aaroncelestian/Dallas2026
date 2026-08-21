@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "offline": "tsc -b && node scripts/packageOffline.mjs",
     "preview": "vite preview",
     "stage": "node scripts/stage.mjs",
     "parse-cif": "node scripts/parseCif.mjs && node scripts/parseRowleyiteVoid.mjs && node scripts/parseRowleyiteFramework.mjs && node scripts/placeRowleyiteGuests.mjs"

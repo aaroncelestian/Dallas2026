@@ -45,9 +45,16 @@ function useEdgeExtend(src: string, enabled: boolean) {
         const ctx = canvas.getContext('2d')
         if (!ctx) return ''
         ctx.drawImage(img, sx, 0, sw, h, 0, 0, sw, h)
-        return canvas.toDataURL('image/jpeg', 0.75)
+        try {
+          return canvas.toDataURL('image/jpeg', 0.75)
+        } catch {
+          // file:// taints the canvas; skip edge extend.
+          return ''
+        }
       }
-      setEdges({ left: ctxFor(0), right: ctxFor(w - sw) })
+      const left = ctxFor(0)
+      const right = ctxFor(w - sw)
+      if (left && right) setEdges({ left, right })
     }
 
     if (img.complete) paint()
