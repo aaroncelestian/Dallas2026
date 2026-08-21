@@ -384,6 +384,7 @@
   line-height: 1.5;
   color: color-mix(in srgb, var(--color-text) 86%, transparent);
   margin: 0;
+  white-space: pre-wrap;
 }
 
 :global(html[data-present]) .notes {

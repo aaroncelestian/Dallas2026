@@ -487,7 +487,7 @@ export const slides: Slide[] = [
         layers: ['voids'],
         guests: true,
         notes:
-          'Four chemotherapeutics sitting in openings on the near face of the cell. The cages are large enough. I\'m not overclaiming a calculated pose — this is the picture of the idea: the hole is the useful part.',
+          'Four chemotherapeutics sitting in openings on the near face of the cell. The cages are large enough. I\'m not overclaiming a calculated pose — this is the picture of the idea: the hole is the useful part.\n\nThey do not treat one cancer. Four different mechanisms, many kinds of disease:\n\n• Doxorubicin — anthracycline; intercalates DNA. Breast, lymphomas, leukemias, sarcomas, and more.\n• Vincristine — vinca alkaloid; stops mitosis. Leukemias, lymphomas, childhood solid tumors.\n• Cisplatin — platinum crosslinker. Testicular, ovarian, bladder, lung, head and neck.\n• Temozolomide — alkylator that crosses into the brain. Glioblastoma and other gliomas.',
       },
       {
         id: 'lead',
